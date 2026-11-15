@@ -391,25 +391,34 @@ def build_all(outdir, series_path):
             if line_chart(p, [(b, AMBER, "BTC"), (q, ACC, "DXY (ECB-reconstructed)")],
                           "BTC vs DXY - both indexed to 100 at start",
                           days=dys, dlines=[(100, DIM, "start = 100")], nice=True):
-                mb, md = sum(b) / n, sum(q) / n
-                cov = sum((x - mb) * (y - md) for x, y in zip(b, q))
-                sb = math.sqrt(sum((x - mb) ** 2 for x in b))
-                sd = math.sqrt(sum((y - md) ** 2 for y in q))
+                # Correlate DAILY RETURNS, not price levels. Two series can both trend hard and
+                # "correlate" strongly as levels while having no day-to-day link at all - that is
+                # spurious correlation. Returns are what answer "does the dollar move BTC?".
+                rb = [b[i] / b[i - 1] - 1 for i in range(1, n)]
+                rq = [q[i] / q[i - 1] - 1 for i in range(1, n)]
+                m = len(rb)
+                mb, md = sum(rb) / m, sum(rq) / m
+                cov = sum((x - mb) * (y - md) for x, y in zip(rb, rq))
+                sb = math.sqrt(sum((x - mb) ** 2 for x in rb))
+                sd = math.sqrt(sum((y - md) ** 2 for y in rq))
                 r = cov / (sb * sd) if sb and sd else 0.0
                 add("c_dxy.png", "Dollar strength - macro headwind or tailwind",
                     [f"DXY {dxy[-1]:.2f}", f"DXY {q[-1] - 100:+.1f}%", f"BTC {b[-1] - 100:+.1f}%",
-                     f"corr {r:+.2f}"],
+                     f"daily corr {r:+.2f}"],
                     "DXY is the US dollar against six currencies; EUR alone is 57.6% of it. Both "
                     "lines are indexed to 100 at the left edge, so this compares PERCENTAGE moves, "
                     "not price levels. The usual regime relationship is inverse - dollar up, BTC "
-                    "down - so the lines trending opposite is normal, and both moving together is "
-                    "the anomaly worth noting. A headwind/tailwind gauge, not a timing trigger. "
-                    "Rebuilt from ECB reference rates, so it can sit ~0.1-0.2% off the ICE print.",
-                    (f"Inverse, as expected (corr {r:+.2f}): dollar strength has been pressuring "
-                     f"BTC across this window." if r < -0.3 else
-                     f"Both moving together (corr {r:+.2f}): the usual dollar-BTC inverse has "
-                     f"broken - BTC is trading on its own flows." if r > 0.3 else
-                     f"No clear link (corr {r:+.2f}): the dollar is not driving BTC here."),
+                    "down. The correlation shown is on DAILY RETURNS, not price levels: two "
+                    "trending series can look tightly linked while having no day-to-day link at "
+                    "all. A headwind/tailwind gauge, not a timing trigger. Rebuilt from ECB "
+                    "reference rates, so it can sit ~0.1-0.2% off the ICE print.",
+                    (f"Inverse and tight (daily corr {r:+.2f}): dollar moves are pressuring BTC "
+                     f"day to day." if r <= -0.3 else
+                     f"Moving together (daily corr {r:+.2f}): the usual inverse has broken - BTC "
+                     f"is trading on its own flows." if r >= 0.3 else
+                     f"Weak day-to-day link (corr {r:+.2f}) even though BTC is {b[-1] - 100:+.0f}% "
+                     f"and DXY {q[-1] - 100:+.0f}% over the window - so the inverse is a slow "
+                     f"regime drift, not a signal you can trade off."),
                     "wide")
     except Exception:
         pass
