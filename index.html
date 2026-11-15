@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BTC Daily Digest</title>
+<meta name="description" content="Daily Bitcoin flow, cost-basis and momentum digest with backtested rules.">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;
+--accent:#58a6ff;--green:#3fb950;--red:#f85149;--amber:#d29922;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+body{background:var(--bg);color:var(--txt);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+-webkit-font-smoothing:antialiased;padding:0 0 80px}
+.wrap{max-width:920px;margin:0 auto;padding:0 20px}
+header{padding:44px 0 26px;border-bottom:1px solid var(--line);margin-bottom:30px}
+h1{font-size:29px;font-weight:650;letter-spacing:-.02em}
+.sub{color:var(--dim);font-size:14px;margin-top:8px}
+nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
+nav a{color:var(--accent);text-decoration:none;font-size:13px;border:1px solid var(--line);
+padding:5px 12px;border-radius:999px;background:var(--card)}
+nav a:hover{border-color:var(--accent)}
+h2{font-size:20px;font-weight:650;margin:46px 0 6px;padding-top:14px;letter-spacing:-.01em}
+h2 .n{color:var(--dim);font-weight:400;font-size:15px;margin-right:8px}
+h3{font-size:15px;font-weight:650;margin:0 0 10px;color:var(--accent)}
+p{color:#c9d1d9;margin:9px 0}
+p.note{color:var(--dim);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.card pre{font-family:var(--mono);font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
+.verdict{color:var(--green);font-weight:600}
+.alert{color:var(--amber);font-weight:650}
+.watch{color:var(--accent)}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;white-space:nowrap}
+th{background:#1c2128;font-weight:650;font-size:13px;color:#c9d1d9}
+td.num{font-family:var(--mono);text-align:right}
+.neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
+img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:14px 0;display:block}
+.callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:12px 16px;margin:14px 0}
+.callout p{margin:4px 0;color:#e6d7a8}
+footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:13px}
+code{font-family:var(--mono);background:#1c2128;padding:2px 6px;border-radius:4px;font-size:13px}
+@media(max-width:600px){h1{font-size:23px}.wrap{padding:0 15px}th,td{padding:6px 8px;font-size:13px}}
+</style></head><body><div class="wrap">
+<header>
+  <h1>BTC Daily Digest</h1>
+  <div class="sub">Spot <strong>$65,424</strong> &middot; updated 2026-11-15 12:37 UTC &middot; US bid ABSENT - premium negative, 30d mean at lows</div>
+  <nav>
+    <a href="#digest">Today's digest</a>
+    <a href="#chart">Chart</a>
+    <a href="#reference">Indicator reference</a>
+    <a href="#evidence">Backtest evidence</a>
+    <a href="#divergence">Divergence guide</a>
+  </nav>
+</header>
+
+<h2 id="digest"><span class="n">01</span>Today's digest</h2>
+<p class="note">All blocks are settled <strong>daily closes</strong> unless a line says "live".
+Flow/cost-basis blocks are as-of the last completed day.</p>
+<div class="card"><pre>BTC daily read  |  2026-11-15 12:37 UTC
+spot $65,424 (Coinbase)   $65,460 (Binance)   USDT/USD 0.99932
+blocks use settled DAILY closes unless a line says &#x27;live&#x27;
+</pre></div>
+<div class="card"><h3>[1] Coinbase Premium Index - US vs global bid</h3><pre>    live -0.055%   last close -0.049% (prev -0.113%)
+    30d avg -0.142%   negative streak 71d   1y low -0.271%
+<span class="verdict">    -&gt; US still discounting to global for 71 straight days: US bid is the missing buyer.</span></pre></div>
+<div class="card"><h3>[2] US spot BTC ETF net flow (T+1) - institutional demand</h3><pre>    latest 2026-11-15 +$0.0M   prev +$0.0M
+    5d -$769.5M   10d -$1,477.5M   30d -$2,327.7M
+<span class="verdict">    -&gt; ETF money still leaving: -$2,327.7M over 30d.</span></pre></div>
+<div class="card"><h3>[3] Coinbase Premium net of Tether - 30d mean (regime)</h3><pre>    -0.014%  (prev -0.015%)   1y percentile 3%   streak 29d
+<span class="verdict">    -&gt; Discount is a multi-week regime, not a one-day blip.</span></pre></div>
+<div class="card"><h3>[4] Cost basis / URPD (2026-11-14) - where supply sits</h3><pre>    top: 84K-86K 5.0% | 80K-82K 3.9% | 62K-64K 3.7% | 76K-78K 3.3% | 64K-66K 2.8% | 78K-80K 2.6%
+    62-64K band: 780,138 BTC (3.71% of supply)
+    STH supply in loss 3,294,828 / profit 564,329 BTC (85% underwater)
+<span class="verdict">    -&gt; Short-term holders are largely underwater: capitulation zone; watch whether the 62-64K shelf holds.</span></pre></div>
+<div class="card"><h3>[5] Valuation floors - how far is the downside (spot $65,424)</h3><pre>    Balanced Price $38,709 (2026-11-14)  -&gt; spot 1.69x
+    AVWAP since 2015-07-20 $29,928 (thru 2026-11-14)  -&gt; spot 2.19x
+<span class="verdict">    -&gt; Price is 1.7x the Balanced floor and 2.2x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,709.</span></pre></div>
+<div class="card"><h3>[6] Stablecoin supply - is money coming back into crypto? (2026-11-15)</h3><pre>    USDT $175.4B   1d +$0.12B   7d -$1.41B   30d -$8.09B
+    USDC $69.3B   1d +$0.08B   7d -$1.36B   30d -$3.54B
+    USDT+USDC combined $244.7B   7d -$2.77B   30d -$11.63B
+<span class="verdict">    -&gt; Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.</span></pre></div>
+<div class="card"><h3>[7] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-14</h3><pre>    RSI(6) 9.2 | RSI(14) 20.0 | RSI(24) 28.0   (RSI14 1y percentile 2%)
+    same maths incl today&#x27;s forming candle (live $65,424): RSI(6) 19.6 | RSI(14) 24.9  &lt;- drifts until the close
+    divergence (20d low/high vs RSI14 - 9y test: only the oversold variant has edge):
+    none - last 20d lows: 2026-11-05 75,969/RSI 38.6 -&gt; 2026-11-10 73,698/RSI 34.2
+<span class="watch">    watch (bullish): a NEW 20d CLOSE below 64,119 (last one today) - but only AFTER a bounce. The chart&#x27;s wick low is 63,270, but this trigger is CLOSE-basis - a wick down and back up does not count. A straight-down close lowers RSI14 too (would print ~19.6 vs 20.0 = no divergence), so it takes a RALLY THAT FAILS, not just a drop.</span>
+<span class="verdict">    -&gt; oversold &lt;30: capitulation zone, historically where bounces start; fast &lt; slow = momentum deteriorating, bounces are being sold into.</span></pre></div>
+<div class="card"><h3>[8] Short-fade watch - fade the bounce at resistance (the only positive-EV side)</h3><pre>    MA200 72,973 | MA50 80,138 | MA10 72,882   -&gt; spot 65,424 is -10.3% vs MA200
+<span class="alert">    NOT ARMED - RSI14 20.0, needs to cross 40 (+20 pts). MA200 72,973 is +11.5% from spot</span>
+    oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first</pre></div>
+<div class="card"><h3>[+] Global flow proxy (Binance, not venue-split)</h3><pre>    taker CVD 5d -2,711 BTC | 30d +7,398 BTC
+    Coinbase spot vol 16,355 BTC (5d avg 12,441)
+
+VERDICT: US bid ABSENT - premium negative, 30d mean at lows
+
+LEGEND  [1] Premium: US vs global bid (+ = US leads, - = US is the missing bid; 20d+ streak = regime)
+        [2] ETF flow: institutional demand (read the 5d/30d sums, never one day)
+        [3] 30d mean net of Tether: is the US discount a regime or just noise?
+        [4] URPD: supply by cost basis (bars above spot = resistance, at/below = support)
+        [5] Floors: 1.0x Balanced = where past cycle bottoms landed; AVWAP = market break-even
+        [6] Stables: money in/out of crypto (7d AND 30d up = capital returning)
+        [7] RSI (daily): momentum 0-100 (&gt;70 overbought, &lt;30 oversold; fast&gt;slow = uptrend intact)
+        [7b] Divergence: 20d low + HIGHER RSI14 (lows &gt;=5d apart). 9y test: plain BULLISH has NO
+             edge (55% vs 53% baseline); BULLISH with RSI14&lt;35 at the 2nd low = 67% win vs 53%.
+             BEARISH showed no edge. Act ONLY on the oversold variant; ~5% dip first is normal.
+        [8] Short-fade: RSI14 crosses above 40 while below MA200 = fade the bounce at resistance.
+             9y: 64% touch -3% before +5%, but EV ~+0.12% - near break-even. Small size, exit fast.</pre></div>
+
+<h2 id="chart"><span class="n">02</span>Chart</h2>
+<p class="note">BTC price, Balanced Price (deep-cycle floor) and the all-time anchored VWAP, log scale.</p>
+<img class="chart" src="chart.png" alt="BTC daily: price, Balanced Price, all-time anchored VWAP (log scale)">
+
+<h2 id="reference"><span class="n">03</span>Indicator reference</h2>
+<p class="note">What each block is for, and how to read it.</p>
+
+<div class="card"><h3>[1] Coinbase Premium Index &mdash; US vs global bid</h3>
+<p>Live and closing spread between Coinbase (US) and Binance (global) BTC price. <strong>Positive = US buyers paying up</strong>; negative = the US is the missing bid. A negative run of 20+ days is a <em>regime</em>, not noise.</p></div>
+
+<div class="card"><h3>[2] US spot BTC ETF net flow (T+1) &mdash; institutional demand</h3>
+<p>Aggregate creations minus redemptions across US spot BTC ETFs. Always read the 5d/30d sums, never a single day.</p></div>
+
+<div class="card"><h3>[3] Coinbase Premium net of Tether &mdash; regime</h3>
+<p>The 30-day mean premium with the USDT/USD rate stripped out, so a stablecoin peg wobble can't fake a signal. Answers: is the US discount structural or transient?</p></div>
+
+<div class="card"><h3>[4] Cost basis / URPD &mdash; where supply sits</h3>
+<p>Supply by acquisition-price bucket ($2,000 wide). Bars <em>above</em> spot are overhead resistance; at or below spot is support. Includes the short-term-holder split: how much STH supply is underwater.</p></div>
+
+<div class="card"><h3>[5] Valuation floors &mdash; how far is the downside</h3>
+<p><strong>Balanced Price</strong> (realized price &minus; transferred price) is where past cycle bottoms have converged (~1.0x). <strong>AVWAP</strong> since 2015 is the market's all-time break-even. Floors, not timing triggers.</p></div>
+
+<div class="card"><h3>[6] Stablecoin supply &mdash; is money coming back?</h3>
+<p>Combined USDT + USDC supply. Expansion = capital arriving into crypto; contraction = capital leaving (not "waiting"). Needs <em>both</em> 7d and 30d up to call a return.</p></div>
+
+<div class="card"><h3>[7] RSI &mdash; momentum</h3>
+<p>Wilder RSI on <strong>daily closes only</strong>, printed two ways so they never have to be reconciled: <strong>settled</strong> (completed days, stable, what to reason with) and <strong>incl. today's forming candle</strong> (what a live chart shows, drifts all day).</p>
+<p class="note">RSI(6) &gt; RSI(14) &gt; RSI(24) = short-term momentum leading. RSI(6) &lt; RSI(24) = deteriorating, bounces being sold into. Never quote an RSI without its timeframe &mdash; the same market reads 62 on 1H and 9 on 1D.</p></div>
+
+<div class="card"><h3>[7b] Divergence &mdash; the only RSI signal with an edge</h3>
+<p><strong>Bullish</strong> = a distinct 20-day price low whose RSI14 is <em>higher</em> than at the previous 20-day low. Measured on <strong>closes</strong>, from the trigger day, no look-ahead. Plain divergence has <strong>no edge</strong> (55% vs 53% baseline); only the variant where RSI14 &lt; 35 at the second low tested positive (67%).</p>
+<p class="note">A straight-down close can never produce this &mdash; a lower close is a loss day, so RSI falls with price. The RSI must be <em>rebuilt by a bounce that then fails</em>.</p></div>
+
+<div class="card"><h3>[8] Short-fade watch &mdash; when to fade the bounce</h3>
+<p>Short trigger: <strong>RSI14 crosses above 40 while price is below MA200</strong> &mdash; a bounce that recovered momentum but is still under the trend line. Take profit fast: EV is only ~+0.12%, near break-even.</p></div>
+
+<div class="card"><h3>[+] Global flow proxy</h3>
+<p>Binance taker CVD, <code>2&times;(taker buy vol) &minus; total vol</code>. Net aggressive order flow, not venue-split. Positive = buyers lifting offers.</p></div>
+
+<h2 id="evidence"><span class="n">04</span>Backtest evidence</h2>
+<p class="note">BTCUSDT daily. Forward returns measured from the day you could act. Barrier tables are intrabar, adverse-first when both hit the same bar. EV = probability-weighted outcome of the target/stop pair.</p>
+
+<h3>RSI crossovers alone &mdash; coin flips (1000d sample)</h3>
+<p>Fires often and loses more often than it wins. Useful for <em>describing</em> momentum, not for triggering entries.</p>
+<table><thead><tr><th>Rule / target</th><th>n</th><th>Forward / EV</th><th>Hit rate</th></tr></thead><tbody>
+<tr><td>Baseline (any day)</td><td class="num">980</td><td class="num pos">+1.03%</td><td class="num">49%</td></tr>
+<tr><td>RSI(6) crosses above RSI(14)</td><td class="num">102</td><td class="num pos">+1.2%</td><td class="num">46%</td></tr>
+<tr><td>RSI(14) crosses back above 50</td><td class="num">48</td><td class="num pos">+0.6%</td><td class="num">46%</td></tr>
+<tr><td>RSI(6) crosses above RSI(24)</td><td class="num">85</td><td class="num pos">+2.0%</td><td class="num">47%</td></tr>
+</tbody></table>
+
+<h3>Divergence &mdash; 9 years, 3378 days</h3>
+<p>A textbook bullish divergence by itself did <strong>not</strong> beat simply holding. Only the oversold-constrained variant has an edge, and n=12 is small.</p>
+<table><thead><tr><th>Rule / target</th><th>n</th><th>Forward / EV</th><th>Hit rate</th></tr></thead><tbody>
+<tr><td>Baseline (any day)</td><td class="num">3358</td><td class="num pos">+3.11%</td><td class="num">53%</td></tr>
+<tr><td>Plain bullish divergence</td><td class="num">31</td><td class="num pos">+1.08%</td><td class="num">55%</td></tr>
+<tr><td>Bullish + RSI14&lt;35 at 2nd low</td><td class="num">12</td><td class="num pos">+7.92%</td><td class="num">67%</td></tr>
+<tr><td>Bearish divergence</td><td class="num">41</td><td class="num pos">+5.75%</td><td class="num">54%</td></tr>
+</tbody></table>
+<div class="callout"><p><strong>Correction:</strong> an earlier figure of "62% win" was wrong. It came from a shorter 2024&ndash;2026 sample and a definition that also flagged higher-low/higher-RSI cases, which are not divergences. The numbers above supersede it.</p></div>
+
+<h3>Short-fade &mdash; fade the bounce at resistance</h3>
+<p>Better odds than the long side, but the edge is thin. Detected by block [8].</p>
+<table><thead><tr><th>Rule / target</th><th>n</th><th>Forward / EV</th><th>Hit rate</th></tr></thead><tbody>
+<tr><td>TP -3% before SL +5%</td><td class="num">118</td><td class="num pos">+0.12% EV</td><td class="num">64%</td></tr>
+<tr><td>TP -5% before SL +5%</td><td class="num">118</td><td class="num neg">-0.20% EV</td><td class="num">48%</td></tr>
+<tr><td>TP -7% before SL +5%</td><td class="num">118</td><td class="num neg">-0.44% EV</td><td class="num">38%</td></tr>
+<tr><td>TP -7% before SL +7%</td><td class="num">118</td><td class="num neg">-1.12% EV</td><td class="num">42%</td></tr>
+<tr><td>TP -10% before SL +7%</td><td class="num">118</td><td class="num neg">-1.36% EV</td><td class="num">28%</td></tr>
+</tbody></table>
+
+<h3>Long the bounce &mdash; do not take this leg</h3>
+<p>Riding a bounce to +7% before a &minus;5% stop happens only <strong>34%</strong> of the time, and every variant is negative-EV. "Buy the bounce then short" loses money on the first leg.</p>
+<table><thead><tr><th>Rule / target</th><th>n</th><th>Forward / EV</th><th>Hit rate</th></tr></thead><tbody>
+<tr><td>+3% before -5%</td><td class="num">41</td><td class="num neg">-1.08% EV</td><td class="num">49%</td></tr>
+<tr><td>+5% before -5%</td><td class="num">41</td><td class="num neg">-0.40% EV</td><td class="num">46%</td></tr>
+<tr><td>+7% (->70K) before -5%</td><td class="num">41</td><td class="num neg">-0.92% EV</td><td class="num">34%</td></tr>
+<tr><td>+7% before -7%</td><td class="num">41</td><td class="num neg">-0.60% EV</td><td class="num">37%</td></tr>
+<tr><td>+10% before -7%</td><td class="num">41</td><td class="num neg">-1.15% EV</td><td class="num">15%</td></tr>
+</tbody></table>
+
+<h2 id="divergence"><span class="n">05</span>Divergence guide</h2>
+<p>Price and the RSI stop agreeing. Price keeps going the same way, but the RSI refuses to follow &mdash; the move is running out of force underneath.</p>
+
+<h3>The four types</h3>
+<table><thead><tr><th>type</th><th>price</th><th>RSI</th><th>means</th></tr></thead><tbody>
+<tr><td>Regular <strong>bullish</strong></td><td>lower low</td><td>HIGHER low</td><td>downtrend losing force &rarr; bounce up</td></tr>
+<tr><td>Regular <strong>bearish</strong></td><td>higher high</td><td>LOWER high</td><td>uptrend losing force &rarr; drop</td></tr>
+<tr><td>Hidden bullish</td><td>higher low</td><td>lower low</td><td>uptrend healthy &rarr; CONTINUATION up</td></tr>
+<tr><td>Hidden bearish</td><td>lower high</td><td>higher high</td><td>downtrend healthy &rarr; CONTINUATION down</td></tr>
+</tbody></table>
+<p class="note">"Regular" = the reversal kind. "Hidden" = continuation. Getting these backwards is how people buy tops.</p>
+
+<h3>Regular bullish &mdash; step by step</h3>
+<p>1. Two clear price lows, the second <strong>lower</strong>. &nbsp; 2. Add RSI(14). &nbsp; 3. RSI at the second (lower) low is <strong>higher</strong> than at the first. &nbsp; 4. Price line slopes <em>down</em>, RSI line slopes <em>up</em>.</p>
+<p class="note">Plain reading: sellers keep pushing to new lows but with less force each time. Fewer sellers, same effort, less result.</p>
+
+<h3>What to look out for</h3>
+<table><thead><tr><th>Good signs</th><th>Invalidators</th></tr></thead><tbody>
+<tr><td>Lows 10+ candles apart, both at obvious swing lows</td><td>Two adjacent candles &mdash; that is noise</td></tr>
+<tr><td>RSI oversold (&lt;30, ideal &lt;25) at both lows</td><td>RSI only fractionally higher (18 &rarr; 19)</td></tr>
+<tr><td>Second low has a long lower wick / quick snap-back</td><td>Price blows through on rising volume, RSI keeps falling</td></tr>
+<tr><td>Volume lighter on the second low (selling drying up)</td><td>Small-timeframe divergence inside a strong trend</td></tr>
+<tr><td>Happens at a known level (URPD shelf, MA200)</td><td>You have to squint to see it</td></tr>
+</tbody></table>
+
+<div class="callout">
+<p><strong>Expectation:</strong> divergence marks a <em>zone</em>, not a moment. Price often makes one final spike before turning &mdash; that spike is the last seller capitulating and it is where stops get hunted. Every variant tested dipped ~5&ndash;6% before it paid.</p>
+<p><strong>Never measure from the pivot date.</strong> Look-ahead flatters this to 86% win / +7.95% &mdash; that is how backtests lie.</p>
+</div>
+
+<footer>
+<p>Generated automatically from keyless public APIs (Coinbase, Binance, DeFiLlama, cryptoetf.today, Look Into Bitcoin, BGeometrics). No credentials, no subscription feeds.</p>
+<p>Not financial advice. Backtest figures are historical and samples are small where noted.</p>
+<p>Last build: 2026-11-15 12:37 UTC</p>
+</footer>
+</div></body></html>
