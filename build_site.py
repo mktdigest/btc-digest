@@ -228,6 +228,15 @@ Flow/cost-basis blocks are as-of the last completed day.</p>
 <div class="card"><h3>[8] Short-fade watch &mdash; when to fade the bounce</h3>
 <p>Short trigger: <strong>RSI14 crosses above 40 while price is below MA200</strong> &mdash; a bounce that recovered momentum but is still under the trend line. Take profit fast: EV is only ~+0.12%, near break-even.</p></div>
 
+<div class="card"><h3>[9] Positioning &mdash; Binance futures long/short crowding</h3>
+<p>The three Binance futures ratios, all <strong>contrarian</strong>:</p>
+<table><thead><tr><th>indicator</th><th>what it counts</th></tr></thead><tbody>
+<tr><td>all-accounts L/S</td><td>every account, longs &divide; shorts</td></tr>
+<tr><td>top-trader accounts</td><td>large accounts, longs &divide; shorts</td></tr>
+<tr><td>top-trader positions</td><td>large accounts, by <em>size</em> not headcount</td></tr>
+</tbody></table>
+<p><strong>High ratio = crowd is long = squeeze fuel DOWN.</strong> Low ratio = crowd short = squeeze fuel UP. When retail is crowded long but top-trader <em>positions</em> are falling, smart money is exiting into retail strength &mdash; a bearish tell. Open interest falling means deleveraging (liquidation), not new shorts; OI rising means fresh positions. A mid-range percentile is no signal at all.</p></div>
+
 <div class="card"><h3>[+] Global flow proxy</h3>
 <p>Binance taker CVD, <code>2&times;(taker buy vol) &minus; total vol</code>. Net aggressive order flow, not venue-split. Positive = buyers lifting offers.</p></div>
 
