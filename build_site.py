@@ -33,7 +33,16 @@ body{background:var(--bg);color:var(--txt);font:18px/1.65 -apple-system,BlinkMac
 .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 header{padding:36px 0 0}
 h1{font-size:38px;font-weight:680;letter-spacing:-.02em}
-.sub{color:var(--dim);font-size:17.5px;margin-top:8px}
+/* Spot is the number that matters - give it the top of the page at display size. The big figure
+   IS the Coinbase print, so Coinbase is not repeated below; the strip shows the other venues and
+   the Coinbase/Binance spread, which is new information rather than an echo. */
+.spotlbl{font-size:15px;font-weight:700;letter-spacing:.13em;color:var(--dim);text-transform:uppercase}
+.spotlbl .upd{font-weight:400;letter-spacing:0;text-transform:none;margin-left:14px;font-size:14.5px}
+.spotpx{font-size:clamp(46px,11vw,78px);font-weight:750;letter-spacing:-.035em;line-height:1.04;
+margin:8px 0 2px;color:#fff;font-variant-numeric:tabular-nums}
+.spotrow{display:flex;flex-wrap:wrap;gap:8px 28px;font-size:17px;color:var(--txt);margin-top:10px;
+font-variant-numeric:tabular-nums}
+.spotrow b{color:var(--dim);font-weight:600;margin-right:9px}
 h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
 h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-height:1.35}
 h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
@@ -235,6 +244,8 @@ def render_digest(raw):
     for l in [x for x in head if x.strip()]:
         if l.startswith("VERDICT:"):
             continue                       # rendered as its own tile in the header
+        if l.startswith("BTC daily read") or l.startswith("spot "):
+            continue                       # promoted into the big spot block at the top
         out.append(f'<div class="hrow">{esc(l)}</div>')
     for s in sections:
         st = section_stance(s["body"])
@@ -480,8 +491,26 @@ def build(raw=None):
     heads = block_heads(raw)   # [(printed number, title)] - inline refs use these, never literals
 
     spot = _grab(r"spot \$([\d,]+)", raw, 1, "n/a")
+    bnpx = _grab(r"\(Coinbase\)\s*\$([\d,]+)", raw, 1, "")
+    usdt = _grab(r"USDT/USD\s+([\d.]+)", raw, 1, "")
     verdict = _grab(r"^VERDICT: (.+)$", raw, 1, "")
     updated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
+    # Secondary venues for the header strip. The big figure IS the Coinbase print, so repeating it
+    # would be the same duplication we just deleted - the spread is the genuinely new number
+    # (how far the US print sits from the global one).
+    bits = []
+    if bnpx:
+        bits.append(f'<span><b>Binance</b>${bnpx}</span>')
+    try:
+        cbv, bnv = float(spot.replace(",", "")), float(bnpx.replace(",", ""))
+        d = cbv - bnv
+        bits.append(f'<span><b>Coinbase &minus; Binance</b>{d:+,.0f} ({d / cbv * 100:+.2f}%)</span>')
+    except Exception:
+        pass
+    if usdt:
+        bits.append(f'<span><b>USDT/USD</b>{usdt}</span>')
+    spot_extra = "".join(bits)
 
     # the deep price/floor/VWAP chart from the digest run
     src = os.path.join(CHART_DIR, f"btc_daily_{datetime.now(timezone.utc):%Y-%m-%d}.png")
@@ -546,7 +575,9 @@ def build(raw=None):
 <style>{CSS}</style></head><body><div class="wrap">
 <header>
   <h1>BTC Daily Digest</h1>
-  <div class="sub">Spot <strong>${spot}</strong> &middot; updated {updated}</div>
+  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated {updated}</span></div>
+  <div class="spotpx">${spot}</div>
+  <div class="spotrow">{spot_extra}</div>
   <div class="verdict-card">VERDICT: {esc(verdict)}</div>
   {kpis}
   <nav class="tabs">
