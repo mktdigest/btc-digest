@@ -409,11 +409,16 @@ def num_of(heads, prefix, default="?"):
 
 
 def ref_section(raw):
-    """Guide cards in the digest's own block order, numbered FROM the digest text."""
+    """Guide cards, ordered AND numbered from the digest text - never from this file's order.
+
+    Sorting by the digest's own number means a card can never end up reading [2] before [1]
+    just because of where someone appended it in REF_CARDS.
+    """
     heads = block_heads(raw)
-    return "\n\n".join(
-        f'<div class="card"><h3>[{num_of(heads, p)}] {t}</h3>\n{b}</div>'
-        for t, p, b in REF_CARDS)
+    numbered = sorted(((num_of(heads, p), t, b) for t, p, b in REF_CARDS),
+                      key=lambda r: int(re.sub(r"\D", "", r[0]) or 0))
+    return "\n\n".join(f'<div class="card"><h3>[{n}] {t}</h3>\n{b}</div>'
+                       for n, t, b in numbered)
 
 
 def build(raw=None):
