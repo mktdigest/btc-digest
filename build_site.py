@@ -304,14 +304,14 @@ def kpi_tiles(raw):
     if pv:
         st = _grab(r"negative streak (\d+)d", raw, 1, "")
         pavg = _grab(r"30d avg ([+-][\d\.]+)%\s+negative streak", raw, 1, "")
-        t.append(tile("US premium", f"{pv}%", f"{st} days negative" if st else "vs global",
-                      f"Coinbase vs Binance. 30d avg {pavg}%" if pavg else "Coinbase vs Binance",
+        t.append(tile("US vs global price", f"{pv}%", f"{st} days below zero" if st else "vs global",
+                      f"Coinbase minus Binance, 30-day avg {pavg}%" if pavg else "Coinbase minus Binance",
                       "neg" if pv.startswith("-") else "pos"))
 
     m = re.search(r"combined \$([\d\.]+B)\s+7d ([+-]?\$[\d\.]+B)\s+30d ([+-]?\$[\d\.]+B)", raw)
     if m:
         lvl, d30 = m.group(1), m.group(3)
-        t.append(tile("Stablecoins", f"${lvl}", f"30d {d30}",
+        t.append(tile("Stablecoin cash", f"${lvl}", f"30-day change {d30}",
                       "Capital leaving crypto, not waiting" if d30.startswith("-")
                       else "Capital returning to crypto",
                       "neg" if d30.startswith("-") else "pos"))
@@ -320,7 +320,8 @@ def kpi_tiles(raw):
     if r14:
         pct = _grab(r"RSI14 1y percentile (\d+)%", raw, 1, "")
         v = float(r14)
-        t.append(tile("RSI(14)", r14, f"1y pctile {pct}%" if pct else "daily close",
+        t.append(tile("Momentum (RSI)", r14,
+                      f"{100 - int(pct)}% of the past year was higher" if pct else "daily close",
                       "Oversold - capitulation zone" if v < 30 else
                       ("Overbought - stretched" if v > 70 else "Neutral, no extreme"),
                       "neg" if v < 30 else ("pos" if v > 70 else "")))
@@ -328,7 +329,7 @@ def kpi_tiles(raw):
     # --- row 2: positioning / sentiment ------------------------------------
     fnd = _grab(r"30d avg ([+-][\d\.]+)% /8h\s*->\s*([+-][\d\.]+)% annualised", raw, 2)
     if fnd:
-        t.append(tile("Funding rate", f"{fnd}%", "30d avg, annualised",
+        t.append(tile("Funding rate", f"{fnd}%", "30-day average, per year",
                       "Longs pay shorts - crowded longs" if fnd.startswith("+")
                       else "Shorts pay longs - squeeze fuel up",
                       "warn" if fnd.startswith("+") else "pos"))
@@ -336,7 +337,7 @@ def kpi_tiles(raw):
     oi = _grab(r"OI \$([\d\.]+)bn \(1d ([+-][\d\.]+)", raw, 1)
     if oi:
         d1 = _grab(r"OI \$[\d\.]+bn \(1d ([+-][\d\.]+)", raw, 1, "n/a")
-        t.append(tile("Perp open interest", f"${oi}bn", f"1d {d1}bn",
+        t.append(tile("Open leverage", f"${oi}B", f"1-day change {d1}B",
                       "Deleveraging, not new shorts" if str(d1).startswith("-")
                       else "Fresh leverage entering",
                       "neg" if str(d1).startswith("-") else "pos"))
@@ -356,8 +357,9 @@ def kpi_tiles(raw):
             verdict = f"below the {c15} crowded-short line - squeeze fuel up"
         else:
             verdict = f"mid-range {c15}-{c85} - no crowding signal"
-        t.append(tile("Long/short ratio", lsv, f"30d {lo}-{hi} \u00b7 {lsp}th pctile",
-                      f"Neutral {med} \u00b7 {verdict}",
+        t.append(tile("Longs per short", lsv,
+                      f"30-day range {lo}-{hi} \u00b7 rank {lsp} of 100",
+                      f"Balanced is {med} \u00b7 {verdict}",
                       "neg" if crowd_long else ("pos" if crowd_short else "")))
 
     fng = _grab(r"now (\d+) \(([^)]+)\)", raw)

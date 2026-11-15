@@ -75,6 +75,32 @@ def _fmt(v):
     return f"{v:.4g}"
 
 
+def _usd(v, suffix="B", dec=2, sign=True):
+    """Money with the sign BEFORE the symbol: -2245 -> '-$2.25B'.
+
+    The old form f"${v:+,.0f}m" printed "$-2,245m" - a minus stranded after the dollar sign.
+    It reads like a typo and buries the scale letter at the end of a long number.
+
+    sign=False for prose where the verb already carries the direction ("fell $0.44B",
+    "has come out $2.25B") - otherwise the minus makes it a double negative.
+    """
+    sgn = ("-" if v < 0 else "+") if sign else ""
+    return f"{sgn}${abs(v):,.{dec}f}{suffix}"
+
+
+def _rank_name(p):
+    """A percentile in plain words. '87th pctile' is meaningless to anyone who has not met one."""
+    if p >= 95:
+        return "the highest in 30 days"
+    if p >= 80:
+        return "near the top of its 30-day range"
+    if p <= 5:
+        return "the lowest in 30 days"
+    if p <= 20:
+        return "near the bottom of its 30-day range"
+    return "mid-range for the last 30 days"
+
+
 def _nice_axis(lo, hi, n=4):
     """Snap [lo, hi] outward to a 1/2/2.5/5 x 10^k grid and return the snapped bounds.
 
@@ -456,22 +482,40 @@ def build_all(outdir, series_path):
     try:
         p = os.path.join(outdir, "c_price.png")
         m10, m50, m200 = ma(close, 10), ma(close, 50), ma(close, 200)
-        if line_chart(p, [(close[-400:], FG, "BTC"), (m10[-400:], TEAL, "MA10"),
-                          (m50[-400:], ACC, "MA50"), (m200[-400:], PUR, "MA200")],
-                      "BTC price vs MA10 / MA50 / MA200  (log scale)", days=days[-400:], log=True):
+        if line_chart(p, [(close[-400:], FG, "price"), (m10[-400:], TEAL, "10-day"),
+                          (m50[-400:], ACC, "50-day"), (m200[-400:], PUR, "200-day")],
+                      "Price vs its 10 / 50 / 200-day averages (log)",
+                      days=days[-400:], log=True):
             a200 = m200[-1] or spot
             gap = (spot - a200) / a200 * 100
-            above = [n for n, m in (("MA10", m10[-1]), ("MA50", m50[-1]), ("MA200", m200[-1]))
+            above = [n for n, m in (("10-day", m10[-1]), ("50-day", m50[-1]), ("200-day", m200[-1]))
                      if m and spot > m]
-            add("c_price.png", "Price vs moving averages",
-                [f"spot ${spot:,.0f}", f"MA10 ${m10[-1]:,.0f}", f"MA50 ${m50[-1]:,.0f}",
-                 f"MA200 ${m200[-1]:,.0f}", f"vs MA200 {gap:+.1f}%"],
-                "A bounce in a downtrend stalls at the FIRST moving average above it. "
-                "MA200 is the line the short-fade block waits for. Price above an MA = "
-                "that MA is support; below = it is resistance.",
-                (f"Spot is below all three MAs ({', '.join(above) if above else 'none above'}), "
-                 f"so every rally runs into overhead supply. MA200 is {abs(gap):.1f}% away."),
-                "wide")
+            if not above:
+                pv = (f"Price is BELOW all three averages, so anyone who bought in the last ten "
+                      f"months is sitting on a loss and every rally runs into sellers trying to "
+                      f"get out even. The 200-day average is at ${m200[-1]:,.0f}, {abs(gap):.1f}% "
+                      f"above today's ${spot:,.0f}: that is the level a bounce has to reclaim "
+                      f"before this is anything but a downtrend.")
+            elif len(above) == 3:
+                pv = (f"Price is ABOVE all three averages, so each one acts as a floor and dips "
+                      f"into them get bought. The nearest floor is the 10-day at "
+                      f"${m10[-1]:,.0f}, {abs(gap):.1f}% below spot.")
+            else:
+                pv = (f"Price is above the {' and '.join(above)} average but below the rest, so "
+                      f"it is wedged: floors underneath from the averages already reclaimed, "
+                      f"sellers overhead from the ones still above it. No clean trend either way.")
+            add("c_price.png", "Price vs its 10, 50 and 200-day averages",
+                [f"price now ${spot:,.0f}", f"10-day avg ${m10[-1]:,.0f}",
+                 f"50-day avg ${m50[-1]:,.0f}", f"200-day avg ${m200[-1]:,.0f}",
+                 f"{abs(gap):.1f}% below the 200-day" if gap < 0 else f"{gap:+.1f}% above the 200-day"],
+                "A moving average is simply the average closing price over the last N days, "
+                "drawn as a line so the trend shows through the daily noise. The 10-day line is "
+                "the last two weeks, the 50-day the last two months, the 200-day the last ten "
+                "months. Rule of thumb: price above an average means that average is support, "
+                "price below means it is resistance, and a bounce inside a downtrend usually "
+                "stalls at the FIRST average overhead. The 200-day is the line the short-fade "
+                "signal waits for.",
+                pv, "wide")
     except Exception:
         pass
 
@@ -560,8 +604,8 @@ def build_all(outdir, series_path):
         prem = S.get("premium", [])
         p = os.path.join(outdir, "c_premium.png")
         m30 = [sum(prem[max(0, i - 29):i + 1]) / len(prem[max(0, i - 29):i + 1]) for i in range(len(prem))]
-        if line_chart(p, [(prem[-240:], ACC, "daily"), (m30[-240:], AMBER, "30d mean")],
-                      "Coinbase premium % - is the US paying up?", days=days[-240:],
+        if line_chart(p, [(prem[-240:], ACC, "daily gap"), (m30[-240:], AMBER, "30-day avg")],
+                      "US vs global BTC price, % - who pays more?", days=days[-240:],
                       hlines=[(0, DIM)]):
             streak = 0
             for v in reversed(prem):
@@ -569,13 +613,20 @@ def build_all(outdir, series_path):
                     streak += 1
                 else:
                     break
-            add("c_premium.png", "Coinbase premium (US vs global bid)",
-                [f"live {prem[-1]:+.3f}%", f"30d mean {m30[-1]:+.3f}%", f"{streak}d negative"],
-                "Above the zero line = US buyers paying more than global = US demand leading. "
-                "A run of 20+ days below zero is a REGIME, not noise - it means the deepest "
-                "pool of buyers is simply absent.",
-                ("US bid missing for %d straight days - the structural buyer is not there."
-                 % streak) if streak >= 20 else "Premium near neutral - no strong US signal.")
+            add("c_premium.png", "US vs global premium - is America paying up?",
+                [f"right now {prem[-1]:+.3f}%", f"30-day average {m30[-1]:+.3f}%",
+                 f"below zero for {streak} days straight"],
+                "The premium is Coinbase's BTC price minus Binance's, in percent: it answers "
+                "'are US buyers paying more or less than the rest of the world?'. Above zero = "
+                "US demand is leading. A run of 20+ days below zero is not noise, it is a "
+                "regime - the deepest pool of buyers is simply not there.",
+                (f"US buyers have paid LESS than the rest of the world for {streak} days in a "
+                 f"row. That is the structural buyer - US institutions - simply absent, so there "
+                 f"is no American bid to lift this market. A few days would be noise; {streak} "
+                 f"days is the regime, and it stays bearish until it flips back above zero."
+                 if streak >= 20 else
+                 "US buyers are paying roughly the same as the rest of the world, so there is no "
+                 "US signal here either way - look at the other flow cards instead."))
     except Exception:
         pass
 
@@ -599,27 +650,39 @@ def build_all(outdir, series_path):
             return r
         r6, r14, r24 = rsi(close, 6), rsi(close, 14), rsi(close, 24)
         p = os.path.join(outdir, "c_rsi.png")
-        if line_chart(p, [(r6[-240:], TEAL, "RSI6"), (r14[-240:], ACC, "RSI14"), (r24[-240:], PUR, "RSI24")],
-                      "RSI(6 / 14 / 24) on daily closes", days=days[-240:],
+        if line_chart(p, [(r6[-240:], TEAL, "6-day"), (r14[-240:], ACC, "14-day"),
+                          (r24[-240:], PUR, "24-day")],
+                      "Momentum score, 0-100 (6 / 14 / 24-day)", days=days[-240:],
                       hlines=[(70, DN), (30, UP)]):
             v6, v14, v24 = r6[-1], r14[-1], r24[-1]
             tail = [x for x in r14 if x is not None]
             pct = sum(1 for x in tail if x <= v14) / len(tail) * 100
             if v14 <= 30:
-                state = "oversold - capitulation zone, where bounces historically start"
+                state = ("oversold - below 30 out of 100, the zone where bounces have "
+                         "historically started")
             elif v14 >= 70:
-                state = "overbought - stretched, mean-reversion risk"
+                state = "overbought - above 70 out of 100, stretched and prone to snapping back"
             else:
-                state = "neutral - no momentum extreme"
-            add("c_rsi.png", "RSI momentum",
-                [f"RSI6 {v6:.1f}", f"RSI14 {v14:.1f}", f"RSI24 {v24:.1f}",
-                 f"RSI14 1y pctile {pct:.0f}%"],
-                "Red 70 / green 30. Fast line above slow = momentum improving; fast BELOW slow = "
-                "momentum deteriorating and bounces are being sold. This describes force - it "
-                "does not trigger a trade on its own.",
-                f"RSI14 {v14:.1f} is {state}. " +
-                ("Fast < slow: momentum still deteriorating." if v6 < v24
-                 else "Fast > slow: short-term momentum leading."))
+                state = "neutral - between 30 and 70, no momentum extreme"
+            slows = v6 < v24
+            add("c_rsi.png", "Momentum score (RSI) - how hard is it moving?",
+                [f"momentum {v14:.1f} out of 100", f"6-day reading {v6:.1f}",
+                 f"24-day reading {v24:.1f}", f"lower than {100 - pct:.0f}% of the last year"],
+                "RSI (relative strength index) scores momentum 0-100 by comparing the size of "
+                "average up-days with down-days. Below 30 = oversold, above 70 = overbought. "
+                "Three speeds are drawn: 6-day (fast), 14-day (middle) and 24-day (slow). Fast "
+                "above slow = momentum improving; fast BELOW slow = momentum deteriorating and "
+                "bounces are being sold into. This describes force - it does not trigger a trade "
+                "on its own.",
+                (f"Momentum scores {v14:.1f} out of 100, which is {state}. The fast 6-day "
+                 f"reading ({v6:.1f}) is still weaker than the slow 24-day ({v24:.1f}), so "
+                 f"selling pressure is still building rather than easing - rallies are being "
+                 f"sold. Oversold means do not chase a short into fresh lows; it is not a buy "
+                 f"signal either."
+                 if slows else
+                 f"Momentum scores {v14:.1f} out of 100, which is {state}. The fast 6-day "
+                 f"reading ({v6:.1f}) is now stronger than the slow 24-day ({v24:.1f}), so "
+                 f"short-term momentum is turning up ahead of the longer trend."))
     except Exception:
         pass
 
@@ -628,18 +691,25 @@ def build_all(outdir, series_path):
         ub = S.get("urpd", [])
         p = os.path.join(outdir, "c_urpd.png")
         stale = "  [cached - bitcoin-data quota]" if S.get("urpd_stale") else ""
-        if ub and urpd_chart(p, ub, spot, f"URPD - where supply sits by cost basis ({S.get('urpd_day','')}){stale}"):
+        if ub and urpd_chart(p, ub, spot, f"Where supply sits by purchase price - {S.get('urpd_day','')}{stale}"):
             top = sorted(ub, key=lambda b: -b["pct"])[:3]
             below = sum(b["pct"] for b in ub if b["hi"] <= spot)
             above = sum(b["pct"] for b in ub if b["lo"] >= spot)
-            add("c_urpd.png", "URPD / cost-basis ladder",
-                [f"top cluster ${top[0]['lo']//1000}k-{top[0]['hi']//1000}k ({top[0]['pct']:.1f}%)",
-                 f"above spot {above:.1f}%", f"below spot {below:.1f}%"],
-                "Each bar is how much supply last moved at that price. Bars ABOVE spot are "
-                "holders who are underwater - they sell into rallies and cap them. Bars BELOW "
-                "spot are holders in profit who tend to hold. The amber line is today's price.",
-                f"Only {below:.1f}% of supply sits below spot versus {above:.1f}% above it - "
-                "thin support underneath, heavy overhead supply to chew through.")
+            add("c_urpd.png", "Where supply sits by purchase price",
+                [f"biggest cluster ${top[0]['lo']//1000}k-${top[0]['hi']//1000}k "
+                 f"= {top[0]['pct']:.1f}% of all coins",
+                 f"{above:.1f}% of coins were bought ABOVE today's price",
+                 f"{below:.1f}% were bought BELOW it"],
+                "Every bar is how much bitcoin last changed hands at that price - in other "
+                "words, where holders' purchase prices sit. Bars ABOVE today's price are holders "
+                "sitting on a loss: they sell into rallies to get out even and cap them. Bars "
+                "BELOW are holders in profit, who tend to sit still. The amber line is today's "
+                "price.",
+                (f"Only {below:.1f}% of all coins were last bought below today's price, while "
+                 f"{above:.1f}% were bought above it. So the market is mostly underwater: there "
+                 f"is heavy overhead supply to chew through as trapped holders sell to break "
+                 f"even, and very little bought-in-profit support underneath. Thin floor, thick "
+                 f"ceiling."))
     except Exception:
         pass
 
@@ -648,16 +718,28 @@ def build_all(outdir, series_path):
         ef = S.get("etf_flow", [])
         ed = S.get("etf_days", [])
         p = os.path.join(outdir, "c_etf.png")
-        if ef and bars_chart(p, ef[-60:], "US spot BTC ETF net flow, daily ($m)", days=ed[-60:],
+        if ef and bars_chart(p, ef[-60:], "US spot bitcoin ETF flows, $ per day",
+                             days=ed[-60:],
                              cum=True, unit="", cum_scale=1e6):
             s5 = sum(ef[-5:]); s30 = sum(ef[-30:]); last = ef[-1]
-            add("c_etf.png", "ETF net flows",
-                [f"latest ${last:+,.0f}m", f"5d ${s5:+,.0f}m", f"30d ${s30:+,.0f}m"],
-                "Green bars = creations (money in), red = redemptions (money out). Read the "
-                "SUMS, never a single day - one day is noise, the 30d line is the trend. The "
-                "amber line is cumulative.",
-                (f"Money still leaving: ${s30:+,.0f}m over 30 days." if s30 < 0
-                 else f"Money returning: ${s30:+,.0f}m over 30 days."))
+            add("c_etf.png", "US spot ETF flows - are institutions buying?",
+                ([f"latest day not published yet", f"last 5 days {_usd(s5 / 1000)}",
+                  f"last 30 days {_usd(s30 / 1000)}"] if abs(last) < 0.5 else
+                 [f"latest day {_usd(last / 1000)}", f"last 5 days {_usd(s5 / 1000)}",
+                  f"last 30 days {_usd(s30 / 1000)}"]),
+                "US spot bitcoin ETFs are how most institutions buy. Green bars = money going in "
+                "(new shares created), red bars = money coming out (shares redeemed). Read the "
+                "SUMS, never a single day: one day is noise, the 30-day total is the trend. The "
+                "amber line is the running total.",
+                (f"Institutions are still selling: {_usd(s30 / 1000, sign=False)} has come out "
+                 f"of the US spot ETFs over the last 30 days, and "
+                 f"{_usd(s5 / 1000, sign=False)} of that in the last "
+                 f"week alone. That is the single biggest buyer of 2024-25 going backwards, so "
+                 f"there is nothing here to catch the falling price."
+                 if s30 < 0 else
+                 f"Institutions are buying again: {_usd(s30 / 1000)} has gone into the US spot "
+                 f"ETFs over the last 30 days. Persistent ETF inflows have been what put a floor "
+                 f"under every dip this cycle."))
     except Exception:
         pass
 
@@ -666,19 +748,31 @@ def build_all(outdir, series_path):
         sd, usdt, usdc = stablecoin_series(120)
         p = os.path.join(outdir, "c_stables.png")
         if line_chart(p, [(usdt, TEAL, "USDT"), (usdc, ACC, "USDC")],
-                      "Stablecoin supply, $bn - is capital coming back?", days=sd):
+                      "Stablecoin supply, $bn - is cash coming back?", days=sd):
             comb = usdt[-1] + usdc[-1]
             d7 = comb - (usdt[-8] + usdc[-8]) if len(usdt) > 8 else 0
             d30 = comb - (usdt[-31] + usdc[-31]) if len(usdt) > 31 else 0
-            add("c_stables.png", "Stablecoin supply",
-                [f"combined ${comb:,.1f}bn", f"7d {d7:+,.2f}bn", f"30d {d30:+,.2f}bn"],
-                "Stablecoins are the dry powder of crypto. Expanding supply = fresh fiat "
-                "entering the system. Contracting = capital leaving crypto entirely - it is "
-                "NOT money sitting on the sidelines waiting.",
-                (f"Contracting on both windows ({d30:+,.2f}bn over 30d) - capital is exiting, "
-                 "not waiting." if d30 < 0 and d7 < 0 else
-                 ("Expanding on both windows - capital returning." if d30 > 0 and d7 > 0
-                  else "Mixed: 7d and 30d disagree, no clean signal yet.")))
+            add("c_stables.png", "Stablecoin supply - is cash waiting to buy?",
+                [f"total stablecoin supply ${comb:,.1f}B", f"7-day change {_usd(d7)}",
+                 f"30-day change {_usd(d30)}"],
+                "Stablecoins (USDT, USDC) are the cash pile of crypto - what you hold when you "
+                "want out of bitcoin but stay inside the system. Growing supply = new fiat "
+                "arriving, dry powder building. Shrinking supply = people redeeming for real "
+                "dollars and leaving crypto altogether. It is NOT money parked on the sidelines "
+                "waiting to buy - a shrinking pile means it is gone.",
+                (f"Stablecoin supply is shrinking by {_usd(d7, sign=False)} in a week and "
+                 f"{_usd(d30, sign=False)} in a "
+                 f"month, down to ${comb:,.1f}B. Money is being redeemed and leaving crypto "
+                 f"entirely, so there is no cash pile building up to buy this dip. That is the "
+                 f"opposite of the setup that ends a downtrend."
+                 if d30 < 0 and d7 < 0 else
+                 f"Stablecoin supply is growing by {_usd(d7, sign=False)} in a week and "
+                 f"{_usd(d30, sign=False)} in a month. "
+                 f"Fresh cash is arriving and sitting ready to buy - dry powder is building, "
+                 f"which is what bottoms are made of."
+                 if d30 > 0 and d7 > 0 else
+                 f"Mixed: the week says {_usd(d7)} and the month says {_usd(d30)}, so the cash "
+                 f"pile is not clearly growing or shrinking. No signal until both agree."))
     except Exception:
         pass
 
@@ -686,21 +780,32 @@ def build_all(outdir, series_path):
     try:
         fr = S.get("funding", [])
         p = os.path.join(outdir, "c_funding.png")
-        if fr and bars_chart(p, [x * 100 for x in fr], "Perp funding rate, % per 8h (30d)",
+        if fr and bars_chart(p, [x * 100 for x in fr],
+                             "Funding rate, % paid every 8 hours (30 days)",
                              symmetric=False):
             now_r = fr[-1] * 100
             avg = sum(fr) / len(fr) * 100
             ann = avg * 3 * 365
             posn = sum(1 for x in fr if x > 0) / len(fr) * 100
-            add("c_funding.png", "Funding rate - what leverage costs",
-                [f"now {now_r:+.4f}%/8h", f"30d avg -> {ann:+.1f}% APR", f"positive {posn:.0f}% of time"],
-                "Funding is the 8-hourly payment between longs and shorts. Positive = LONGS pay "
-                "shorts = leveraged longs are the crowded side (bearish tilt, dips get flushed). "
-                "Negative = shorts pay, meaning crowded shorts and squeeze fuel UP - hostile to "
-                "a short.",
-                ("Longs still paying - leveraged longs have NOT capitulated, so dips get "
-                 "flushed." if avg > 0 else
-                 "Shorts are paying - crowded short positioning is squeeze fuel upward."))
+            add("c_funding.png", "Funding rate - what it costs to hold a bet",
+                [f"right now {now_r:+.4f}% every 8 hours",
+                 f"30-day average {ann:+.1f}% a year",
+                 f"positive in {posn:.0f}% of the last 30 days"],
+                "Funding is the small payment leveraged traders make to each other every 8 "
+                "hours. Positive funding = LONGS pay shorts, meaning the crowd is leaning long "
+                "and the long side is crowded (bearish tilt - dips get flushed out). Negative "
+                "funding = SHORTS pay longs, meaning shorts are crowded and are squeeze fuel "
+                "upward (hostile to a new short). The yearly figure just compounds the "
+                "8-hourly rate - three payments a day.",
+                (f"Funding averages {ann:+.1f}% a year and has been positive in {posn:.0f}% of "
+                 f"the last 30 days: longs are paying to keep their bets open. That means the "
+                 f"crowded long side has NOT given up yet, so there is still fuel for another "
+                 f"flush lower. Funding only turns bullish for BTC once it goes negative and "
+                 f"stays there - that is when the weak longs have actually been cleared."
+                 if avg > 0 else
+                 f"Funding averages {ann:+.1f}% a year, so shorts are paying longs to stay "
+                 f"short. Crowded short positioning is squeeze fuel upward - a bad place to open "
+                 f"a fresh short."))
     except Exception:
         pass
 
@@ -713,24 +818,42 @@ def build_all(outdir, series_path):
         # the only hard reference: everything above it is net long, whatever "normal" happens to be.
         med = lambda v: (statistics.median(v) if v else 0.0)
         refs = [(1.0, WHITE, "1.00 = balanced"),
-                (med(ra), ACC, f"all-acct median {med(ra):.2f}"),
-                (med(rt), PUR, f"top-acct median {med(rt):.2f}"),
-                (med(rp), TEAL, f"top-pos median {med(rp):.2f}")]
-        if line_chart(p, [(ra, ACC, "all accounts"), (rt, PUR, "top acct"), (rp, TEAL, "top positions")],
-                      "Binance long/short ratios (contrarian)", dlines=refs):
+                (med(ra), ACC, f"ordinary median {med(ra):.2f}"),
+                (med(rt), PUR, f"big-account median {med(rt):.2f}"),
+                (med(rp), TEAL, f"big-money median {med(rp):.2f}")]
+        if line_chart(p, [(ra, ACC, "ordinary"), (rt, PUR, "big accounts"),
+                          (rp, TEAL, "big money")],
+                      "Longs per short on Binance futures", dlines=refs):
             pa = sum(1 for x in ra if x <= ra[-1]) / len(ra) * 100
             pt = sum(1 for x in rt if x <= rt[-1]) / len(rt) * 100
-            add("c_ratios.png", "Long/short ratios - who is crowded",
-                [f"all acct {ra[-1]:.2f} ({_ord(pa)} pctile)", f"top acct {rt[-1]:.2f} ({_ord(pt)} pctile)",
-                 f"top positions {rp[-1]:.2f}"],
-                "Above 1 = more longs than shorts. Read it CONTRARIAN: a crowded long book is "
-                "squeeze fuel DOWN; a crowded short book is squeeze fuel UP. When retail is "
-                "long but top-trader POSITIONS are falling, smart money is exiting into retail "
-                "strength. Mid-range percentile = no signal.",
-                ("Crowd is crowded LONG (%s pctile) - squeeze fuel down. Top-trader "
-                 "positions at %.2f, so smart money is not adding." % (_ord(pa), rp[-1]) if pa >= 80
-                 else ("Crowd crowded SHORT - squeeze fuel up." if pa <= 20
-                       else "Positioning mid-range - no contrarian signal.")))
+            pp = sum(1 for x in rp if x <= rp[-1]) / len(rp) * 100
+            add("c_ratios.png", "Long/short ratios - who is betting which way",
+                [f"ordinary accounts {ra[-1]:.2f} longs per short",
+                 f"big traders' accounts {rt[-1]:.2f} longs per short",
+                 f"big traders' position size {rp[-1]:.2f} longs per short",
+                 f"the crowd is {_rank_name(pa)}"],
+                "Each line counts how many long positions exist for every short on Binance "
+                "futures. Above 1.00 = more longs. 'Ordinary accounts' counts people, 'big "
+                "traders accounts' counts only the largest accounts, and 'big traders position "
+                "size' weights those big traders by how much money they have on rather than "
+                "how many accounts they hold. Read all of it CONTRARIAN: a crowded long book is "
+                "fuel for a squeeze DOWN, a crowded short book is fuel for a squeeze UP. When "
+                "ordinary traders are long but big traders' money is shrinking, the informed "
+                "side is handing risk to the crowd.",
+                (f"The crowd is heavily long: ordinary accounts hold {ra[-1]:.2f} longs for "
+                 f"every short, which is {_rank_name(pa)}. Crowded longs are fuel for a squeeze "
+                 f"DOWN. Meanwhile big traders' position size is {rp[-1]:.2f} ({_rank_name(pp)}), "
+                 f"so the money is not adding to that long - the informed side is handing risk to "
+                 f"the crowd. The pain trade is lower."
+                 if pa >= 80 else
+                 f"The crowd is heavily short: ordinary accounts hold only {ra[-1]:.2f} longs per "
+                 f"short, which is {_rank_name(pa)}. Crowded shorts are fuel for a squeeze UP, so "
+                 f"a fresh short here is fighting the positioning."
+                 if pa <= 20 else
+                 f"Positioning is unremarkable: ordinary accounts hold {ra[-1]:.2f} longs per "
+                 f"short, which is {_rank_name(pa)}, and big traders' position size is "
+                 f"{rp[-1]:.2f}. Nobody is crowded, so there is no contrarian squeeze to trade "
+                 f"off this chart."))
     except Exception:
         pass
 
@@ -744,21 +867,31 @@ def build_all(outdir, series_path):
         if ra and rt and rp:
             p = os.path.join(outdir, "c_ratio_pct.png")
             qa, qt, qp = _rank_pct(ra), _rank_pct(rt), _rank_pct(rp)
-            if line_chart(p, [(qa, ACC, "all accounts"), (qt, PUR, "top acct"), (qp, TEAL, "top positions")],
-                          "Long/short ratios as own-window percentiles",
+            if line_chart(p, [(qa, ACC, "ordinary"), (qt, PUR, "big accounts"),
+                              (qp, TEAL, "big money")],
+                          "Crowding score 0-100 vs each series' own month",
                           dlines=[(85, DN, "85 = crowded long"), (15, UP, "15 = crowded short")],
                           ylim=(0, 100)):
-                add("c_ratio_pct.png", "Long/short crowding - apples to apples",
-                    [f"all acct {_ord(qa[-1])} pctile", f"top acct {_ord(qt[-1])} pctile",
-                     f"top pos {_ord(qp[-1])} pctile"],
-                    "Same data as the chart above, re-scored so the three are comparable. 100 means "
-                    "that series is at its most crowded in 30 days, 0 its least. Above 85 = crowded "
-                    "long (contrarian bearish); below 15 = crowded short (squeeze fuel up).",
-                    ("All three pinned high - the whole book is leaning long, squeeze risk is broad."
+                add("c_ratio_pct.png", "Crowding score - all three ratios on one scale",
+                    [f"ordinary accounts {qa[-1]:.0f} out of 100",
+                     f"big traders' accounts {qt[-1]:.0f} out of 100",
+                     f"big traders' position size {qp[-1]:.0f} out of 100"],
+                    "The three ratios in the chart above each have a different 'normal' level, "
+                    "so their raw numbers cannot be compared with each other. Here each one is "
+                    "re-scored from 0 to 100 against its OWN last 30 days: 100 = the most "
+                    "long-heavy it has been in a month, 0 = the least. Above 85 = crowded long "
+                    "(bearish); below 15 = crowded short (squeeze fuel up).",
+                    (f"All three sit high - {qa[-1]:.0f}, {qt[-1]:.0f} and {qp[-1]:.0f} out of "
+                     f"100. Every group is leaning long at once, so the squeeze risk downward is "
+                     f"broad rather than concentrated in one type of trader."
                      if min(qa[-1], qt[-1], qp[-1]) >= 80 else
-                     f"Headcount {_ord(qa[-1])} vs position size {_ord(qp[-1])} - "
-                     + ("many small longs, not big conviction." if qa[-1] > qp[-1] + 20
-                        else "no wide split between crowd and size.")))
+                     f"Ordinary accounts score {qa[-1]:.0f} out of 100 while big traders' "
+                     f"position size scores {qp[-1]:.0f} - "
+                     + ("lots of small longs with big money not behind them. Retail is long, the "
+                        "money is not: that is the setup for a squeeze down."
+                        if qa[-1] > qp[-1] + 20 else
+                        "no wide split between the crowd and the money, so there is no standout "
+                        "contrarian read here.")))
     except Exception:
         pass
 
@@ -766,15 +899,25 @@ def build_all(outdir, series_path):
     try:
         oi = S.get("oi_bn", [])
         p = os.path.join(outdir, "c_oi.png")
-        if oi and line_chart(p, [(oi, AMBER, "OI $bn")], "Binance BTC perp open interest, $bn (30d)"):
+        if oi and line_chart(p, [(oi, AMBER, "open positions $bn")],
+                             "Value of open leveraged positions, $bn (30 days)"):
             d1 = oi[-1] - oi[-2]
-            add("c_oi.png", "Open interest - how much leverage exists",
-                [f"${oi[-1]:.2f}bn", f"1d {d1:+.2f}bn", f"30d range {min(oi):.2f}-{max(oi):.2f}"],
-                "Total value of open perp positions. RISING = fresh positions entering (trend "
-                "fuel). FALLING = positions closing, usually forced liquidation - that is "
-                "deleveraging, not new shorts, and it often marks a local bounce.",
-                (f"OI draining ({d1:+.2f}bn) - deleveraging/liquidation, not fresh shorts."
-                 if d1 < 0 else f"OI building ({d1:+.2f}bn) - fresh leverage entering."))
+            add("c_oi.png", "Open interest - how much leverage is in the system",
+                [f"${oi[-1]:.2f}B of positions open", f"1-day change {_usd(d1)}",
+                 f"30-day range ${min(oi):.2f}B-${max(oi):.2f}B"],
+                "Open interest is the total value of leveraged perpetual positions still open - "
+                "in plain terms, how much borrowed money is sitting in the market right now. "
+                "RISING = new positions opening (fuel for the current move). FALLING = positions "
+                "closing, usually forced liquidation, which is deleveraging and not new shorts "
+                "being opened.",
+                (f"Open positions fell {_usd(d1, sign=False)} in a day to ${oi[-1]:.2f}B. Positions being "
+                 f"closed - usually forced - is deleveraging, not new money betting on lower "
+                 f"prices. That kind of flush usually marks a short-term bounce rather than a "
+                 f"fresh leg down, so this is not the place to chase a short."
+                 if d1 < 0 else
+                 f"Open positions rose {_usd(d1, sign=False)} in a day to ${oi[-1]:.2f}B. Fresh leverage is "
+                 f"entering, which adds fuel to the current move in whichever direction it is "
+                 f"going - and makes the eventual liquidation bigger."))
     except Exception:
         pass
 
@@ -790,17 +933,25 @@ def build_all(outdir, series_path):
         from datetime import datetime as _dt, timezone as _tz
         lbl = [_dt.fromtimestamp(t / 1000, _tz.utc).strftime("%Y-%m-%d") for t in ts]
         p = os.path.join(outdir, "c_volume.png")
-        if line_chart(p, [(spt, TEAL, "spot"), (per, AMBER, "perp")],
-                      "BTC volume, $bn/day - spot vs perpetual", days=lbl):
+        if line_chart(p, [(spt, TEAL, "real spot"), (per, AMBER, "leveraged")],
+                      "BTC volume per day, $bn - real vs leveraged", days=lbl):
             ratio = per[-1] / spt[-1] if spt[-1] else 0
-            add("c_volume.png", "Volume: spot vs perp",
-                [f"spot ${spt[-1]:.1f}bn", f"perp ${per[-1]:.1f}bn", f"perp/spot {ratio:.1f}x"],
-                "Spot volume is real buying and selling. Perp volume is leveraged bets on "
-                "price. When perp dwarfs spot, price is being moved by leverage rather than "
-                "by people taking delivery - moves are faster and less durable.",
-                (f"Perp is {ratio:.1f}x spot - leverage-dominated tape, expect fragile moves "
-                 "and liquidation wicks." if ratio > 3 else
-                 f"Perp {ratio:.1f}x spot - unusually spot-led, moves carry more weight."))
+            add("c_volume.png", "Volume - real trading vs leveraged betting",
+                [f"real spot trading ${spt[-1]:.1f}B a day",
+                 f"leveraged betting ${per[-1]:.1f}B a day",
+                 f"{ratio:.1f}x more leveraged than real"],
+                "Spot volume is coins actually bought and sold - delivery. Perpetual (perp) "
+                "volume is leveraged bets on the price where nobody takes delivery. When perp "
+                "dwarfs spot, price is being moved by borrowed money rather than by real "
+                "demand, so moves are faster and fade quicker.",
+                (f"For every $1 of real spot trading there is ${ratio:.1f} of leveraged betting. "
+                 f"Price is being set by borrowed money, not by people buying coins - expect fast "
+                 f"moves that fade, liquidation wicks that overshoot, and fakeouts through levels. "
+                 f"Size positions down in this regime."
+                 if ratio > 3 else
+                 f"Leverage is unusually light: perp volume is only {ratio:.1f}x spot, so real "
+                 f"buying and selling is driving price. Moves carry more weight here and are "
+                 f"less likely to be a liquidation wick."))
     except Exception:
         pass
 
