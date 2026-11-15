@@ -153,7 +153,7 @@ def _mapx(i, n, x0, x1):
 
 
 def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
-               pad=(104, 26, 52, 44), ylim=None):
+               pad=(104, 26, 52, 44), ylim=None, nice=False):
     """series: list of (values, colour, label).
 
     dlines: [(value, colour, label)] - dotted reference lines (a series' own median, a balance
@@ -176,6 +176,10 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
             lo, hi = lo * 0.99, hi * 1.01
         pad_y = (hi - lo) * 0.08
         lo, hi = lo - pad_y, hi + pad_y
+        if nice:
+            # Opt-in: snap the axis to round steps. Only for charts read by absolute level
+            # (indexed-to-100 overlays); it coarsens tightly-ranged series like OI or premium.
+            lo, hi = _nice_axis(lo, hi)
         if not log and min(flat) >= 0 and lo < 0:
             lo = 0.0
     tlo, thi = tf(lo), tf(hi)
@@ -369,6 +373,44 @@ def build_all(outdir, series_path):
                 (f"Spot is below all three MAs ({', '.join(above) if above else 'none above'}), "
                  f"so every rally runs into overhead supply. MA200 is {abs(gap):.1f}% away."),
                 "wide")
+    except Exception:
+        pass
+
+    # 1b. BTC vs dollar strength (DXY) ---------------------------------------
+    try:
+        dxy = S.get("dxy", [])
+        if dxy and close and len(dxy) >= 2:
+            n = min(len(dxy), len(close))
+            dxy, px, dys = dxy[-n:], close[-n:], (days or [])[-n:]
+            # Index BOTH to 100 at the left edge. A dual axis (BTC ~$65k vs DXY ~99) invents
+            # crossovers that look meaningful and are pure scale artefacts; comparing percentage
+            # moves from a common base is the honest way to show correlation.
+            b = [v / px[0] * 100 for v in px]
+            q = [v / dxy[0] * 100 for v in dxy]
+            p = os.path.join(outdir, "c_dxy.png")
+            if line_chart(p, [(b, AMBER, "BTC"), (q, ACC, "DXY (ECB-reconstructed)")],
+                          "BTC vs DXY - both indexed to 100 at start",
+                          days=dys, dlines=[(100, DIM, "start = 100")], nice=True):
+                mb, md = sum(b) / n, sum(q) / n
+                cov = sum((x - mb) * (y - md) for x, y in zip(b, q))
+                sb = math.sqrt(sum((x - mb) ** 2 for x in b))
+                sd = math.sqrt(sum((y - md) ** 2 for y in q))
+                r = cov / (sb * sd) if sb and sd else 0.0
+                add("c_dxy.png", "Dollar strength - macro headwind or tailwind",
+                    [f"DXY {dxy[-1]:.2f}", f"DXY {q[-1] - 100:+.1f}%", f"BTC {b[-1] - 100:+.1f}%",
+                     f"corr {r:+.2f}"],
+                    "DXY is the US dollar against six currencies; EUR alone is 57.6% of it. Both "
+                    "lines are indexed to 100 at the left edge, so this compares PERCENTAGE moves, "
+                    "not price levels. The usual regime relationship is inverse - dollar up, BTC "
+                    "down - so the lines trending opposite is normal, and both moving together is "
+                    "the anomaly worth noting. A headwind/tailwind gauge, not a timing trigger. "
+                    "Rebuilt from ECB reference rates, so it can sit ~0.1-0.2% off the ICE print.",
+                    (f"Inverse, as expected (corr {r:+.2f}): dollar strength has been pressuring "
+                     f"BTC across this window." if r < -0.3 else
+                     f"Both moving together (corr {r:+.2f}): the usual dollar-BTC inverse has "
+                     f"broken - BTC is trading on its own flows." if r > 0.3 else
+                     f"No clear link (corr {r:+.2f}): the dollar is not driving BTC here."),
+                    "wide")
     except Exception:
         pass
 
