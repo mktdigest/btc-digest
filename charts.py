@@ -262,7 +262,7 @@ def build_all(outdir, series_path):
                 [f"spot ${spot:,.0f}", f"MA10 ${m10[-1]:,.0f}", f"MA50 ${m50[-1]:,.0f}",
                  f"MA200 ${m200[-1]:,.0f}", f"vs MA200 {gap:+.1f}%"],
                 "A bounce in a downtrend stalls at the FIRST moving average above it. "
-                "MA200 is the line the short-fade in block [8] waits for. Price above an MA = "
+                "MA200 is the line the short-fade block waits for. Price above an MA = "
                 "that MA is support; below = it is resistance.",
                 (f"Spot is below all three MAs ({', '.join(above) if above else 'none above'}), "
                  f"so every rally runs into overhead supply. MA200 is {abs(gap):.1f}% away."),

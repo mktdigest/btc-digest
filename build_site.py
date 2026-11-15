@@ -301,11 +301,127 @@ def kpi_tiles(raw):
     return '<div class="kpis">' + "".join(t) + "</div>" if t else ""
 
 
+# Guide tab: one card per digest block. The NUMBER is looked up from the digest text (see
+# ref_section) instead of hardcoded - hardcoding is exactly what let the numbers drift out of
+# order. Fields: (display title, stable prefix of the digest's own block title, body HTML).
+REF_CARDS = [
+    ("Coinbase Premium Index &mdash; US vs global bid", "Coinbase Premium Index",
+     '<p>Live and closing spread between Coinbase (US) and Binance (global) BTC price. '
+     '<strong>Positive = US buyers paying up</strong>; negative = the US is the missing bid. '
+     'A negative run of 20+ days is a <em>regime</em>, not noise.</p>'),
+
+    ("US spot BTC ETF net flow (T+1) &mdash; institutional demand", "US spot BTC ETF net flow",
+     '<p>Aggregate creations minus redemptions across US spot BTC ETFs. Always read the '
+     '5d/30d sums, never a single day.</p>'),
+
+    ("Coinbase Premium net of Tether &mdash; regime", "Coinbase Premium net of Tether",
+     '<p>The 30-day mean premium with the USDT/USD rate stripped out, so a stablecoin peg '
+     'wobble cannot fake a signal. Answers: is the US discount structural or transient?</p>'),
+
+    ("Stablecoin supply &mdash; is money coming back?", "Stablecoin supply",
+     '<p>Combined USDT + USDC supply. Expansion = capital arriving into crypto; contraction = '
+     'capital leaving (not &ldquo;waiting&rdquo;). Needs <em>both</em> the 7d and 30d change '
+     'positive to call a return.</p>'),
+
+    ("Spot taker flow by venue &mdash; who is actually buying", "Spot taker flow by venue",
+     '<p>Net aggressive buying (taker buy &minus; taker sell) per exchange. A <strong>partial</strong> '
+     'rebuild of CoinGlass&rsquo;s per-venue CVD, because only two venues publish history:</p>'
+     '<table><thead><tr><th>venue</th><th>what we can get</th></tr></thead><tbody>'
+     '<tr><td>Binance</td><td>full history &mdash; 1d / 7d / 30d, exact</td></tr>'
+     '<tr><td>OKX</td><td>exact, but only a 48h window</td></tr>'
+     '<tr><td>Coinbase</td><td>live tape snapshot only &mdash; no history published</td></tr>'
+     '<tr><td>Bybit</td><td>nothing public</td></tr></tbody></table>'
+     '<p>The verdict uses the <strong>deep, long-window books</strong> (Binance, OKX) and is '
+     'measured <em>relative to volume</em> &mdash; under 3% of gross is called BALANCED, so a '
+     'near-flat venue cannot be dressed up as selling.</p>'
+     '<p class="note">The Binance perp CVD line is the same idea on futures: '
+     '<code>2&times;(taker buy vol) &minus; total vol</code>.</p>'),
+
+    ("Positioning &mdash; Binance futures long/short crowding", "Positioning",
+     '<p>Three Binance futures ratios, all <strong>contrarian</strong>:</p>'
+     '<table><thead><tr><th>indicator</th><th>what it counts</th></tr></thead><tbody>'
+     '<tr><td>all-accounts L/S</td><td>every account, longs &divide; shorts</td></tr>'
+     '<tr><td>top-trader accounts</td><td>large accounts, longs &divide; shorts</td></tr>'
+     '<tr><td>top-trader positions</td><td>large accounts, by <em>size</em> not headcount</td></tr>'
+     '</tbody></table>'
+     '<p><strong>High ratio = crowd is long = squeeze fuel DOWN.</strong> Low = crowd short = '
+     'squeeze fuel UP. Retail crowded long while top-trader <em>positions</em> fall &rarr; smart '
+     'money exiting into retail strength (bearish). OI falling = deleveraging, not new shorts. '
+     'A mid-range percentile is no signal.</p>'),
+
+    ("Funding rate &amp; perp basis &mdash; what leverage costs", "Derivatives cost",
+     '<p>The 8-hourly payment between longs and shorts, plus the perp&rsquo;s premium to spot '
+     'index. <strong>Positive funding = longs pay shorts = leveraged longs are the crowded '
+     'side</strong> (bearish tilt &mdash; dips get flushed). Negative funding = shorts pay, '
+     'meaning crowded shorts and squeeze fuel <em>up</em>, which is hostile to a short. '
+     'Basis near zero means perp and spot agree.</p>'),
+
+    ("Fear &amp; Greed &mdash; how extreme the crowd is", "Sentiment - Fear & Greed",
+     '<p>0&ndash;100 composite of volatility, momentum, volume, social and dominance. '
+     '<strong>Crowd-state, not price-state:</strong> it says where people are, not where price '
+     'goes. Below 20 = capitulation &mdash; contrarian-bullish for a <em>bounce</em>, which is a '
+     'warning against shorting into it. Above 80 = euphoria, contrarian-bearish.</p>'),
+
+    ("Cost basis / URPD &mdash; where supply sits", "Cost basis / URPD",
+     '<p>Supply by acquisition-price bucket ($2,000 wide). Bars <em>above</em> spot are overhead '
+     'resistance; at or below spot is support. Includes the short-term-holder split: how much '
+     'STH supply is underwater.</p>'),
+
+    ("Valuation floors &mdash; how far is the downside", "Valuation floors",
+     '<p><strong>Balanced Price</strong> (realized price &minus; transferred price) is where past '
+     'cycle bottoms have converged (~1.0x). <strong>AVWAP</strong> since 2015 is the market&rsquo;s '
+     'all-time break-even. Floors, not timing triggers.</p>'),
+
+    ("RSI &mdash; momentum", "RSI - momentum",
+     '<p>Wilder RSI on <strong>daily closes only</strong>, printed two ways so they never have to '
+     'be reconciled: <strong>settled</strong> (completed days, stable, what to reason with) and '
+     '<strong>incl. today&rsquo;s forming candle</strong> (what a live chart shows, drifts all day).</p>'
+     '<p class="note">RSI(6) &gt; RSI(14) &gt; RSI(24) = short-term momentum leading. '
+     'RSI(6) &lt; RSI(24) = deteriorating, bounces being sold into. Never quote an RSI without its '
+     'timeframe &mdash; the same market reads 62 on 1H and 9 on 1D.</p>'),
+
+    ("Divergence &mdash; the only RSI signal with an edge", "Divergence - 20d price low",
+     '<p><strong>Bullish</strong> = a distinct 20-day price low whose RSI14 is <em>higher</em> than '
+     'at the previous 20-day low. Measured on <strong>closes</strong>, from the trigger day, no '
+     'look-ahead. Plain divergence has <strong>no edge</strong> (55% vs 53% baseline); only the '
+     'variant where RSI14 &lt; 35 at the second low tested positive (67%, n=12).</p>'
+     '<p class="note">A straight-down close can never produce this &mdash; a lower close is a loss '
+     'day, so RSI falls with price. The RSI must be <em>rebuilt by a bounce that then fails</em>.</p>'),
+
+    ("Short-fade watch &mdash; when to fade the bounce", "Short-fade watch",
+     '<p>Short trigger: <strong>RSI14 crosses above 40 while price is below MA200</strong> &mdash; a '
+     'bounce that recovered momentum but is still under the trend line. Prints MA200/MA50/MA10 and '
+     'the exact gap. Take profit fast: EV is only ~+0.12%, near break-even.</p>'),
+]
+
+
+def block_heads(raw):
+    """[(number, title)] for every block the digest printed, in printed order."""
+    return re.findall(r"^\[(\d+[a-z]?|\+)\]\s+(.+)$", raw, re.M)
+
+
+def num_of(heads, prefix, default="?"):
+    """The number the digest gave the block whose title starts with `prefix`."""
+    for n, t in heads:
+        if t.startswith(prefix):
+            return n
+    return default
+
+
+def ref_section(raw):
+    """Guide cards in the digest's own block order, numbered FROM the digest text."""
+    heads = block_heads(raw)
+    return "\n\n".join(
+        f'<div class="card"><h3>[{num_of(heads, p)}] {t}</h3>\n{b}</div>'
+        for t, p, b in REF_CARDS)
+
+
 def build(raw=None):
     if raw is None:
         raw = run_digest()
     blocks_html = render_digest(raw)
     kpis = kpi_tiles(raw)
+    heads = block_heads(raw)   # [(printed number, title)] - inline refs use these, never literals
 
     spot = _grab(r"spot \$([\d,]+)", raw, 1, "n/a")
     verdict = _grab(r"^VERDICT: (.+)$", raw, 1, "")
@@ -400,64 +516,9 @@ If the flow section is bearish, everything below it is a bounce to sell. All blo
 </section>
 
 <section id="ref" class="tab">
-<p class="note">What each block is for, and how to read it.</p>
+<p class="note">What each block is for, and how to read it. Numbered in the order they appear on the Dashboard, so the legend, the page and this guide always agree.</p>
 
-<div class="card"><h3>[1] Coinbase Premium Index &mdash; US vs global bid</h3>
-<p>Live and closing spread between Coinbase (US) and Binance (global) BTC price. <strong>Positive = US buyers paying up</strong>; negative = the US is the missing bid. A negative run of 20+ days is a <em>regime</em>, not noise.</p></div>
-
-<div class="card"><h3>[2] US spot BTC ETF net flow (T+1) &mdash; institutional demand</h3>
-<p>Aggregate creations minus redemptions across US spot BTC ETFs. Always read the 5d/30d sums, never a single day.</p></div>
-
-<div class="card"><h3>[3] Coinbase Premium net of Tether &mdash; regime</h3>
-<p>The 30-day mean premium with the USDT/USD rate stripped out, so a stablecoin peg wobble can't fake a signal. Answers: is the US discount structural or transient?</p></div>
-
-<div class="card"><h3>[4] Cost basis / URPD &mdash; where supply sits</h3>
-<p>Supply by acquisition-price bucket ($2,000 wide). Bars <em>above</em> spot are overhead resistance; at or below spot is support. Includes the short-term-holder split: how much STH supply is underwater.</p></div>
-
-<div class="card"><h3>[5] Valuation floors &mdash; how far is the downside</h3>
-<p><strong>Balanced Price</strong> (realized price &minus; transferred price) is where past cycle bottoms have converged (~1.0x). <strong>AVWAP</strong> since 2015 is the market's all-time break-even. Floors, not timing triggers.</p></div>
-
-<div class="card"><h3>[6] Stablecoin supply &mdash; is money coming back?</h3>
-<p>Combined USDT + USDC supply. Expansion = capital arriving into crypto; contraction = capital leaving (not &ldquo;waiting&rdquo;). Needs <em>both</em> 7d and 30d up to call a return.</p></div>
-
-<div class="card"><h3>[7] RSI &mdash; momentum</h3>
-<p>Wilder RSI on <strong>daily closes only</strong>, printed two ways so they never have to be reconciled: <strong>settled</strong> (completed days, stable, what to reason with) and <strong>incl. today's forming candle</strong> (what a live chart shows, drifts all day).</p>
-<p class="note">RSI(6) &gt; RSI(14) &gt; RSI(24) = short-term momentum leading. RSI(6) &lt; RSI(24) = deteriorating, bounces being sold into. Never quote an RSI without its timeframe &mdash; the same market reads 62 on 1H and 9 on 1D.</p></div>
-
-<div class="card"><h3>[7b] Divergence &mdash; the only RSI signal with an edge</h3>
-<p><strong>Bullish</strong> = a distinct 20-day price low whose RSI14 is <em>higher</em> than at the previous 20-day low. Measured on <strong>closes</strong>, from the trigger day, no look-ahead. Plain divergence has <strong>no edge</strong> (55% vs 53% baseline); only the variant where RSI14 &lt; 35 at the second low tested positive (67%, n=12).</p>
-<p class="note">A straight-down close can never produce this &mdash; a lower close is a loss day, so RSI falls with price. The RSI must be <em>rebuilt by a bounce that then fails</em>.</p></div>
-
-<div class="card"><h3>[8] Short-fade watch &mdash; when to fade the bounce</h3>
-<p>Short trigger: <strong>RSI14 crosses above 40 while price is below MA200</strong> &mdash; a bounce that recovered momentum but is still under the trend line. Prints MA200/MA50/MA10 and the exact gap. Take profit fast: EV is only ~+0.12%, near break-even.</p></div>
-
-<div class="card"><h3>[9] Positioning &mdash; Binance futures long/short crowding</h3>
-<p>Three Binance futures ratios, all <strong>contrarian</strong>:</p>
-<table><thead><tr><th>indicator</th><th>what it counts</th></tr></thead><tbody>
-<tr><td>all-accounts L/S</td><td>every account, longs &divide; shorts</td></tr>
-<tr><td>top-trader accounts</td><td>large accounts, longs &divide; shorts</td></tr>
-<tr><td>top-trader positions</td><td>large accounts, by <em>size</em> not headcount</td></tr>
-</tbody></table>
-<p><strong>High ratio = crowd is long = squeeze fuel DOWN.</strong> Low = crowd short = squeeze fuel UP. Retail crowded long while top-trader <em>positions</em> fall → smart money exiting into retail strength (bearish). OI falling = deleveraging, not new shorts. A mid-range percentile is no signal.</p></div>
-
-<div class="card"><h3>[10] Funding rate &amp; perp basis &mdash; what leverage costs</h3>
-<p>The 8-hourly payment between longs and shorts, plus the perp's premium to spot index. <strong>Positive funding = longs pay shorts = leveraged longs are the crowded side</strong> (bearish tilt &mdash; dips get flushed). Negative funding = shorts pay, meaning crowded shorts and squeeze fuel <em>up</em>, which is hostile to a short. Basis near zero means perp and spot agree.</p></div>
-
-<div class="card"><h3>[11] Fear &amp; Greed &mdash; how extreme the crowd is</h3>
-<p>0&ndash;100 composite of volatility, momentum, volume, social and dominance. <strong>Crowd-state, not price-state:</strong> it says where people are, not where price goes. Below 20 = capitulation &mdash; contrarian-bullish for a <em>bounce</em>, which is a warning against shorting into it. Above 80 = euphoria, contrarian-bearish.</p></div>
-
-<div class="card"><h3>[+] Spot taker flow by venue &mdash; who is actually buying</h3>
-<p>Net aggressive buying (taker buy &minus; taker sell) per exchange, in USD. A <strong>partial</strong> rebuild of CoinGlass's per-venue CVD, because only two venues publish history:</p>
-<table><thead><tr><th>venue</th><th>what we can get</th></tr></thead><tbody>
-<tr><td>Binance</td><td>full history &mdash; 1d / 7d / 30d, exact</td></tr>
-<tr><td>OKX</td><td>exact, but only a 48h window</td></tr>
-<tr><td>Coinbase</td><td>live tape snapshot only &mdash; no history published</td></tr>
-<tr><td>Bybit</td><td>nothing public</td></tr>
-</tbody></table>
-<p>The verdict uses the <strong>deep, long-window books</strong> (Binance, OKX) and is measured <em>relative to volume</em> &mdash; under 3% of gross is called BALANCED, so a near-flat venue can't be dressed up as selling.</p></div>
-
-<div class="card"><h3>[+] Global flow proxy</h3>
-<p>Binance taker CVD, <code>2&times;(taker buy vol) &minus; total vol</code>. Net aggressive order flow, not venue-split. Positive = buyers lifting offers.</p></div>
+{ref_section(raw)}
 </section>
 
 <section id="ev" class="tab">
@@ -473,7 +534,7 @@ If the flow section is bearish, everything below it is a bounce to sell. All blo
 <div class="callout"><p><strong>Correction:</strong> an earlier figure of &ldquo;62% win&rdquo; was wrong. It came from a shorter 2024&ndash;2026 sample and a definition that also flagged higher-low/higher-RSI cases, which are not divergences. The numbers above supersede it.</p></div>
 
 <h3>Short-fade &mdash; fade the bounce at resistance</h3>
-<p>Better odds than the long side, but the edge is thin. Detected by block [8].</p>
+<p>Better odds than the long side, but the edge is thin. Detected by block {num_of(heads, "Short-fade watch")}.</p>
 {ev_table(EVIDENCE["short_fade"])}
 
 <h3>Long the bounce &mdash; do not take this leg</h3>
@@ -482,8 +543,8 @@ If the flow section is bearish, everything below it is a bounce to sell. All blo
 </section>
 
 <section id="guide" class="tab">
-<p class="note"><strong>Where the live reading is:</strong> block <strong>[7b] Divergence</strong> on the
-<em>Dashboard</em> tab, inside section <em>2. MOMENTUM</em>. This tab is the guide, not the reading.</p>
+<p class="note"><strong>Where the live reading is:</strong> block <strong>{num_of(heads, "Divergence")} &mdash; Divergence</strong> on the
+<em>Dashboard</em> tab, inside section <em>4. MOMENTUM</em>. This tab is the guide, not the reading.</p>
 <p>Price and the RSI stop agreeing. Price keeps going the same way, but the RSI refuses to follow &mdash; the move is running out of force underneath.</p>
 
 <h3>The four types</h3>
