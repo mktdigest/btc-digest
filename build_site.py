@@ -297,7 +297,7 @@ def kpi_tiles(raw):
     e30 = _grab(r"30d (-?\$[\d,\.]+M)", raw)
     if e30:
         e5 = _grab(r"5d (-?\$[\d,\.]+M)", raw, 1, "n/a")
-        t.append(tile("ETF flows", e30, f"5d {e5}", "US spot ETFs, 30-day net",
+        t.append(tile("ETF flows", e30, f"last 5 days {e5}", "US spot ETFs, 30-day net",
                       "neg" if e30.startswith("-") else "pos"))
 
     pv = _grab(r"live ([+-][\d\.]+)%", raw)
@@ -337,7 +337,11 @@ def kpi_tiles(raw):
     oi = _grab(r"OI \$([\d\.]+)bn \(1d ([+-][\d\.]+)", raw, 1)
     if oi:
         d1 = _grab(r"OI \$[\d\.]+bn \(1d ([+-][\d\.]+)", raw, 1, "n/a")
-        t.append(tile("Open leverage", f"${oi}B", f"1-day change {d1}B",
+        # "$" must sit before the digits, not after the sign: "1-day change -0.44B" read as a
+        # bare number with no unit at all.
+        d1s = str(d1)
+        d1_disp = f"{'-' if d1s.startswith('-') else '+'}${d1s.lstrip('-+')}B"
+        t.append(tile("Open leverage", f"${oi}B", f"1-day change {d1_disp}",
                       "Deleveraging, not new shorts" if str(d1).startswith("-")
                       else "Fresh leverage entering",
                       "neg" if str(d1).startswith("-") else "pos"))
