@@ -56,6 +56,8 @@ def _font(size=17, bold=False):
 
 def _fmt(v):
     a = abs(v)
+    if a == 0:
+        return "0"
     if a >= 1e9:
         return f"{v / 1e9:.1f}B"
     if a >= 1e6:
@@ -71,10 +73,37 @@ def _fmt(v):
     return f"{v:.2f}"
 
 
+def _ord(n):
+    """41 -> 41st, 43 -> 43rd, 11 -> 11th. Never format 'th' straight onto a number."""
+    n = int(round(n))
+    if 11 <= n % 100 <= 13:
+        return f"{n}th"
+    return f"{n}" + {1: "st", 2: "nd", 3: "rd"}.get(n % 10, "th")
+
+
+def _rank_pct(vals):
+    """Each value's rank within its own list, 0-100.
+
+    Uses the SAME definition as the digest's percentile (share of the window at or below the
+    value), so the chart and the text can never disagree about what a percentile means.
+    """
+    n = len(vals) or 1
+    return [sum(1 for x in vals if x <= v) / n * 100 for v in vals]
+
+
 def _frame(title, w=W, h=H):
     img = Image.new("RGB", (w, h), BG)
     d = ImageDraw.Draw(img)
-    d.text((20, 14), title, fill=FG, font=_font(23, True))
+    f = _font(23, True)
+    # Keep the title clear of the right-aligned series legend that line_chart draws at y=20.
+    # A 59-char title ran straight into it and rendered as unreadable overlap, so truncate here
+    # rather than trusting every caller to keep titles short.
+    maxw = w - 430
+    if d.textlength(title, font=f) > maxw:
+        while title and d.textlength(title + "\u2026", font=f) > maxw:
+            title = title[:-1]
+        title = title.rstrip() + "\u2026"
+    d.text((20, 14), title, fill=FG, font=f)
     return img, d
 
 
@@ -102,7 +131,7 @@ def _mapx(i, n, x0, x1):
 
 
 def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
-               pad=(104, 26, 52, 44)):
+               pad=(104, 26, 52, 44), ylim=None):
     """series: list of (values, colour, label).
 
     dlines: [(value, colour, label)] - dotted reference lines (a series' own median, a balance
@@ -117,13 +146,16 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
     flat = [v for vals, *_ in series for v in vals if v is not None and (v > 0 if log else True)]
     if not flat:
         return False
-    lo, hi = min(flat), max(flat)
-    if lo == hi:
-        lo, hi = lo * 0.99, hi * 1.01
-    pad_y = (hi - lo) * 0.08
-    lo, hi = lo - pad_y, hi + pad_y
-    if not log and min(flat) >= 0 and lo < 0:
-        lo = 0.0
+    if ylim:
+        lo, hi = ylim                          # fixed scale, e.g. 0-100 for a percentile panel
+    else:
+        lo, hi = min(flat), max(flat)
+        if lo == hi:
+            lo, hi = lo * 0.99, hi * 1.01
+        pad_y = (hi - lo) * 0.08
+        lo, hi = lo - pad_y, hi + pad_y
+        if not log and min(flat) >= 0 and lo < 0:
+            lo = 0.0
     tlo, thi = tf(lo), tf(hi)
     _grid(d, x0, x1, y0, y1, lo, hi)
 
@@ -132,7 +164,8 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
             y = y1 - (y1 - y0) * (tf(v) - tlo) / (thi - tlo)
             d.line([(x0, y), (x1, y)], fill=col, width=2)
 
-    # dotted reference lines, hand-drawn (PIL has no dash style), each tagged at the right edge
+    # dotted reference lines, hand-drawn (PIL has no dash style). Labels are drawn AFTER the
+    # series further down - drawing them here let the series lines print straight through the text.
     tags = []
     for v, col, lbl in dlines:
         if not (hi >= v >= lo):
@@ -143,6 +176,13 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
             d.line([(x, y), (min(x + 9, x1), y)], fill=col, width=2)
             x += 16
         tags.append([y, lbl, col])
+
+    for vals, col, *rest in series:
+        pts = [(_mapx(i, len(vals), x0, x1), y1 - (y1 - y0) * (tf(v) - tlo) / (thi - tlo))
+               for i, v in enumerate(vals) if v is not None and (v > 0 if log else True)]
+        if len(pts) > 1:
+            d.line(pts, fill=col, width=3, joint="curve")
+
     tags.sort(key=lambda r: r[0])
     for i in range(1, len(tags)):                    # push labels apart so none overlap
         if tags[i][0] - tags[i - 1][0] < 18:
@@ -153,12 +193,6 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
         tw = d.textlength(lbl, font=ftag)
         d.rectangle([x1 - tw - 14, y - 11, x1 - 2, y + 11], fill=BG)   # box it, or lines show through
         d.text((x1 - 8, y), lbl, fill=col, font=ftag, anchor="rm")
-
-    for vals, col, *rest in series:
-        pts = [(_mapx(i, len(vals), x0, x1), y1 - (y1 - y0) * (tf(v) - tlo) / (thi - tlo))
-               for i, v in enumerate(vals) if v is not None and (v > 0 if log else True)]
-        if len(pts) > 1:
-            d.line(pts, fill=col, width=3, joint="curve")
 
     lx = x1
     for vals, col, *rest in reversed(series):
@@ -465,16 +499,44 @@ def build_all(outdir, series_path):
             pa = sum(1 for x in ra if x <= ra[-1]) / len(ra) * 100
             pt = sum(1 for x in rt if x <= rt[-1]) / len(rt) * 100
             add("c_ratios.png", "Long/short ratios - who is crowded",
-                [f"all acct {ra[-1]:.2f} ({pa:.0f}th pctile)", f"top acct {rt[-1]:.2f} ({pt:.0f}th pctile)",
+                [f"all acct {ra[-1]:.2f} ({_ord(pa)} pctile)", f"top acct {rt[-1]:.2f} ({_ord(pt)} pctile)",
                  f"top positions {rp[-1]:.2f}"],
                 "Above 1 = more longs than shorts. Read it CONTRARIAN: a crowded long book is "
                 "squeeze fuel DOWN; a crowded short book is squeeze fuel UP. When retail is "
                 "long but top-trader POSITIONS are falling, smart money is exiting into retail "
                 "strength. Mid-range percentile = no signal.",
-                ("Crowd is crowded LONG (%.0fth pctile) - squeeze fuel down. Top-trader "
-                 "positions at %.2f, so smart money is not adding." % (pa, rp[-1]) if pa >= 80
+                ("Crowd is crowded LONG (%s pctile) - squeeze fuel down. Top-trader "
+                 "positions at %.2f, so smart money is not adding." % (_ord(pa), rp[-1]) if pa >= 80
                  else ("Crowd crowded SHORT - squeeze fuel up." if pa <= 20
                        else "Positioning mid-range - no contrarian signal.")))
+    except Exception:
+        pass
+
+    # 8b. the SAME three ratios as own-window percentiles -------------------
+    # Raw levels are not comparable: the headcount series sits near 2.3 by construction and the
+    # size series near 1.85, so a "normal" 2.0 reads as long-heavy and a crowded 3.0 reads as
+    # average. Re-scored against each series' OWN 30-day window, all three land on one 0-100
+    # scale and "how crowded is this, really?" becomes answerable at a glance.
+    try:
+        ra = S.get("ratios_all", []); rt = S.get("ratios_topacct", []); rp = S.get("ratios_toppos", [])
+        if ra and rt and rp:
+            p = os.path.join(outdir, "c_ratio_pct.png")
+            qa, qt, qp = _rank_pct(ra), _rank_pct(rt), _rank_pct(rp)
+            if line_chart(p, [(qa, ACC, "all accounts"), (qt, PUR, "top acct"), (qp, TEAL, "top positions")],
+                          "Long/short ratios as own-window percentiles",
+                          dlines=[(85, DN, "85 = crowded long"), (15, UP, "15 = crowded short")],
+                          ylim=(0, 100)):
+                add("c_ratio_pct.png", "Long/short crowding - apples to apples",
+                    [f"all acct {_ord(qa[-1])} pctile", f"top acct {_ord(qt[-1])} pctile",
+                     f"top pos {_ord(qp[-1])} pctile"],
+                    "Same data as the chart above, re-scored so the three are comparable. 100 means "
+                    "that series is at its most crowded in 30 days, 0 its least. Above 85 = crowded "
+                    "long (contrarian bearish); below 15 = crowded short (squeeze fuel up).",
+                    ("All three pinned high - the whole book is leaning long, squeeze risk is broad."
+                     if min(qa[-1], qt[-1], qp[-1]) >= 80 else
+                     f"Headcount {_ord(qa[-1])} vs position size {_ord(qp[-1])} - "
+                     + ("many small longs, not big conviction." if qa[-1] > qp[-1] + 20
+                        else "no wide split between crowd and size.")))
     except Exception:
         pass
 
