@@ -231,6 +231,105 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
     return True
 
 
+def dual_chart(path, primary, secondary, title, days=None, log=True,
+               pad=(104, 118, 56, 44), h=430, ylim=None, sdlines=()):
+    """Two series, two independent y-axes: price on the left, an index LEVEL on the right.
+
+    Written for BTC vs DXY. Indexing both series to 100 (the earlier approach) made the
+    comparison mathematically fair but visually useless: DXY travelled 96-103 over the window,
+    so on a shared 40-120 axis it flattened into a line pinned at 100 while BTC's drawdown owned
+    the whole panel. You could not see the dollar at all. Here DXY keeps its REAL level on its
+    own axis, zoomed to its own range, so its strength is legible.
+
+    The trade-off is that the two slopes are no longer comparable - a 1% DXY move and a 1% BTC
+    move are different pixel heights. The on-canvas note and the caption both say so; the
+    percentages live in the caption's number line instead.
+
+    pad's right gutter must fit the right-axis labels (118px at 2 decimals).
+    """
+    pvals, pcol, plbl = primary
+    svals, scol, slbl = secondary
+    pl, pr, pt, pb = pad
+    img, d = _frame(title, h=h)
+    x0, x1, y0, y1 = pl, W - pr, pt, h - pb
+    tf = (lambda v: math.log10(v)) if log else (lambda v: v)
+    pf = [v for v in pvals if v is not None and (v > 0 if log else True)]
+    sf = [v for v in svals if v is not None]
+    if not pf or not sf:
+        return False
+
+    if ylim:
+        lo, hi = ylim
+    else:
+        lo, hi = min(pf), max(pf)
+        pad_y = (hi - lo) * 0.08 or abs(hi) * 0.01 or 1
+        lo, hi = lo - pad_y, hi + pad_y
+    tlo, thi = tf(lo), tf(hi)
+    _grid(d, x0, x1, y0, y1, lo, hi,
+          deco=lambda v: f"${v / 1000:,.0f}k" if abs(v) >= 1000 else f"${v:,.0f}")
+
+    # Right axis: snap to round levels so the labels read 96 / 98 / 100 / 102 / 104 instead of
+    # 96.203 / 97.962 / ... The zoom is the point, so keep all 5 ticks inside the series range.
+    slo, shi = min(sf), max(sf)
+    sp_y = (shi - slo) * 0.12 or abs(shi) * 0.005 or 1
+    slo, shi = _nice_axis(slo - sp_y, shi + sp_y, 4)
+    sspan = (shi - slo) or 1
+    step = sspan / 4
+    # Pick the fewest decimals that print `step` EXACTLY. Snapping produced a 2.5 step, and a
+    # naive ">= 1.5 -> 0 decimals" rule then labelled the 97.5 tick "98": a label that lies about
+    # where its own gridline sits. Derive it from the step instead of guessing at the size.
+    dec = 2
+    for cand in (0, 1, 2):
+        if abs(round(step, cand) - step) < 1e-9:
+            dec = cand
+            break
+
+    def sy(v):
+        return y1 - (y1 - y0) * (v - slo) / sspan
+
+    for i in range(5):
+        v = slo + step * i
+        y = sy(v)
+        d.line([(x1, y), (x1 + 7, y)], fill=DIM, width=2)
+        d.text((x1 + 12, y), f"{v:.{dec}f}", fill=scol, font=_font(16), anchor="lm")
+    # No axis-name text at the top: it collided with the top tick and the legend. The legend
+    # labels carry "(left)"/"(right)" and the tick colours match the lines instead.
+
+    ftag = _font(15, True)
+    for v, col, lbl in sdlines:
+        if not (shi >= v >= slo):
+            continue
+        y = sy(v)
+        x = x0
+        while x < x1:
+            d.line([(x, y), (min(x + 8, x1), y)], fill=col, width=1)
+            x += 15
+        if lbl:
+            tw = d.textlength(lbl, font=ftag)
+            d.rectangle([x1 - tw - 14, y - 11, x1 - 2, y + 11], fill=BG)
+            d.text((x1 - 8, y), lbl, fill=col, font=ftag, anchor="rm")
+
+    # Primary (price) uses the left/log mapping, secondary (index level) the right/linear one.
+    ppts = [(_mapx(i, len(pvals), x0, x1), y1 - (y1 - y0) * (tf(v) - tlo) / (thi - tlo))
+            for i, v in enumerate(pvals) if v is not None and (v > 0 if log else True)]
+    spts = [(_mapx(i, len(svals), x0, x1), sy(v))
+            for i, v in enumerate(svals) if v is not None]
+    for pts, col in ((ppts, pcol), (spts, scol)):
+        if len(pts) > 1:
+            d.line(pts, fill=col, width=3, joint="curve")
+
+    lx = x1
+    for col, lbl in ((scol, slbl), (pcol, plbl)):
+        d.text((lx, 20), lbl, fill=col, font=_font(17, True), anchor="ra")
+        lx -= int(d.textlength(lbl, font=_font(17, True))) + 30
+    _xaxis(d, days or [], x0, x1, y1)
+    d.text((20, h - 16),
+           "Left axis = BTC price (log). Right axis = DXY, ZOOMED to its own range - read the "
+           "direction and the labelled level, not the slope.", fill=DIM, font=_font(15))
+    img.save(path)
+    return True
+
+
 def bars_chart(path, values, title, days=None, pad=(104, 26, 52, 44), pos=UP, neg=DN,
                cum=False, unit="", cum_scale=1.0, deco=None, symmetric=True):
     pl, pr, pt, pb = pad
@@ -382,15 +481,16 @@ def build_all(outdir, series_path):
         if dxy and close and len(dxy) >= 2:
             n = min(len(dxy), len(close))
             dxy, px, dys = dxy[-n:], close[-n:], (days or [])[-n:]
-            # Index BOTH to 100 at the left edge. A dual axis (BTC ~$65k vs DXY ~99) invents
-            # crossovers that look meaningful and are pure scale artefacts; comparing percentage
-            # moves from a common base is the honest way to show correlation.
+            # DXY at its REAL level on its own right-hand axis, zoomed to its own range.
+            # An indexed overlay of both series (the previous version) is fair maths and a
+            # useless chart: DXY's 96->103 range compressed to a flat line at 100 and you could
+            # not see the dollar at all. Levels on their own axis; % moves in the number line.
             b = [v / px[0] * 100 for v in px]
             q = [v / dxy[0] * 100 for v in dxy]
             p = os.path.join(outdir, "c_dxy.png")
-            if line_chart(p, [(b, AMBER, "BTC"), (q, ACC, "DXY (ECB-reconstructed)")],
-                          "BTC vs DXY - both indexed to 100 at start",
-                          days=dys, dlines=[(100, DIM, "start = 100")], nice=True):
+            if dual_chart(p, (px, AMBER, "BTC price (left)"), (dxy, ACC, "DXY (right)"),
+                          "BTC price vs DXY - actual levels, separate axes",
+                          days=dys, log=True, sdlines=[(100.0, DIM, "")]):
                 # Correlate DAILY RETURNS, not price levels. Two series can both trend hard and
                 # "correlate" strongly as levels while having no day-to-day link at all - that is
                 # spurious correlation. Returns are what answer "does the dollar move BTC?".
@@ -402,23 +502,38 @@ def build_all(outdir, series_path):
                 sb = math.sqrt(sum((x - mb) ** 2 for x in rb))
                 sd = math.sqrt(sum((y - md) ** 2 for y in rq))
                 r = cov / (sb * sd) if sb and sd else 0.0
+                dpts = dxy[-1] - dxy[0]
+                dpc = dpts / dxy[0] * 100
+                # Where today's level sits inside the window: a 103 print means little on its
+                # own, "103 = top of the 13-month range" is the actionable part.
+                rank = sum(1 for v in dxy if v <= dxy[-1]) / len(dxy) * 100
                 add("c_dxy.png", "Dollar strength - macro headwind or tailwind",
-                    [f"DXY {dxy[-1]:.2f}", f"DXY {q[-1] - 100:+.1f}%", f"BTC {b[-1] - 100:+.1f}%",
+                    [f"DXY {dxy[-1]:.2f}", f"{dpc:+.1f}% / {dpts:+.1f} pts",
+                     f"range {min(dxy):.1f}-{max(dxy):.1f}", f"BTC {b[-1] - 100:+.1f}%",
                      f"daily corr {r:+.2f}"],
-                    "DXY is the US dollar against six currencies; EUR alone is 57.6% of it. Both "
-                    "lines are indexed to 100 at the left edge, so this compares PERCENTAGE moves, "
-                    "not price levels. The usual regime relationship is inverse - dollar up, BTC "
-                    "down. The correlation shown is on DAILY RETURNS, not price levels: two "
-                    "trending series can look tightly linked while having no day-to-day link at "
-                    "all. A headwind/tailwind gauge, not a timing trigger. Rebuilt from ECB "
-                    "reference rates, so it can sit ~0.1-0.2% off the ICE print.",
-                    (f"Inverse and tight (daily corr {r:+.2f}): dollar moves are pressuring BTC "
-                     f"day to day." if r <= -0.3 else
-                     f"Moving together (daily corr {r:+.2f}): the usual inverse has broken - BTC "
-                     f"is trading on its own flows." if r >= 0.3 else
-                     f"Weak day-to-day link (corr {r:+.2f}) even though BTC is {b[-1] - 100:+.0f}% "
-                     f"and DXY {q[-1] - 100:+.0f}% over the window - so the inverse is a slow "
-                     f"regime drift, not a signal you can trade off."),
+                    "DXY is the US dollar against six currencies; EUR alone is 57.6% of it. The "
+                    "blue line is DXY's ACTUAL level, read off the right-hand axis, which is "
+                    "zoomed to the range it actually traded - so the line's slope is not on the "
+                    "same scale as BTC's and the two lines' heights cannot be compared "
+                    "positionally. What IS comparable is the percentage column above. The usual "
+                    "regime relationship is inverse - dollar up, BTC down. Correlation is on "
+                    "DAILY RETURNS, not price levels: two trending series can look tightly "
+                    "linked while having no day-to-day link at all. A headwind/tailwind gauge, "
+                    "not a timing trigger. Rebuilt from ECB reference rates, so it can sit "
+                    "~0.1-0.2% off the ICE print.",
+                    (f"Dollar is at the TOP of its range (P{rank:.0f}, {dxy[-1]:.2f} vs "
+                     f"{min(dxy):.1f}-{max(dxy):.1f}, +{dpc:.1f}% to date): a rising dollar drains "
+                     f"liquidity from BTC, so treat rallies as fades while this holds."
+                     if rank >= 80 and dpc > 0 else
+                     f"Dollar is at the BOTTOM of its range (P{rank:.0f}, {dxy[-1]:.2f}): a "
+                     f"falling dollar is a tailwind - the macro backdrop is not what is "
+                     f"holding BTC down." if rank <= 20 else
+                     f"Dollar mid-range (P{rank:.0f}, {dxy[-1]:.2f} in {min(dxy):.1f}-"
+                     f"{max(dxy):.1f}, {dpc:+.1f}%): no strong macro push either way. Daily "
+                     f"return correlation {r:+.2f} - "
+                     + (f"the inverse is live, dollar ticks are pressuring BTC." if r <= -0.3 else
+                        f"weak day-to-day link, so the {dpc:+.0f}% dollar move is slow regime "
+                        f"drift rather than a tradeable signal.")),
                     "wide")
     except Exception:
         pass
