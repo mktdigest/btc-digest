@@ -6,6 +6,7 @@ then tabs for Charts / Reference / Evidence / Guide so the page is never one lon
 
 Usage:  python3 build_site.py [path-to-digest.txt]
 """
+import hashlib
 import html
 import os
 import re
@@ -536,9 +537,20 @@ def build(raw=None):
         # normalise: callers pass "wide" or " wide" - concatenating raw gave class="ccardwide"
         cls = f" {cls.strip()}" if cls and cls.strip() else ""
         chips = "".join(f'<span class="chip">{esc(x)}</span>' for x in (now or []))
+        # Cache-buster on the image URL. GitHub Pages serves assets with a long max-age and the
+        # browser keeps the OLD PNG when only the bytes change under the same filename - that
+        # shipped a corrected caption on top of the previous chart and the reader saw the old
+        # plot ("am still looking at the old chart"). Hash the bytes so a new image is a new URL.
+        ver = f"{datetime.now(timezone.utc):%Y%m%d%H%M}"
+        try:
+            with open(os.path.join(HERE, img_src), "rb") as fh:
+                ver = hashlib.md5(fh.read()).hexdigest()[:10]
+        except Exception:
+            pass
+        sep = "&" if "?" in img_src else "?"
         return (f'<div class="ccard{cls}"><h4>{esc(title)}</h4>'
                 f'<div class="cnow">{chips}</div>'
-                f'<img src="{img_src}" alt="{esc(alt)}">'
+                f'<img src="{img_src}{sep}v={ver}" alt="{esc(alt)}">'
                 f'<p class="cuse"><strong>How to use it:</strong> {esc(use)}</p>'
                 + (f'<p class="cverdict">&rarr; {esc(verdict)}</p>' if verdict else "")
                 + "</div>")
