@@ -10,6 +10,7 @@ apparent size instead of being scaled down into illegibility.
 import json
 import math
 import os
+import statistics
 import urllib.request
 
 from PIL import Image, ImageDraw, ImageFont
@@ -100,8 +101,15 @@ def _mapx(i, n, x0, x1):
     return x0 + (x1 - x0) * (i / max(1, n - 1))
 
 
-def line_chart(path, series, title, days=None, log=False, hlines=(), pad=(104, 26, 52, 44)):
-    """series: list of (values, colour, label)."""
+def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
+               pad=(104, 26, 52, 44)):
+    """series: list of (values, colour, label).
+
+    dlines: [(value, colour, label)] - dotted reference lines (a series' own median, a balance
+    point) labelled at the right edge. PIL has no dash style so these are drawn by hand. The L/S
+    medians sit ~11px apart on the canvas, so labels are staggered vertically and boxed on the
+    chart background - otherwise they print on top of each other and read as a single number.
+    """
     pl, pr, pt, pb = pad
     img, d = _frame(title)
     x0, x1, y0, y1 = pl, W - pr, pt, H - pb
@@ -123,6 +131,28 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), pad=(104, 2
         if hi >= v >= lo:
             y = y1 - (y1 - y0) * (tf(v) - tlo) / (thi - tlo)
             d.line([(x0, y), (x1, y)], fill=col, width=2)
+
+    # dotted reference lines, hand-drawn (PIL has no dash style), each tagged at the right edge
+    tags = []
+    for v, col, lbl in dlines:
+        if not (hi >= v >= lo):
+            continue
+        y = y1 - (y1 - y0) * (tf(v) - tlo) / (thi - tlo)
+        x = x0
+        while x < x1:
+            d.line([(x, y), (min(x + 9, x1), y)], fill=col, width=2)
+            x += 16
+        tags.append([y, lbl, col])
+    tags.sort(key=lambda r: r[0])
+    for i in range(1, len(tags)):                    # push labels apart so none overlap
+        if tags[i][0] - tags[i - 1][0] < 18:
+            tags[i][0] = tags[i - 1][0] + 18
+    ftag = _font(15, True)
+    for y, lbl, col in tags:
+        y = min(max(y, y0 + 10), y1 - 4)
+        tw = d.textlength(lbl, font=ftag)
+        d.rectangle([x1 - tw - 14, y - 11, x1 - 2, y + 11], fill=BG)   # box it, or lines show through
+        d.text((x1 - 8, y), lbl, fill=col, font=ftag, anchor="rm")
 
     for vals, col, *rest in series:
         pts = [(_mapx(i, len(vals), x0, x1), y1 - (y1 - y0) * (tf(v) - tlo) / (thi - tlo))
@@ -422,8 +452,16 @@ def build_all(outdir, series_path):
     try:
         ra = S.get("ratios_all", []); rt = S.get("ratios_topacct", []); rp = S.get("ratios_toppos", [])
         p = os.path.join(outdir, "c_ratios.png")
+        # Draw each series' OWN median, because the three answers to "is this crowded?" differ -
+        # a bare 1.8 means nothing until you know that series' normal. Plus the 1.00 balance line,
+        # the only hard reference: everything above it is net long, whatever "normal" happens to be.
+        med = lambda v: (statistics.median(v) if v else 0.0)
+        refs = [(1.0, WHITE, "1.00 = balanced"),
+                (med(ra), ACC, f"all-acct median {med(ra):.2f}"),
+                (med(rt), PUR, f"top-acct median {med(rt):.2f}"),
+                (med(rp), TEAL, f"top-pos median {med(rp):.2f}")]
         if line_chart(p, [(ra, ACC, "all accounts"), (rt, PUR, "top acct"), (rp, TEAL, "top positions")],
-                      "Binance long/short ratios (contrarian)", hlines=[(1, DIM)]):
+                      "Binance long/short ratios (contrarian)", dlines=refs):
             pa = sum(1 for x in ra if x <= ra[-1]) / len(ra) * 100
             pt = sum(1 for x in rt if x <= rt[-1]) / len(rt) * 100
             add("c_ratios.png", "Long/short ratios - who is crowded",
