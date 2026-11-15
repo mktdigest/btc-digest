@@ -28,25 +28,25 @@ CSS = """
 :root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;
 --accent:#58a6ff;--green:#3fb950;--red:#f85149;--amber:#d29922;
 --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
-body{background:var(--bg);color:var(--txt);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+body{background:var(--bg);color:var(--txt);font:18px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
 -webkit-font-smoothing:antialiased;padding:0 0 70px}
-.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
 header{padding:36px 0 0}
-h1{font-size:28px;font-weight:650;letter-spacing:-.02em}
-.sub{color:var(--dim);font-size:14px;margin-top:6px}
-h2{font-size:20px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
-h3{font-size:15px;font-weight:650;margin:0 0 10px;color:var(--accent)}
-h4{font-size:13px;margin:0 0 8px;color:var(--txt)}
+h1{font-size:36px;font-weight:650;letter-spacing:-.02em}
+.sub{color:var(--dim);font-size:17px;margin-top:6px}
+h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
+h3{font-size:20px;font-weight:650;margin:0 0 10px;color:var(--accent)}
+h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
-p.note{color:var(--dim);font-size:14px}
+p.note{color:var(--dim);font-size:16.5px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px;margin:13px 0}
-.card pre{font-family:var(--mono);font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
+.card pre{font-family:var(--mono);font-size:15.5px;line-height:1.7;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .verdict{color:var(--green);font-weight:600}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
-table{width:100%;border-collapse:collapse;margin:13px 0;font-size:14px;display:block;overflow-x:auto}
-th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;white-space:nowrap}
-th{background:#1c2128;font-weight:650;font-size:13px;color:#c9d1d9}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:16.5px;display:block;overflow-x:auto}
+th,td{border:1px solid var(--line);padding:10px 13px;text-align:left;white-space:nowrap}
+th{background:#1c2128;font-weight:650;font-size:15px;color:#c9d1d9}
 td.num{font-family:var(--mono);text-align:right}
 .neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
 img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px 0;display:block}
@@ -61,22 +61,26 @@ h3.sec{font-size:16px;color:var(--txt);font-weight:700;margin:26px 0 2px;padding
 border-top:1px solid var(--line);letter-spacing:-.01em}
 p.sdesc{color:var(--dim);font-size:13px;margin:2px 0 10px;font-style:italic}
 .kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:9px;margin:16px 0 0}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
-.kpi .k{display:block;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.045em}
-.kpi .v{display:block;font-size:18px;font-weight:650;font-family:var(--mono);margin-top:3px}
-.kpi .n{display:block;font-size:11px;color:var(--dim);margin-top:1px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:12px 15px}
+.kpi .k{display:block;font-size:12.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.045em}
+.kpi .v{display:block;font-size:26px;font-weight:650;font-family:var(--mono);margin-top:4px}
+.kpi .n{display:block;font-size:13.5px;color:var(--dim);margin-top:2px}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:22px 0 0;border-bottom:1px solid var(--line)}
 .tabs button{background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);
-font:inherit;font-size:14px;padding:9px 15px;cursor:pointer;font-weight:600}
+font:inherit;font-size:17px;padding:11px 18px;cursor:pointer;font-weight:600}
 .tabs button:hover{color:var(--txt)}
 .tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
 .tab{display:none}.tab.on{display:block}
-.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}
-@media(max-width:780px){.cgrid{grid-template-columns:1fr}}
-.ccard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
-.ccard img{width:100%;border-radius:6px;display:block}
-.ccard p{font-size:12.5px;color:var(--dim);margin:8px 0 0}
+.cgrid{display:grid;grid-template-columns:1fr;gap:22px;margin-top:18px}
+.ccard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
+.ccard img{width:100%;border-radius:8px;display:block;margin:14px 0}
+.ccard p{font-size:16.5px;color:#c9d1d9;margin:10px 0 0}
 .ccard.wide{grid-column:1/-1}
+.cnow{display:flex;flex-wrap:wrap;gap:9px;margin:4px 0 4px}
+.chip{background:#1c2128;border:1px solid var(--line);border-radius:7px;padding:7px 14px;
+font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
+.cuse{color:var(--dim);font-size:16.5px}
+.cverdict{color:#7ee787;font-weight:650;font-size:17px;margin-top:12px}
 @media(max-width:600px){h1{font-size:23px}.wrap{padding:0 15px}th,td{padding:6px 8px;font-size:13px}}
 """
 
@@ -264,13 +268,41 @@ def build(raw=None):
     if not os.path.exists(src):
         cands = sorted(f for f in os.listdir(CHART_DIR) if f.startswith("btc_daily_"))
         src = os.path.join(CHART_DIR, cands[-1]) if cands else None
+    def card(title, img_src, alt, now, use, verdict, cls=""):
+        chips = "".join(f'<span class="chip">{esc(x)}</span>' for x in (now or []))
+        return (f'<div class="ccard{cls}"><h4>{esc(title)}</h4>'
+                f'<div class="cnow">{chips}</div>'
+                f'<img src="{img_src}" alt="{esc(alt)}">'
+                f'<p class="cuse"><strong>How to use it:</strong> {esc(use)}</p>'
+                + (f'<p class="cverdict">&rarr; {esc(verdict)}</p>' if verdict else "")
+                + "</div>")
+
+    bal = _grab(r"Balanced Price \$([\d,]+)", raw)
+    balx = _grab(r"Balanced Price \$[\d,]+ \([\d-]+\)\s+-> spot ([\d\.]+)x", raw)
+    avw = _grab(r"AVWAP since [\d-]+ \$([\d,]+)", raw)
+    avwx = _grab(r"AVWAP since [\d-]+ \$[\d,]+ \(thru [\d-]+\)\s+-> spot ([\d\.]+)x", raw)
     cycle_html = ""
     if src and os.path.exists(src):
         shutil.copy(src, os.path.join(HERE, "chart.png"))
-        cycle_html = ('<div class="ccard wide"><h4>Cycle context &mdash; price vs Balanced Price &amp; all-time AVWAP</h4>'
-                      '<img src="chart.png" alt="BTC price, Balanced Price, anchored VWAP">'
-                      '<p>Log scale. Balanced Price is where past cycle bottoms converged (~1.0&times;); '
-                      'AVWAP is the market&rsquo;s all-time break-even. Floors, not timing triggers.</p></div>')
+        cyc_now = []
+        if bal:
+            cyc_now.append(f"Balanced ${bal}")
+        if balx:
+            cyc_now.append(f"spot {balx}x balanced")
+        if avw:
+            cyc_now.append(f"AVWAP ${avw}")
+        if avwx:
+            cyc_now.append(f"spot {avwx}x AVWAP")
+        cycle_html = card(
+            "Cycle context - price vs Balanced Price and all-time anchored VWAP",
+            "chart.png", "BTC price, Balanced Price, anchored VWAP", cyc_now,
+            "Balanced Price is where past cycle BOTTOMS converged (about 1.0x). The AVWAP is the "
+            "market's all-time break-even. The further spot sits above these, the more downside "
+            "exists before deep support is reached. These are floors, not timing triggers - price "
+            "can stay far above them for a long time.",
+            (f"Spot is {balx}x the Balanced floor and {avwx}x the all-time VWAP. A full retest of "
+             f"the floor would be roughly ${bal}." if bal and balx and avwx else ""),
+            " wide")
 
     # indicator charts
     chart_meta = []
@@ -279,14 +311,9 @@ def build(raw=None):
     except Exception as e:
         chart_meta = [{"file": "", "title": f"charts unavailable ({type(e).__name__})", "caption": ""}]
 
-    ccards = []
-    files = [c for c in chart_meta if c.get("file")]
-    for i, c in enumerate(files):
-        # an odd count would leave the last card alone in its row - let it span instead
-        cls = " wide" if (len(files) % 2 == 1 and i == len(files) - 1) else ""
-        ccards.append(f'<div class="ccard{cls}"><h4>{esc(c["title"])}</h4>'
-                      f'<img src="{esc(c["file"])}" alt="{esc(c["title"])}">'
-                      f'<p>{esc(c["caption"])}</p></div>')
+    ccards = [card(c["title"], esc(c["file"]), c["title"], c.get("now"),
+                   c.get("use", ""), c.get("verdict", ""), c.get("cls", ""))
+              for c in chart_meta if c.get("file")]
     chart_grid = '<div class="cgrid">' + cycle_html + "".join(ccards) + "</div>"
 
     doc = f"""<!DOCTYPE html>
