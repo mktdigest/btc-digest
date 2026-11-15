@@ -313,6 +313,9 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
 {ev_table(EVIDENCE["long_bounce"])}
 
 <h2 id="divergence"><span class="n">05</span>Divergence guide</h2>
+<p class="note"><strong>Where the live reading is:</strong> block <strong>[7b] Divergence</strong>, inside
+section <em>4. MOMENTUM</em> at the top of this page. This section explains how to interpret it &mdash;
+it is the guide, not the reading.</p>
 <p>Price and the RSI stop agreeing. Price keeps going the same way, but the RSI refuses to follow &mdash; the move is running out of force underneath.</p>
 
 <h3>The four types</h3>
