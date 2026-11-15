@@ -41,7 +41,21 @@ p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:16.5px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px;margin:13px 0}
 .card pre{font-family:var(--mono);font-size:16px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
-.verdict{color:var(--green);font-weight:600}
+.verdict{color:var(--dim);font-weight:600}
+.vline{display:block;font-weight:650}
+.vline .stag,.key .stag{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.06em;
+padding:2px 8px;border-radius:5px;margin-right:9px;vertical-align:1px}
+.vline.bear{color:#ff8a80}.vline.bear .stag,.key .stag.bear{background:#3d1418;color:#ff8a80;border:1px solid #6e2126}
+.vline.bull{color:#7ee787}.vline.bull .stag,.key .stag.bull{background:#0d2818;color:#7ee787;border:1px solid #238636}
+.vline.warn{color:#e3b341}.vline.warn .stag,.key .stag.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
+.vline.flat{color:#8b949e}.vline.flat .stag,.key .stag.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
+.sbadge{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.03em;
+padding:4px 12px;border-radius:7px;margin-left:10px;vertical-align:3px;white-space:nowrap}
+.sbadge.bear{background:#3d1418;color:#ff8a80;border:1px solid #6e2126}
+.sbadge.bull{background:#0d2818;color:#7ee787;border:1px solid #238636}
+.sbadge.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
+.sbadge.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
+.key{margin:16px 0 2px;font-size:16px;color:var(--dim);line-height:2.1}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
 table{width:100%;border-collapse:collapse;margin:13px 0;font-size:16.5px;display:block;overflow-x:auto}
@@ -128,10 +142,23 @@ def esc(s):
     return html.escape(s)
 
 
+STANCE_LABEL = {"bear": "BEARISH", "bull": "BULLISH", "warn": "CAUTION", "flat": "NO SIGNAL"}
+
+
 def fmt_line(line):
-    e = esc(line.rstrip())
     st = line.strip()
+    # Verdict lines carry an explicit stance tag written by the digest. Colour comes from THAT,
+    # never from the wording - "EXTREME FEAR" is contrarian-bullish but a warning against
+    # shorting, and "oversold" is a bounce zone inside a deteriorating trend.
+    m = re.match(r"^->\s*\[(bear|bull|warn|flat)\]\s*(.*)$", st)
+    if m:
+        stance, body = m.group(1), m.group(2)
+        return (f'<span class="vline {stance}">'
+                f'<b class="stag">{STANCE_LABEL[stance]}</b>{esc(body)}</span>')
+    e = esc(line.rstrip())
     if st.startswith("->"):
+        # untagged verdict: show it neutrally rather than defaulting to green, which made
+        # bearish news read as good news. Every block should be tagged; grey here means a gap.
         return f'<span class="verdict">{e}</span>'
     if st.startswith("watch"):
         return f'<span class="watch">{e}</span>'
@@ -165,6 +192,28 @@ def render_blocks(lines):
     return "\n".join(out)
 
 
+def section_stance(body_lines):
+    """Net stance of a whole section, from the stance tags its blocks carry.
+
+    This is the cue the section header was missing. "If flow is bearish, everything below is a
+    bounce to sell" was an instruction with no way to check it - you had to total up five blocks
+    by hand. Now the header says it outright.
+    """
+    tags = re.findall(r"->\s*\[(bear|bull|warn|flat)\]", "\n".join(body_lines))
+    if not tags:
+        return None
+    nb, nu, nw = tags.count("bear"), tags.count("bull"), tags.count("warn")
+    tally = " / ".join(f"{n} {word}" for n, word in
+                       ((nb, "bearish"), (nu, "bullish"), (nw, "caution")) if n)
+    if nb > nu:
+        return "bear", f"NET BEARISH - {tally}"
+    if nu > nb:
+        return "bull", f"NET BULLISH - {tally}"
+    if nb or nw:
+        return "warn", f"MIXED - {tally}"
+    return "flat", "NO SIGNAL - nothing directional"
+
+
 def render_digest(raw):
     lines = [l for l in raw.splitlines() if not l.startswith("MEDIA:")]
     bar = "=" * 70
@@ -188,7 +237,9 @@ def render_digest(raw):
             continue                       # rendered as its own tile in the header
         out.append(f'<div class="hrow">{esc(l)}</div>')
     for s in sections:
-        out.append(f'<h3 class="sec">{esc(s["title"])}</h3>')
+        st = section_stance(s["body"])
+        badge = f' <span class="sbadge {st[0]}">{esc(st[1])}</span>' if st else ""
+        out.append(f'<h3 class="sec">{esc(s["title"])}{badge}</h3>')
         for d in s["desc"]:
             out.append(f'<p class="sdesc">{esc(d)}</p>')
         if s["title"].startswith("LEGEND"):
@@ -512,6 +563,13 @@ def build(raw=None):
 then positioning &amp; sentiment, price structure, momentum, and finally the actionable signals.
 If the flow section is bearish, everything below it is a bounce to sell. All blocks are settled
 <strong>daily closes</strong> unless a line says &ldquo;live&rdquo;.</p>
+
+<p class="key">Every block ends in a tagged verdict, and each section header carries its net tally.
+Colour is the stance, not the tone of the wording:
+<span class="stag bear">BEARISH</span> capital or demand leaking, or the crowd leaning the wrong way &middot;
+<span class="stag bull">BULLISH</span> capital or demand arriving &middot;
+<span class="stag warn">CAUTION</span> contrarian or bounce risk &mdash; act on it carefully &middot;
+<span class="stag flat">NO SIGNAL</span> nothing directional, do not force a trade.</p>
 {blocks_html}
 </section>
 
