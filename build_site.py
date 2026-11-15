@@ -340,15 +340,23 @@ def kpi_tiles(raw):
                       else "Fresh leverage entering",
                       "neg" if str(d1).startswith("-") else "pos"))
 
-    ls = _grab(r"all-acct L/S ([\d\.]+) \(30d [\d\.]+-[\d\.]+, pctile (\d+)%\)", raw, 1)
+    ls = re.search(r"all-acct L/S ([\d\.]+) \(30d ([\d\.]+)-([\d\.]+), median ([\d\.]+), "
+                   r"crowd lines ([\d\.]+)/([\d\.]+), pctile (\d+)%\)", raw)
     if ls:
-        lsp = _grab(r"all-acct L/S [\d\.]+ \(30d [\d\.]+-[\d\.]+, pctile (\d+)%\)", raw, 1, "0")
-        crowd_long = int(lsp) >= 80
-        crowd_short = int(lsp) <= 20
-        t.append(tile("Long/short ratio", ls, f"{lsp}th pctile",
-                      "Crowd crowded LONG - squeeze fuel down" if crowd_long else
-                      ("Crowd crowded SHORT - squeeze fuel up" if crowd_short
-                       else "Positioning mid-range - no signal"),
+        lsv, lo, hi, med, c15, c85 = ls.group(1, 2, 3, 4, 5, 6)
+        lsp = int(ls.group(7))
+        # Thresholds MUST match the digest's own verdict gates (p85 / p15). These were 80/20 here
+        # while the block text used 85/15, so at an 82nd-pctile reading the tile said "mid-range,
+        # no signal" while the block directly beneath it said "crowded LONG".
+        crowd_long, crowd_short = lsp >= 85, lsp <= 15
+        if crowd_long:
+            verdict = f"above the {c85} crowded-long line - squeeze fuel down"
+        elif crowd_short:
+            verdict = f"below the {c15} crowded-short line - squeeze fuel up"
+        else:
+            verdict = f"mid-range {c15}-{c85} - no crowding signal"
+        t.append(tile("Long/short ratio", lsv, f"30d {lo}-{hi} \u00b7 {lsp}th pctile",
+                      f"Neutral {med} \u00b7 {verdict}",
                       "neg" if crowd_long else ("pos" if crowd_short else "")))
 
     fng = _grab(r"now (\d+) \(([^)]+)\)", raw)
