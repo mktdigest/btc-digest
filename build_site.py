@@ -438,9 +438,16 @@ REF_CARDS = [
      'STH supply is underwater.</p>'),
 
     ("Valuation floors &mdash; how far is the downside", "Valuation floors",
+     '<p><strong>VWAP</strong> = volume-weighted average price. The average price BTC traded at, '
+     'where a price that traded heavy volume counts for more than a price that traded almost '
+     'nothing. It answers &ldquo;what did buyers actually pay?&rdquo; A simple average counts every '
+     'candle equally; VWAP counts the ones with real money behind them.</p>'
+     '<p><strong>AVWAP</strong> = anchored VWAP &mdash; the same calculation started from a chosen '
+     'date instead of the whole history. Anchored at 2015-07-20 (Coinbase&rsquo;s first BTC-USD '
+     'candle) it is the break-even price of every Coinbase buyer since the exchange opened. Above '
+     'it the average buyer is in profit; below it, underwater.</p>'
      '<p><strong>Balanced Price</strong> (realized price &minus; transferred price) is where past '
-     'cycle bottoms have converged (~1.0x). <strong>AVWAP</strong> since 2015 is the market&rsquo;s '
-     'all-time break-even. Floors, not timing triggers.</p>'),
+     'cycle bottoms have converged (~1.0x). Both are deep floors, not timing triggers.</p>'),
 
     ("RSI &mdash; momentum", "RSI - momentum",
      '<p>Wilder RSI on <strong>daily closes only</strong>, printed two ways so they never have to '
@@ -555,10 +562,14 @@ def build(raw=None):
         cycle_html = card(
             "Cycle context - price vs Balanced Price and all-time anchored VWAP",
             "chart.png", "BTC price, Balanced Price, anchored VWAP", cyc_now,
-            "Balanced Price is where past cycle BOTTOMS converged (about 1.0x). The AVWAP is the "
-            "market's all-time break-even. The further spot sits above these, the more downside "
-            "exists before deep support is reached. These are floors, not timing triggers - price "
-            "can stay far above them for a long time.",
+            "VWAP = volume-weighted average price: the average price BTC changed hands at, where a "
+            "price that traded heavy volume counts for more than one that traded almost nothing. "
+            "It answers 'what did buyers actually pay?' AVWAP is the same sum anchored to a chosen "
+            "start date - here 2015-07-20, Coinbase's first BTC-USD candle - so it is the "
+            "break-even of EVERY Coinbase buyer since the exchange opened. Above it, the average "
+            "buyer is in profit; below it, underwater. Balanced Price is where past cycle BOTTOMS "
+            "converged (~1.0x). Both are deep floors, not timing triggers - price can sit far "
+            "above them for a long time, as it does now (2.2x AVWAP, 1.7x Balanced).",
             (f"Spot is {balx}x the Balanced floor and {avwx}x the all-time VWAP. A full retest of "
              f"the floor would be roughly ${bal}." if bal and balx and avwx else ""),
             " wide")

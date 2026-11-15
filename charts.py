@@ -70,7 +70,29 @@ def _fmt(v):
         return f"{v:.0f}"
     if a >= 1:
         return f"{v:.1f}"
-    return f"{v:.2f}"
+    # Below 1, %.2f collapsed funding rates (~0.002-0.01) into duplicate "0.00" / "-0.01" axis
+    # labels. %g keeps significant digits instead, so small values stay distinct and readable.
+    return f"{v:.4g}"
+
+
+def _nice_axis(lo, hi, n=4):
+    """Snap [lo, hi] outward to a 1/2/2.5/5 x 10^k grid and return the snapped bounds.
+
+    _grid divides the range into n equal parts and labels each one, so an arbitrary data range
+    yields labels like 0.01137 / 0.007834 / 0.0007652. Choosing a round step first makes the axis
+    readable; the cost is a little empty space at the ends, which is far cheaper than an axis
+    nobody can read.
+    """
+    if not (hi > lo):
+        hi = lo + (abs(lo) or 1.0)
+    raw = (hi - lo) / max(1, n)
+    b = 10 ** math.floor(math.log10(raw)) if raw > 0 else 1.0
+    step = 10 * b
+    for m in (1, 2, 2.5, 5, 10):
+        if raw <= m * b:
+            step = m * b
+            break
+    return math.floor(lo / step) * step, math.ceil(hi / step) * step
 
 
 def _ord(n):
@@ -206,30 +228,46 @@ def line_chart(path, series, title, days=None, log=False, hlines=(), dlines=(),
 
 
 def bars_chart(path, values, title, days=None, pad=(104, 26, 52, 44), pos=UP, neg=DN,
-               cum=False, unit="", cum_scale=1.0, deco=None):
+               cum=False, unit="", cum_scale=1.0, deco=None, symmetric=True):
     pl, pr, pt, pb = pad
     img, d = _frame(title)
     x0, x1, y0, y1 = pl, W - pr, pt, H - pb
     if not values:
         return False
-    vmax = max(abs(min(values)), abs(max(values))) or 1
-    _grid(d, x0, x1, y0, y1, -vmax, vmax, deco=deco)
-    mid = (y0 + y1) / 2
+    if symmetric:
+        # Centred on zero so the +/- balance reads correctly, with 12% headroom so the tallest bar
+        # never ends exactly on the top gridline (which read as chopped off at the axis limit).
+        ext = (max(abs(min(values)), abs(max(values))) or 1) * 1.12
+        lo_v, hi_v = -ext, ext
+    else:
+        # One-sided data (funding is positive 99% of the time). Scaling symmetrically wasted half
+        # the panel on empty negative space; fit the data instead. Snap to a round step here
+        # because these magnitudes (~0.002-0.01) otherwise label as 0.01137 / 0.0007652.
+        lo_v, hi_v = min(min(values), 0.0), max(max(values), 0.0)
+        sp = (hi_v - lo_v) or 1.0
+        lo_v, hi_v = _nice_axis(lo_v - sp * 0.08, hi_v + sp * 0.08)
+    _grid(d, x0, x1, y0, y1, lo_v, hi_v, deco=deco)
+
+    vspan = (hi_v - lo_v) or 1.0
+
+    def _yof(v):
+        return y1 - (y1 - y0) * (v - lo_v) / vspan
+
+    zero = _yof(0.0)
     n = len(values)
+    bw = int(max(2, (x1 - x0) / n * 0.7))
     for i, v in enumerate(values):
-        h = (y1 - y0) / 2 * (abs(v) / vmax)
-        x = _mapx(i, n, x0, x1)
-        d.line([(x, mid), (x, mid - h if v > 0 else mid + h)],
-               fill=pos if v > 0 else neg, width=int(max(2, (x1 - x0) / n * 0.7)))
-    d.line([(x0, mid), (x1, mid)], fill=DIM)
+        d.line([(_mapx(i, n, x0, x1), zero), (_mapx(i, n, x0, x1), _yof(v))],
+               fill=pos if v > 0 else neg, width=bw)
+    d.line([(x0, zero), (x1, zero)], fill=DIM)
     if cum:
         run, tot = [], 0.0
         for v in values:
             tot += v
             run.append(tot)
         cmin, cmax = min(run), max(run)
-        span = (cmax - cmin) or 1
-        pts = [(_mapx(i, n, x0, x1), y1 - (y1 - y0) * 0.9 * ((v - cmin) / span) - (y1 - y0) * 0.05)
+        cspan = (cmax - cmin) or 1
+        pts = [(_mapx(i, n, x0, x1), y1 - (y1 - y0) * 0.9 * ((v - cmin) / cspan) - (y1 - y0) * 0.05)
                for i, v in enumerate(run)]
         d.line(pts, fill=AMBER, width=3, joint="curve")
         d.text((x1, 20), f"cumulative {_fmt(tot * cum_scale)}{unit}", fill=AMBER,
@@ -465,7 +503,8 @@ def build_all(outdir, series_path):
     try:
         fr = S.get("funding", [])
         p = os.path.join(outdir, "c_funding.png")
-        if fr and bars_chart(p, [x * 100 for x in fr], "Perp funding rate, % per 8h (30d)"):
+        if fr and bars_chart(p, [x * 100 for x in fr], "Perp funding rate, % per 8h (30d)",
+                             symmetric=False):
             now_r = fr[-1] * 100
             avg = sum(fr) / len(fr) * 100
             ann = avg * 3 * 365
