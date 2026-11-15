@@ -1,5 +1,5 @@
 BTC daily read  |  2026-11-15 13:28 UTC
-spot $65,693 (Coinbase)   $65,726 (Binance)   USDT/USD 0.99935
+spot $65,569 (Coinbase)   $65,594 (Binance)   USDT/USD 0.99935
 blocks use settled DAILY closes unless a line says 'live'
 VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
@@ -14,7 +14,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> ETF money still leaving: -$2,327.7M over 30d.
 
 [1] Coinbase Premium Index - US vs global bid
-    live -0.051%   last close -0.049% (prev -0.113%)
+    live -0.038%   last close -0.049% (prev -0.113%)
     30d avg -0.142%   negative streak 71d   1y low -0.271%
     -> US still discounting to global for 71 straight days: US bid is the missing buyer.
 
@@ -29,9 +29,9 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.
 
 [+] Spot taker flow by venue - net aggressive buying
-    Binance  1d -67m   7d -121m (-1.2% of vol)   30d +508m
+    Binance  1d -68m   7d -122m (-1.2% of vol)   30d +507m
     OKX      48h -6m (-0.3% of vol)   (OKX publishes 48h only)
-    Coinbase live +3.8 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    Coinbase live +12.5 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
     -> both venues roughly BALANCED (<3% of volume): no directional spot pressure.
     Binance PERP CVD 5d -2,711 BTC | 30d +7,398 BTC
@@ -52,9 +52,9 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 [4] Cost basis / URPD: UNAVAILABLE
     (RuntimeError)
 
-[5] Valuation floors - how far is the downside (spot $65,693)
-    Balanced Price $38,709 (2026-11-14)  -> spot 1.70x
-    AVWAP since 2015-07-20 $29,928 (thru 2026-11-14)  -> spot 2.20x
+[5] Valuation floors - how far is the downside (spot $65,569)
+    Balanced Price $38,709 (2026-11-14)  -> spot 1.69x
+    AVWAP since 2015-07-20 $29,928 (thru 2026-11-14)  -> spot 2.19x
     -> Price is 1.7x the Balanced floor and 2.2x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,709.
 
 ======================================================================
@@ -63,7 +63,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 ======================================================================
 [7] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-14
     RSI(6) 9.2 | RSI(14) 20.0 | RSI(24) 28.0   (RSI14 1y percentile 2%)
-    same maths incl today's forming candle (live $65,693): RSI(6) 21.4 | RSI(14) 25.9  <- drifts until the close
+    same maths incl today's forming candle (live $65,569): RSI(6) 20.6 | RSI(14) 25.4  <- drifts until the close
     divergence (20d low/high vs RSI14 - 9y test: only the oversold variant has edge):
     none - last 20d lows: 2026-11-05 75,969/RSI 38.6 -> 2026-11-10 73,698/RSI 34.2
     watch (bullish): a NEW 20d CLOSE below 64,119 (last one today) - but only AFTER a bounce. The chart's wick low is 63,270, but this trigger is CLOSE-basis - a wick down and back up does not count. A straight-down close lowers RSI14 too (would print ~19.6 vs 20.0 = no divergence), so it takes a RALLY THAT FAILS, not just a drop.
@@ -74,8 +74,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.
 ======================================================================
 [8] Short-fade watch - fade the bounce at resistance (the only positive-EV side)
-    MA200 72,973 | MA50 80,138 | MA10 72,882   -> spot 65,693 is -10.0% vs MA200
-    NOT ARMED - RSI14 20.0, needs to cross 40 (+20 pts). MA200 72,973 is +11.1% from spot
+    MA200 72,973 | MA50 80,138 | MA10 72,882   -> spot 65,569 is -10.1% vs MA200
+    NOT ARMED - RSI14 20.0, needs to cross 40 (+20 pts). MA200 72,973 is +11.3% from spot
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first
 
 
