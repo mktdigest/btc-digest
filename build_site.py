@@ -189,8 +189,9 @@ def ev_table(rows):
     return "\n".join(h)
 
 
-def build():
-    raw = run_digest()
+def build(raw=None):
+    if raw is None:
+        raw = run_digest()
     blocks_html = render_digest(raw)
 
     # chart
@@ -356,4 +357,10 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
 
 
 if __name__ == "__main__":
-    build()
+    # optional arg: path to an already-captured digest (avoids re-running it and
+    # re-spending API quota, e.g. bitcoin-data.com's 10 req/hour limit)
+    if len(sys.argv) > 1:
+        with open(sys.argv[1]) as fh:
+            build(fh.read())
+    else:
+        build()
