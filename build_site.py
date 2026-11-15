@@ -53,6 +53,12 @@ img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:14px
 .callout p{margin:4px 0;color:#e6d7a8}
 footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:13px}
 code{font-family:var(--mono);background:#1c2128;padding:2px 6px;border-radius:4px;font-size:13px}
+.hrow{font-family:var(--mono);font-size:13px;color:var(--dim);margin:2px 0}
+.verdict-card{background:#0d2818;border:1px solid #238636;border-radius:8px;padding:12px 16px;
+margin:12px 0 18px;font-size:15px;font-weight:650;color:#7ee787}
+h3.sec{font-size:17px;color:var(--txt);font-weight:700;margin:34px 0 2px;padding-top:10px;
+border-top:1px solid var(--line);letter-spacing:-.01em}
+p.sdesc{color:var(--dim);font-size:13.5px;margin:2px 0 12px;font-style:italic}
 @media(max-width:600px){h1{font-size:23px}.wrap{padding:0 15px}th,td{padding:6px 8px;font-size:13px}}
 """
 
@@ -110,33 +116,66 @@ def fmt_line(line):
     return e
 
 
-def render_digest(raw):
-    lines = [l for l in raw.splitlines() if not l.startswith("MEDIA:")]
-    blocks, cur, pre = [], [], []
+def render_blocks(lines):
+    """Render a run of lines into block cards, splitting on [N] markers."""
+    blocks, cur = [], None
     for l in lines:
-        if re.match(r"^\[[0-9+\]]", l):
+        if re.match(r"^\[[0-9+]+[a-z]?\]", l):
             if cur:
                 blocks.append(cur)
             cur = [l]
-        elif cur:
-            cur.append(l)
-        else:
-            pre.append(l)
+        elif cur is not None:
+            if l.strip() == "":
+                blocks.append(cur)
+                cur = None
+            else:
+                cur.append(l)
     if cur:
         blocks.append(cur)
-
     out = []
-    if any(x.strip() for x in pre):
-        out.append('<div class="card"><pre>' + "\n".join(fmt_line(l) for l in pre if l.strip() or True) + "</pre></div>")
     for b in blocks:
-        title = b[0]
-        body = [l for l in b[1:]]
-        while body and not body[-1].strip():
-            body.pop()
-        if not body:
+        title, body = b[0], b[1:]
+        if not any(x.strip() for x in body):
             continue
         out.append(f'<div class="card"><h3>{esc(title)}</h3><pre>'
                    + "\n".join(fmt_line(l) for l in body) + "</pre></div>")
+    return "\n".join(out)
+
+
+def render_digest(raw):
+    """Parse the digestic into header + numbered sections, render as HTML."""
+    lines = [l for l in raw.splitlines() if not l.startswith("MEDIA:")]
+    bar = "=" * 70
+    head, sections, i = [], [], 0
+    while i < len(lines):
+        if lines[i].strip() == bar:
+            title = lines[i + 1] if i + 1 < len(lines) else ""
+            desc, j = [], i + 2
+            while j < len(lines) and lines[j].strip() != bar:
+                if lines[j].strip():
+                    desc.append(lines[j].strip())
+                j += 1
+            sections.append({"title": title, "desc": desc, "body": []})
+            i = j + 1
+            continue
+        (sections[-1]["body"] if sections else head).append(lines[i])
+        i += 1
+
+    out = []
+    for l in [x for x in head if x.strip()]:
+        if l.startswith("VERDICT:"):
+            out.append(f'<div class="verdict-card">{esc(l)}</div>')
+        else:
+            out.append(f'<div class="hrow">{esc(l)}</div>')
+    for s in sections:
+        out.append(f'<h3 class="sec">{esc(s["title"])}</h3>')
+        for d in s["desc"]:
+            out.append(f'<p class="sdesc">{esc(d)}</p>')
+        if s["title"].startswith("LEGEND"):
+            body = "\n".join(l for l in s["body"] if l.strip())
+            out.append(f'<div class="card"><pre>{esc(body)}</pre></div>')
+        else:
+            out.append(render_blocks(s["body"]))
     return "\n".join(out)
 
 
@@ -189,7 +228,9 @@ def build():
 
 <h2 id="digest"><span class="n">01</span>Today's digest</h2>
 <p class="note">All blocks are settled <strong>daily closes</strong> unless a line says "live".
-Flow/cost-basis blocks are as-of the last completed day.</p>
+Sections run in order of importance: <strong>flow first</strong> (where the money is going), then positioning
+(who is leveraged), price structure (where supply sits), momentum, and finally the actionable signals.
+If the flow section is bearish, everything below it is a bounce to sell.</p>
 {blocks_html}
 
 <h2 id="chart"><span class="n">02</span>Chart</h2>
@@ -236,6 +277,16 @@ Flow/cost-basis blocks are as-of the last completed day.</p>
 <tr><td>top-trader positions</td><td>large accounts, by <em>size</em> not headcount</td></tr>
 </tbody></table>
 <p><strong>High ratio = crowd is long = squeeze fuel DOWN.</strong> Low ratio = crowd short = squeeze fuel UP. When retail is crowded long but top-trader <em>positions</em> are falling, smart money is exiting into retail strength &mdash; a bearish tell. Open interest falling means deleveraging (liquidation), not new shorts; OI rising means fresh positions. A mid-range percentile is no signal at all.</p></div>
+
+<div class="card"><h3>[+] Spot taker flow by venue &mdash; who is actually buying</h3>
+<p>Net aggressive buying (taker buy &minus; taker sell) per exchange, in USD. This is a <strong>partial</strong> rebuild of CoinGlass's per-venue CVD, because only two venues publish the data:</p>
+<table><thead><tr><th>venue</th><th>what we can get</th></tr></thead><tbody>
+<tr><td>Binance</td><td>full history &mdash; 1d / 7d / 30d, exact</td></tr>
+<tr><td>OKX</td><td>exact, but only a 48h window</td></tr>
+<tr><td>Coinbase</td><td>live tape snapshot only &mdash; no history published</td></tr>
+<tr><td>Bybit</td><td>nothing public</td></tr>
+</tbody></table>
+<p>The verdict is driven by the <strong>deep, long-window books</strong> (Binance, OKX). The Coinbase line is marked context-only because a snapshot of the last thousand trades is minutes of data, not a trend &mdash; the same US-selling signal is captured properly by the Coinbase premium in block [1].</p></div>
 
 <div class="card"><h3>[+] Global flow proxy</h3>
 <p>Binance taker CVD, <code>2&times;(taker buy vol) &minus; total vol</code>. Net aggressive order flow, not venue-split. Positive = buyers lifting offers.</p></div>
