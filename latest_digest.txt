@@ -1,5 +1,5 @@
-BTC daily read  |  2026-11-15 14:04 UTC
-spot $65,246 (Coinbase)   $65,288 (Binance)   USDT/USD 0.99938
+BTC daily read  |  2026-11-15 14:08 UTC
+spot $65,157 (Coinbase)   $65,194 (Binance)   USDT/USD 0.99939
 blocks use settled DAILY closes unless a line says 'live'
 VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
@@ -14,7 +14,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> ETF money still leaving: -$2,327.7M over 30d.
 
 [1] Coinbase Premium Index - US vs global bid
-    live -0.065%   last close -0.049% (prev -0.113%)
+    live -0.057%   last close -0.049% (prev -0.113%)
     30d avg -0.142%   negative streak 71d   1y low -0.271%
     -> US still discounting to global for 71 straight days: US bid is the missing buyer.
 
@@ -29,9 +29,9 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.
 
 [+] Spot taker flow by venue - net aggressive buying
-    Binance  1d -72m   7d -125m (-1.2% of vol)   30d +504m
+    Binance  1d -73m   7d -126m (-1.2% of vol)   30d +503m
     OKX      48h -10m (-0.4% of vol)   (OKX publishes 48h only)
-    Coinbase live +0.8 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    Coinbase live -0.2 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
     -> both venues roughly BALANCED (<3% of volume): no directional spot pressure.
     Binance PERP CVD 5d -2,711 BTC | 30d +7,398 BTC
@@ -49,8 +49,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 [10] Derivatives cost - funding rate & perp basis
     funding now +0.0006% /8h  ->  +0.6% annualised
     30d avg +0.0069% /8h  ->  +7.6% annualised   (positive in 99% of periods)
-    perp basis -0.046%  (mark 65,266 vs index 65,296)
-    perp 24h vol $23.4bn   last 24h -1.85%
+    perp basis -0.057%  (mark 65,156 vs index 65,193)
+    perp 24h vol $23.4bn   last 24h -1.93%
     -> longs pay shorts: leveraged longs still the crowded side, dips get flushed (bearish tilt).
 
 [11] Sentiment - Fear & Greed index
@@ -65,8 +65,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 [4] Cost basis / URPD: UNAVAILABLE
     (RuntimeError)
 
-[5] Valuation floors - how far is the downside (spot $65,246)
-    Balanced Price $38,709 (2026-11-14)  -> spot 1.69x
+[5] Valuation floors - how far is the downside (spot $65,157)
+    Balanced Price $38,709 (2026-11-14)  -> spot 1.68x
     AVWAP since 2015-07-20 $29,928 (thru 2026-11-14)  -> spot 2.18x
     -> Price is 1.7x the Balanced floor and 2.2x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,709.
 
@@ -77,7 +77,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 ======================================================================
 [7] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-14
     RSI(6) 9.2 | RSI(14) 20.0 | RSI(24) 28.0   (RSI14 1y percentile 2%)
-    same maths incl today's forming candle (live $65,246): RSI(6) 18.3 | RSI(14) 24.3  <- drifts until the close
+    same maths incl today's forming candle (live $65,157): RSI(6) 17.7 | RSI(14) 23.9  <- drifts until the close
     -> oversold <30: capitulation zone, historically where bounces start; fast < slow = momentum deteriorating, bounces are being sold into.
 
 [7b] Divergence - 20d price low vs RSI14 (the only RSI signal with an edge)
@@ -89,8 +89,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.
 ======================================================================
 [8] Short-fade watch - fade the bounce at resistance (the only positive-EV side)
-    MA200 72,973 | MA50 80,138 | MA10 72,882   -> spot 65,246 is -10.6% vs MA200
-    NOT ARMED - RSI14 20.0, needs to cross 40 (+20 pts). MA200 72,973 is +11.8% from spot
+    MA200 72,973 | MA50 80,138 | MA10 72,882   -> spot 65,157 is -10.7% vs MA200
+    NOT ARMED - RSI14 20.0, needs to cross 40 (+20 pts). MA200 72,973 is +12.0% from spot
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first
 
 

@@ -49,6 +49,7 @@ th,td{border:1px solid var(--line);padding:10px 13px;text-align:left;white-space
 th{background:#1c2128;font-weight:650;font-size:15px;color:#c9d1d9}
 td.num{font-family:var(--mono);text-align:right}
 .neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
+.warn{color:var(--amber);font-weight:650}
 img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px 0;display:block}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
@@ -60,11 +61,13 @@ margin:16px 0 4px;font-size:15px;font-weight:650;color:#7ee787}
 h3.sec{font-size:16px;color:var(--txt);font-weight:700;margin:26px 0 2px;padding-top:12px;
 border-top:1px solid var(--line);letter-spacing:-.01em}
 p.sdesc{color:var(--dim);font-size:13px;margin:2px 0 10px;font-style:italic}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:9px;margin:16px 0 0}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:12px 15px}
-.kpi .k{display:block;font-size:12.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.045em}
-.kpi .v{display:block;font-size:26px;font-weight:650;font-family:var(--mono);margin-top:4px}
-.kpi .n{display:block;font-size:13.5px;color:var(--dim);margin-top:2px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 0}
+@media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 16px}
+.kpi .k{display:block;font-size:14px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-weight:650}
+.kpi .v{display:block;font-size:26px;font-weight:650;font-family:var(--mono);margin-top:6px;line-height:1.15}
+.kpi .d{display:block;font-size:16.5px;font-weight:650;font-family:var(--mono);margin-top:4px}
+.kpi .n{display:block;font-size:14.5px;color:var(--dim);margin-top:5px;line-height:1.45}
 .tabs{display:flex;gap:4px;flex-wrap:wrap;margin:22px 0 0;border-bottom:1px solid var(--line)}
 .tabs button{background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);
 font:inherit;font-size:17px;padding:11px 18px;cursor:pointer;font-weight:600}
@@ -212,44 +215,89 @@ def _grab(pat, text, group=1, default=None):
 
 
 def kpi_tiles(raw):
-    """Pull the headline numbers out of the digest into at-a-glance tiles."""
-    def tile(k, v, n="", cls=""):
+    """Headline numbers as eight tiles laid out 4 x 2.
+
+    Each tile has four layers: what it is, the headline value, the COMPARISON WINDOW that
+    makes the value mean something, and a plain-English implication. The comparison line is
+    its own sized element - a signal like "30d -$11.66bn capital leaving" must not hide in
+    small grey text. Row 1 is flow, row 2 is positioning/sentiment.
+    """
+    def tile(k, v, d="", n="", vcls="", dcls=""):
         return (f'<div class="kpi"><span class="k">{esc(k)}</span>'
-                f'<span class="v {cls}">{esc(str(v))}</span>'
+                f'<span class="v {vcls}">{esc(str(v))}</span>'
+                f'<span class="d {dcls or vcls}">{esc(str(d))}</span>'
                 f'<span class="n">{esc(n)}</span></div>')
 
     t = []
-    etf = _grab(r"30d (-?\$[\d,\.]+M)", raw)
-    if etf:
-        t.append(tile("ETF 30d", etf, "institutional demand", "neg" if etf.startswith("-") else "pos"))
+
+    # --- row 1: flow -------------------------------------------------------
+    e30 = _grab(r"30d (-?\$[\d,\.]+M)", raw)
+    if e30:
+        e5 = _grab(r"5d (-?\$[\d,\.]+M)", raw, 1, "n/a")
+        t.append(tile("ETF flows", e30, f"5d {e5}", "US spot ETFs, 30-day net",
+                      "neg" if e30.startswith("-") else "pos"))
+
     pv = _grab(r"live ([+-][\d\.]+)%", raw)
-    st = _grab(r"negative streak (\d+)d", raw)
     if pv:
-        t.append(tile("US premium", f"{pv}%", f"{st}d negative" if st else "vs global",
+        st = _grab(r"negative streak (\d+)d", raw, 1, "")
+        pavg = _grab(r"30d avg ([+-][\d\.]+)%\s+negative streak", raw, 1, "")
+        t.append(tile("US premium", f"{pv}%", f"{st} days negative" if st else "vs global",
+                      f"Coinbase vs Binance. 30d avg {pavg}%" if pavg else "Coinbase vs Binance",
                       "neg" if pv.startswith("-") else "pos"))
+
     m = re.search(r"combined \$([\d\.]+B)\s+7d ([+-]?\$[\d\.]+B)\s+30d ([+-]?\$[\d\.]+B)", raw)
     if m:
-        t.append(tile("Stablecoins", m.group(1), f"30d {m.group(3)}",
-                      "neg" if m.group(3).startswith("-") else "pos"))
+        lvl, d30 = m.group(1), m.group(3)
+        t.append(tile("Stablecoins", f"${lvl}", f"30d {d30}",
+                      "Capital leaving crypto, not waiting" if d30.startswith("-")
+                      else "Capital returning to crypto",
+                      "neg" if d30.startswith("-") else "pos"))
+
     r14 = _grab(r"RSI\(14\) ([\d\.]+)", raw)
     if r14:
-        t.append(tile("RSI14", r14, "daily close",
-                      "neg" if float(r14) < 30 else ("pos" if float(r14) > 70 else "")))
-    fnd = _grab(r"30d avg ([+-][\d\.]+)% /8h  ->  ([+-][\d\.]+)% annualised", raw, 2)
+        pct = _grab(r"RSI14 1y percentile (\d+)%", raw, 1, "")
+        v = float(r14)
+        t.append(tile("RSI(14)", r14, f"1y pctile {pct}%" if pct else "daily close",
+                      "Oversold - capitulation zone" if v < 30 else
+                      ("Overbought - stretched" if v > 70 else "Neutral, no extreme"),
+                      "neg" if v < 30 else ("pos" if v > 70 else "")))
+
+    # --- row 2: positioning / sentiment ------------------------------------
+    fnd = _grab(r"30d avg ([+-][\d\.]+)% /8h\s*->\s*([+-][\d\.]+)% annualised", raw, 2)
     if fnd:
-        t.append(tile("Funding", f"{fnd}%", "annualised", "neg" if fnd.startswith("-") else "pos"))
-    oi = _grab(r"OI \$([\d\.]+)bn \(1d ([+-][\d\.]+)", raw)
-    oi1 = _grab(r"OI \$[\d\.]+bn \(1d ([+-][\d\.]+)", raw)
+        t.append(tile("Funding rate", f"{fnd}%", "30d avg, annualised",
+                      "Longs pay shorts - crowded longs" if fnd.startswith("+")
+                      else "Shorts pay longs - squeeze fuel up",
+                      "warn" if fnd.startswith("+") else "pos"))
+
+    oi = _grab(r"OI \$([\d\.]+)bn \(1d ([+-][\d\.]+)", raw, 1)
     if oi:
-        t.append(tile("Perp OI", f"${oi}bn", f"1d {oi1}", "pos" if str(oi1).startswith("+") else "neg"))
-    ls = _grab(r"all-acct L/S ([\d\.]+) \(30d [\d\.\-]+-[\d\.]+, pctile (\d+)%\)", raw, 1)
-    lsp = _grab(r"all-acct L/S [\d\.]+ \(30d [\d\.\-]+-[\d\.]+, pctile (\d+)%\)", raw, 1)
+        d1 = _grab(r"OI \$[\d\.]+bn \(1d ([+-][\d\.]+)", raw, 1, "n/a")
+        t.append(tile("Perp open interest", f"${oi}bn", f"1d {d1}bn",
+                      "Deleveraging, not new shorts" if str(d1).startswith("-")
+                      else "Fresh leverage entering",
+                      "neg" if str(d1).startswith("-") else "pos"))
+
+    ls = _grab(r"all-acct L/S ([\d\.]+) \(30d [\d\.]+-[\d\.]+, pctile (\d+)%\)", raw, 1)
     if ls:
-        t.append(tile("L/S ratio", ls, f"{lsp}th pctile", "neg" if lsp and int(lsp) >= 85 else ""))
+        lsp = _grab(r"all-acct L/S [\d\.]+ \(30d [\d\.]+-[\d\.]+, pctile (\d+)%\)", raw, 1, "0")
+        crowd_long = int(lsp) >= 80
+        crowd_short = int(lsp) <= 20
+        t.append(tile("Long/short ratio", ls, f"{lsp}th pctile",
+                      "Crowd crowded LONG - squeeze fuel down" if crowd_long else
+                      ("Crowd crowded SHORT - squeeze fuel up" if crowd_short
+                       else "Positioning mid-range - no signal"),
+                      "neg" if crowd_long else ("pos" if crowd_short else "")))
+
     fng = _grab(r"now (\d+) \(([^)]+)\)", raw)
-    fngc = _grab(r"now \d+ \(([^)]+)\)", raw)
     if fng:
-        t.append(tile("Fear & Greed", fng, fngc or "", "neg" if int(fng) <= 20 else ""))
+        cls = _grab(r"now \d+ \(([^)]+)\)", raw, 1, "")
+        v = int(fng)
+        t.append(tile("Fear & Greed", fng, cls,
+                      "Capitulation - bounce fuel up, bad to short" if v <= 20
+                      else ("Euphoria - contrarian bearish" if v >= 80 else "No crowd extreme"),
+                      "neg" if v <= 20 else ("warn" if v >= 80 else "")))
+
     return '<div class="kpis">' + "".join(t) + "</div>" if t else ""
 
 
