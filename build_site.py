@@ -269,6 +269,8 @@ def build(raw=None):
         cands = sorted(f for f in os.listdir(CHART_DIR) if f.startswith("btc_daily_"))
         src = os.path.join(CHART_DIR, cands[-1]) if cands else None
     def card(title, img_src, alt, now, use, verdict, cls=""):
+        # normalise: callers pass "wide" or " wide" - concatenating raw gave class="ccardwide"
+        cls = f" {cls.strip()}" if cls and cls.strip() else ""
         chips = "".join(f'<span class="chip">{esc(x)}</span>' for x in (now or []))
         return (f'<div class="ccard{cls}"><h4>{esc(title)}</h4>'
                 f'<div class="cnow">{chips}</div>'
