@@ -2,77 +2,92 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BTC Daily Digest</title>
-<meta name="description" content="Daily Bitcoin flow, cost-basis and momentum digest with backtested rules.">
+<meta name="description" content="Daily Bitcoin flow, positioning and momentum digest with backtested rules.">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;
---accent:#58a6ff;--green:#3fb950;--red:#f85149;--amber:#d29922;--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+--accent:#58a6ff;--green:#3fb950;--red:#f85149;--amber:#d29922;
+--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--bg);color:var(--txt);font:16px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
--webkit-font-smoothing:antialiased;padding:0 0 80px}
-.wrap{max-width:920px;margin:0 auto;padding:0 20px}
-header{padding:44px 0 26px;border-bottom:1px solid var(--line);margin-bottom:30px}
-h1{font-size:29px;font-weight:650;letter-spacing:-.02em}
-.sub{color:var(--dim);font-size:14px;margin-top:8px}
-nav{display:flex;flex-wrap:wrap;gap:8px;margin-top:20px}
-nav a{color:var(--accent);text-decoration:none;font-size:13px;border:1px solid var(--line);
-padding:5px 12px;border-radius:999px;background:var(--card)}
-nav a:hover{border-color:var(--accent)}
-h2{font-size:20px;font-weight:650;margin:46px 0 6px;padding-top:14px;letter-spacing:-.01em}
-h2 .n{color:var(--dim);font-weight:400;font-size:15px;margin-right:8px}
+-webkit-font-smoothing:antialiased;padding:0 0 70px}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+header{padding:36px 0 0}
+h1{font-size:28px;font-weight:650;letter-spacing:-.02em}
+.sub{color:var(--dim);font-size:14px;margin-top:6px}
+h2{font-size:20px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
 h3{font-size:15px;font-weight:650;margin:0 0 10px;color:var(--accent)}
+h4{font-size:13px;margin:0 0 8px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin:14px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px;margin:13px 0}
 .card pre{font-family:var(--mono);font-size:13px;line-height:1.65;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .verdict{color:var(--green);font-weight:600}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
-table{width:100%;border-collapse:collapse;margin:14px 0;font-size:14px;display:block;overflow-x:auto}
+table{width:100%;border-collapse:collapse;margin:13px 0;font-size:14px;display:block;overflow-x:auto}
 th,td{border:1px solid var(--line);padding:8px 11px;text-align:left;white-space:nowrap}
 th{background:#1c2128;font-weight:650;font-size:13px;color:#c9d1d9}
 td.num{font-family:var(--mono);text-align:right}
 .neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
-img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:14px 0;display:block}
-.callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:12px 16px;margin:14px 0}
+img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px 0;display:block}
+.callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
-footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--dim);font-size:13px}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:13px}
 code{font-family:var(--mono);background:#1c2128;padding:2px 6px;border-radius:4px;font-size:13px}
 .hrow{font-family:var(--mono);font-size:13px;color:var(--dim);margin:2px 0}
-.verdict-card{background:#0d2818;border:1px solid #238636;border-radius:8px;padding:12px 16px;
-margin:12px 0 18px;font-size:15px;font-weight:650;color:#7ee787}
-h3.sec{font-size:17px;color:var(--txt);font-weight:700;margin:34px 0 2px;padding-top:10px;
+.verdict-card{background:#0d2818;border:1px solid #238636;border-radius:9px;padding:12px 16px;
+margin:16px 0 4px;font-size:15px;font-weight:650;color:#7ee787}
+h3.sec{font-size:16px;color:var(--txt);font-weight:700;margin:26px 0 2px;padding-top:12px;
 border-top:1px solid var(--line);letter-spacing:-.01em}
-p.sdesc{color:var(--dim);font-size:13.5px;margin:2px 0 12px;font-style:italic}
+p.sdesc{color:var(--dim);font-size:13px;margin:2px 0 10px;font-style:italic}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:9px;margin:16px 0 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:9px 12px}
+.kpi .k{display:block;font-size:10.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.045em}
+.kpi .v{display:block;font-size:18px;font-weight:650;font-family:var(--mono);margin-top:3px}
+.kpi .n{display:block;font-size:11px;color:var(--dim);margin-top:1px}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:22px 0 0;border-bottom:1px solid var(--line)}
+.tabs button{background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);
+font:inherit;font-size:14px;padding:9px 15px;cursor:pointer;font-weight:600}
+.tabs button:hover{color:var(--txt)}
+.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tab{display:none}.tab.on{display:block}
+.cgrid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-top:18px}
+@media(max-width:780px){.cgrid{grid-template-columns:1fr}}
+.ccard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px}
+.ccard img{width:100%;border-radius:6px;display:block}
+.ccard p{font-size:12.5px;color:var(--dim);margin:8px 0 0}
+.ccard.wide{grid-column:1/-1}
 @media(max-width:600px){h1{font-size:23px}.wrap{padding:0 15px}th,td{padding:6px 8px;font-size:13px}}
 </style></head><body><div class="wrap">
 <header>
   <h1>BTC Daily Digest</h1>
-  <div class="sub">Spot <strong>$65,437</strong> &middot; updated 2026-11-15 13:36 UTC &middot; US bid ABSENT - premium negative, 30d mean at lows</div>
-  <nav>
-    <a href="#digest">Today's digest</a>
-    <a href="#chart">Chart</a>
-    <a href="#reference">Indicator reference</a>
-    <a href="#evidence">Backtest evidence</a>
-    <a href="#divergence">Divergence guide</a>
+  <div class="sub">Spot <strong>$65,436</strong> &middot; updated 2026-11-15 13:45 UTC</div>
+  <div class="verdict-card">VERDICT: US bid ABSENT - premium negative, 30d mean at lows</div>
+  <div class="kpis"><div class="kpi"><span class="k">ETF 30d</span><span class="v neg">-$2,327.7M</span><span class="n">institutional demand</span></div><div class="kpi"><span class="k">US premium</span><span class="v neg">-0.062%</span><span class="n">71d negative</span></div><div class="kpi"><span class="k">Stablecoins</span><span class="v neg">244.6B</span><span class="n">30d -$11.66B</span></div><div class="kpi"><span class="k">RSI14</span><span class="v neg">20.0</span><span class="n">daily close</span></div><div class="kpi"><span class="k">Funding</span><span class="v pos">+7.6%</span><span class="n">annualised</span></div><div class="kpi"><span class="k">Perp OI</span><span class="v neg">$6.28bn</span><span class="n">1d -0.44</span></div><div class="kpi"><span class="k">L/S ratio</span><span class="v neg">3.08</span><span class="n">87th pctile</span></div><div class="kpi"><span class="k">Fear &amp; Greed</span><span class="v neg">10</span><span class="n">Extreme Fear</span></div></div>
+  <nav class="tabs">
+    <button class="on" data-t="dash">Dashboard</button>
+    <button data-t="charts">Charts</button>
+    <button data-t="ref">Reference</button>
+    <button data-t="ev">Evidence</button>
+    <button data-t="guide">Guide</button>
   </nav>
 </header>
 
-<h2 id="digest"><span class="n">01</span>Today's digest</h2>
-<p class="note">All blocks are settled <strong>daily closes</strong> unless a line says "live".
-Sections run in order of importance: <strong>flow first</strong> (where the money is going), then positioning
-(who is leveraged), price structure (where supply sits), momentum, and finally the actionable signals.
-If the flow section is bearish, everything below it is a bounce to sell.</p>
-<div class="hrow">BTC daily read  |  2026-11-15 13:35 UTC</div>
-<div class="hrow">spot $65,437 (Coinbase)   $65,473 (Binance)   USDT/USD 0.99937</div>
+<section id="dash" class="tab on">
+<p class="note">Sections run in order of importance: <strong>flow first</strong> (where the money is going),
+then positioning &amp; sentiment, price structure, momentum, and finally the actionable signals.
+If the flow section is bearish, everything below it is a bounce to sell. All blocks are settled
+<strong>daily closes</strong> unless a line says &ldquo;live&rdquo;.</p>
+<div class="hrow">BTC daily read  |  2026-11-15 13:45 UTC</div>
+<div class="hrow">spot $65,436 (Coinbase)   $65,476 (Binance)   USDT/USD 0.99937</div>
 <div class="hrow">blocks use settled DAILY closes unless a line says &#x27;live&#x27;</div>
-<div class="verdict-card">VERDICT: US bid ABSENT - premium negative, 30d mean at lows</div>
 <h3 class="sec">1. FLOW - where the money is going</h3>
 <p class="sdesc">ETF net flows, Coinbase premium, stablecoins, venue taker flow.</p>
 <p class="sdesc">Read this first. If flow is bearish, everything below is a bounce to sell.</p>
 <div class="card"><h3>[2] US spot BTC ETF net flow (T+1) - institutional demand</h3><pre>    latest 2026-11-15 +$0.0M   prev +$0.0M
     5d -$769.5M   10d -$1,477.5M   30d -$2,327.7M
 <span class="verdict">    -&gt; ETF money still leaving: -$2,327.7M over 30d.</span></pre></div>
-<div class="card"><h3>[1] Coinbase Premium Index - US vs global bid</h3><pre>    live -0.055%   last close -0.049% (prev -0.113%)
+<div class="card"><h3>[1] Coinbase Premium Index - US vs global bid</h3><pre>    live -0.062%   last close -0.049% (prev -0.113%)
     30d avg -0.142%   negative streak 71d   1y low -0.271%
 <span class="verdict">    -&gt; US still discounting to global for 71 straight days: US bid is the missing buyer.</span></pre></div>
 <div class="card"><h3>[3] Coinbase Premium net of Tether - 30d mean (regime)</h3><pre>    -0.014%  (prev -0.015%)   1y percentile 3%   streak 29d
@@ -82,33 +97,42 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
     USDT+USDC combined $244.6B   7d -$2.80B   30d -$11.66B
 <span class="verdict">    -&gt; Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.</span></pre></div>
 <div class="card"><h3>[+] Spot taker flow by venue - net aggressive buying</h3><pre>    Binance  1d -69m   7d -122m (-1.2% of vol)   30d +507m
-    OKX      48h -10m (-0.4% of vol)   (OKX publishes 48h only)
-    Coinbase live +1.1 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    OKX      48h -12m (-0.5% of vol)   (OKX publishes 48h only)
+    Coinbase live +0.7 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
 <span class="verdict">    -&gt; both venues roughly BALANCED (&lt;3% of volume): no directional spot pressure.</span>
     Binance PERP CVD 5d -2,711 BTC | 30d +7,398 BTC</pre></div>
-<h3 class="sec">2. POSITIONING - who is leveraged</h3>
-<p class="sdesc">Long/short crowding and open interest. Contrarian: crowded longs = squeeze fuel DOWN.</p>
+<h3 class="sec">2. POSITIONING &amp; SENTIMENT - who is leveraged, and how they feel</h3>
+<p class="sdesc">[9] long/short crowding, [10] funding &amp; basis (what leverage costs), [11] Fear &amp; Greed.</p>
+<p class="sdesc">Contrarian throughout: crowded longs = squeeze fuel DOWN; crowd panic = bounce fuel UP.</p>
 <div class="card"><h3>[9] Positioning - Binance futures long/short crowding (CONTRARIAN)</h3><pre>    all-acct L/S 3.08 (30d 1.02-3.23, pctile 87%) | top acct 3.68 (pctile 97%) | top pos 1.81 (pctile 43%)
     taker buy/sell 0.92 (prev 0.90) | OI $6.28bn (1d -0.44, 30d 6.28-8.24)
 <span class="verdict">    -&gt; crowd crowded LONG (all-acct pctile 87): squeeze fuel DOWN, bearish confirm; top traders CUTTING longs (2.11-&gt;1.81); OI draining = deleveraging/liquidation, not new shorts.</span></pre></div>
+<div class="card"><h3>[10] Derivatives cost - funding rate &amp; perp basis</h3><pre>    funding now +0.0014% /8h  -&gt;  +1.5% annualised
+    30d avg +0.0069% /8h  -&gt;  +7.6% annualised   (positive in 99% of periods)
+    perp basis -0.063%  (mark 65,444 vs index 65,485)
+    perp 24h vol $23.7bn   last 24h -1.93%
+<span class="verdict">    -&gt; longs pay shorts: leveraged longs still the crowded side, dips get flushed (bearish tilt).</span></pre></div>
+<div class="card"><h3>[11] Sentiment - Fear &amp; Greed index</h3><pre>    now 10 (Extreme Fear)   yesterday 13   30d range 10-68
+    30d avg 40   (current = 3rd percentile of the 30d window)
+<span class="verdict">    -&gt; EXTREME FEAR (pctile 3): crowd capitulating - contrarian-bullish for a BOUNCE, which is a warning against shorting into it, not a buy signal.</span></pre></div>
 <h3 class="sec">3. PRICE STRUCTURE - where supply sits</h3>
 <p class="sdesc">Cost-basis clusters and valuation floors. Levels to lean on, not timing triggers.</p>
 <div class="card"><h3>[4] Cost basis / URPD: UNAVAILABLE</h3><pre>    (RuntimeError)</pre></div>
-<div class="card"><h3>[5] Valuation floors - how far is the downside (spot $65,437)</h3><pre>    Balanced Price $38,709 (2026-11-14)  -&gt; spot 1.69x
+<div class="card"><h3>[5] Valuation floors - how far is the downside (spot $65,436)</h3><pre>    Balanced Price $38,709 (2026-11-14)  -&gt; spot 1.69x
     AVWAP since 2015-07-20 $29,928 (thru 2026-11-14)  -&gt; spot 2.19x
 <span class="verdict">    -&gt; Price is 1.7x the Balanced floor and 2.2x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,709.</span></pre></div>
 <h3 class="sec">4. MOMENTUM - how it is moving</h3>
 <p class="sdesc">[7] RSI reads force; [7b] divergence reads exhaustion. They describe, they do not trigger.</p>
 <p class="sdesc">Divergence guide (what the four types mean, and the invalidators) is on the page.</p>
 <div class="card"><h3>[7] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-14</h3><pre>    RSI(6) 9.2 | RSI(14) 20.0 | RSI(24) 28.0   (RSI14 1y percentile 2%)
-    same maths incl today&#x27;s forming candle (live $65,437): RSI(6) 19.7 | RSI(14) 25.0  &lt;- drifts until the close
+    same maths incl today&#x27;s forming candle (live $65,436): RSI(6) 19.7 | RSI(14) 24.9  &lt;- drifts until the close
 <span class="verdict">    -&gt; oversold &lt;30: capitulation zone, historically where bounces start; fast &lt; slow = momentum deteriorating, bounces are being sold into.</span></pre></div>
 <div class="card"><h3>[7b] Divergence - 20d price low vs RSI14 (the only RSI signal with an edge)</h3><pre>    none - last 20d lows: 2026-11-05 75,969/RSI 38.6 -&gt; 2026-11-10 73,698/RSI 34.2
 <span class="watch">    watch (bullish): a NEW 20d CLOSE below 64,119 (last one today) - but only AFTER a bounce. The chart&#x27;s wick low is 63,270, but this trigger is CLOSE-basis - a wick down and back up does not count. A straight-down close lowers RSI14 too (would print ~19.6 vs 20.0 = no divergence), so it takes a RALLY THAT FAILS, not just a drop.</span></pre></div>
 <h3 class="sec">5. TRADING SIGNALS - what to actually do</h3>
 <p class="sdesc">Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.</p>
-<div class="card"><h3>[8] Short-fade watch - fade the bounce at resistance (the only positive-EV side)</h3><pre>    MA200 72,973 | MA50 80,138 | MA10 72,882   -&gt; spot 65,437 is -10.3% vs MA200
+<div class="card"><h3>[8] Short-fade watch - fade the bounce at resistance (the only positive-EV side)</h3><pre>    MA200 72,973 | MA50 80,138 | MA10 72,882   -&gt; spot 65,436 is -10.3% vs MA200
 <span class="alert">    NOT ARMED - RSI14 20.0, needs to cross 40 (+20 pts). MA200 72,973 is +11.5% from spot</span>
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first</pre></div>
 <h3 class="sec">LEGEND - what every block means</h3>
@@ -127,14 +151,20 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
         [9] Positioning: Binance futures L/S ratios - CONTRARIAN. High ratio = crowd long =
              squeeze fuel DOWN; low = crowd short = squeeze fuel UP. Top-trader pos falling =
              smart money exiting longs. OI draining = liquidation, not new shorts. Mid-range = no signal.
+        [10] Funding/basis: cost of leverage. Positive/longs-pay = crowded longs (bearish tilt);
+             negative/shorts-pay = crowded shorts (squeeze fuel UP). Basis = perp premium to index.
+        [11] Fear &amp; Greed: crowd panic/greed 0-100. &lt;20 = capitulation (bounce fuel UP, bad to short);
+             &gt;80 = euphoria (contrarian-bearish). Shows where the crowd sits, not where price goes.
         [+] Venue flow: net spot taker buying per exchange. Only Binance+OKX publish history;
              Coinbase is a live snapshot (context only) and Bybit has none. Verdict uses the deep books.</pre></div>
+</section>
 
-<h2 id="chart"><span class="n">02</span>Chart</h2>
-<p class="note">BTC price, Balanced Price (deep-cycle floor) and the all-time anchored VWAP, log scale.</p>
-<img class="chart" src="chart.png" alt="BTC daily: price, Balanced Price, all-time anchored VWAP (log scale)">
+<section id="charts" class="tab">
+<p class="note">Every indicator the digest tracks, charted. Hover-free, static PNGs &mdash; they render anywhere.</p>
+<div class="cgrid"><div class="ccard wide"><h4>Cycle context &mdash; price vs Balanced Price &amp; all-time AVWAP</h4><img src="chart.png" alt="BTC price, Balanced Price, anchored VWAP"><p>Log scale. Balanced Price is where past cycle bottoms converged (~1.0&times;); AVWAP is the market&rsquo;s all-time break-even. Floors, not timing triggers.</p></div><div class="ccard"><h4>Price vs moving averages</h4><img src="c_price.png" alt="Price vs moving averages"><p>A bounce in a downtrend stalls at the first MA above it. MA200 is the short-fade trigger level.</p></div><div class="ccard"><h4>Coinbase premium</h4><img src="c_premium.png" alt="Coinbase premium"><p>Above 0 = US paying up. A long run below 0 is a regime: the US bid is missing.</p></div><div class="ccard"><h4>RSI momentum</h4><img src="c_rsi.png" alt="RSI momentum"><p>Red 70 / green 30. Fast below slow = momentum deteriorating, bounces get sold.</p></div><div class="ccard"><h4>ETF net flows</h4><img src="c_etf.png" alt="ETF net flows"><p>Green = creations, red = redemptions. The amber line is cumulative - direction matters more than any day.</p></div><div class="ccard"><h4>Stablecoin supply</h4><img src="c_stables.png" alt="Stablecoin supply"><p>Expanding = fresh fiat entering crypto. Contracting = capital leaving, not waiting.</p></div><div class="ccard"><h4>Funding rate</h4><img src="c_funding.png" alt="Funding rate"><p>Positive = longs pay shorts = leveraged longs crowded (bearish tilt). Negative = the reverse.</p></div><div class="ccard"><h4>Long/short ratios</h4><img src="c_ratios.png" alt="Long/short ratios"><p>Above 1 = more longs than shorts. Contrarian: a crowded long book is squeeze fuel down.</p></div><div class="ccard"><h4>Open interest</h4><img src="c_oi.png" alt="Open interest"><p>Rising = new positions. Falling = deleveraging (liquidation), not necessarily new shorts.</p></div><div class="ccard wide"><h4>Volume: spot vs perp</h4><img src="c_volume.png" alt="Volume: spot vs perp"><p>Perp volume dwarfing spot means leverage is driving price, and moves are more fragile.</p></div></div>
+</section>
 
-<h2 id="reference"><span class="n">03</span>Indicator reference</h2>
+<section id="ref" class="tab">
 <p class="note">What each block is for, and how to read it.</p>
 
 <div class="card"><h3>[1] Coinbase Premium Index &mdash; US vs global bid</h3>
@@ -153,42 +183,49 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
 <p><strong>Balanced Price</strong> (realized price &minus; transferred price) is where past cycle bottoms have converged (~1.0x). <strong>AVWAP</strong> since 2015 is the market's all-time break-even. Floors, not timing triggers.</p></div>
 
 <div class="card"><h3>[6] Stablecoin supply &mdash; is money coming back?</h3>
-<p>Combined USDT + USDC supply. Expansion = capital arriving into crypto; contraction = capital leaving (not "waiting"). Needs <em>both</em> 7d and 30d up to call a return.</p></div>
+<p>Combined USDT + USDC supply. Expansion = capital arriving into crypto; contraction = capital leaving (not &ldquo;waiting&rdquo;). Needs <em>both</em> 7d and 30d up to call a return.</p></div>
 
 <div class="card"><h3>[7] RSI &mdash; momentum</h3>
 <p>Wilder RSI on <strong>daily closes only</strong>, printed two ways so they never have to be reconciled: <strong>settled</strong> (completed days, stable, what to reason with) and <strong>incl. today's forming candle</strong> (what a live chart shows, drifts all day).</p>
 <p class="note">RSI(6) &gt; RSI(14) &gt; RSI(24) = short-term momentum leading. RSI(6) &lt; RSI(24) = deteriorating, bounces being sold into. Never quote an RSI without its timeframe &mdash; the same market reads 62 on 1H and 9 on 1D.</p></div>
 
 <div class="card"><h3>[7b] Divergence &mdash; the only RSI signal with an edge</h3>
-<p><strong>Bullish</strong> = a distinct 20-day price low whose RSI14 is <em>higher</em> than at the previous 20-day low. Measured on <strong>closes</strong>, from the trigger day, no look-ahead. Plain divergence has <strong>no edge</strong> (55% vs 53% baseline); only the variant where RSI14 &lt; 35 at the second low tested positive (67%).</p>
+<p><strong>Bullish</strong> = a distinct 20-day price low whose RSI14 is <em>higher</em> than at the previous 20-day low. Measured on <strong>closes</strong>, from the trigger day, no look-ahead. Plain divergence has <strong>no edge</strong> (55% vs 53% baseline); only the variant where RSI14 &lt; 35 at the second low tested positive (67%, n=12).</p>
 <p class="note">A straight-down close can never produce this &mdash; a lower close is a loss day, so RSI falls with price. The RSI must be <em>rebuilt by a bounce that then fails</em>.</p></div>
 
 <div class="card"><h3>[8] Short-fade watch &mdash; when to fade the bounce</h3>
-<p>Short trigger: <strong>RSI14 crosses above 40 while price is below MA200</strong> &mdash; a bounce that recovered momentum but is still under the trend line. Take profit fast: EV is only ~+0.12%, near break-even.</p></div>
+<p>Short trigger: <strong>RSI14 crosses above 40 while price is below MA200</strong> &mdash; a bounce that recovered momentum but is still under the trend line. Prints MA200/MA50/MA10 and the exact gap. Take profit fast: EV is only ~+0.12%, near break-even.</p></div>
 
 <div class="card"><h3>[9] Positioning &mdash; Binance futures long/short crowding</h3>
-<p>The three Binance futures ratios, all <strong>contrarian</strong>:</p>
+<p>Three Binance futures ratios, all <strong>contrarian</strong>:</p>
 <table><thead><tr><th>indicator</th><th>what it counts</th></tr></thead><tbody>
 <tr><td>all-accounts L/S</td><td>every account, longs &divide; shorts</td></tr>
 <tr><td>top-trader accounts</td><td>large accounts, longs &divide; shorts</td></tr>
 <tr><td>top-trader positions</td><td>large accounts, by <em>size</em> not headcount</td></tr>
 </tbody></table>
-<p><strong>High ratio = crowd is long = squeeze fuel DOWN.</strong> Low ratio = crowd short = squeeze fuel UP. When retail is crowded long but top-trader <em>positions</em> are falling, smart money is exiting into retail strength &mdash; a bearish tell. Open interest falling means deleveraging (liquidation), not new shorts; OI rising means fresh positions. A mid-range percentile is no signal at all.</p></div>
+<p><strong>High ratio = crowd is long = squeeze fuel DOWN.</strong> Low = crowd short = squeeze fuel UP. Retail crowded long while top-trader <em>positions</em> fall → smart money exiting into retail strength (bearish). OI falling = deleveraging, not new shorts. A mid-range percentile is no signal.</p></div>
+
+<div class="card"><h3>[10] Funding rate &amp; perp basis &mdash; what leverage costs</h3>
+<p>The 8-hourly payment between longs and shorts, plus the perp's premium to spot index. <strong>Positive funding = longs pay shorts = leveraged longs are the crowded side</strong> (bearish tilt &mdash; dips get flushed). Negative funding = shorts pay, meaning crowded shorts and squeeze fuel <em>up</em>, which is hostile to a short. Basis near zero means perp and spot agree.</p></div>
+
+<div class="card"><h3>[11] Fear &amp; Greed &mdash; how extreme the crowd is</h3>
+<p>0&ndash;100 composite of volatility, momentum, volume, social and dominance. <strong>Crowd-state, not price-state:</strong> it says where people are, not where price goes. Below 20 = capitulation &mdash; contrarian-bullish for a <em>bounce</em>, which is a warning against shorting into it. Above 80 = euphoria, contrarian-bearish.</p></div>
 
 <div class="card"><h3>[+] Spot taker flow by venue &mdash; who is actually buying</h3>
-<p>Net aggressive buying (taker buy &minus; taker sell) per exchange, in USD. This is a <strong>partial</strong> rebuild of CoinGlass's per-venue CVD, because only two venues publish the data:</p>
+<p>Net aggressive buying (taker buy &minus; taker sell) per exchange, in USD. A <strong>partial</strong> rebuild of CoinGlass's per-venue CVD, because only two venues publish history:</p>
 <table><thead><tr><th>venue</th><th>what we can get</th></tr></thead><tbody>
 <tr><td>Binance</td><td>full history &mdash; 1d / 7d / 30d, exact</td></tr>
 <tr><td>OKX</td><td>exact, but only a 48h window</td></tr>
 <tr><td>Coinbase</td><td>live tape snapshot only &mdash; no history published</td></tr>
 <tr><td>Bybit</td><td>nothing public</td></tr>
 </tbody></table>
-<p>The verdict is driven by the <strong>deep, long-window books</strong> (Binance, OKX). The Coinbase line is marked context-only because a snapshot of the last thousand trades is minutes of data, not a trend &mdash; the same US-selling signal is captured properly by the Coinbase premium in block [1].</p></div>
+<p>The verdict uses the <strong>deep, long-window books</strong> (Binance, OKX) and is measured <em>relative to volume</em> &mdash; under 3% of gross is called BALANCED, so a near-flat venue can't be dressed up as selling.</p></div>
 
 <div class="card"><h3>[+] Global flow proxy</h3>
 <p>Binance taker CVD, <code>2&times;(taker buy vol) &minus; total vol</code>. Net aggressive order flow, not venue-split. Positive = buyers lifting offers.</p></div>
+</section>
 
-<h2 id="evidence"><span class="n">04</span>Backtest evidence</h2>
+<section id="ev" class="tab">
 <p class="note">BTCUSDT daily. Forward returns measured from the day you could act. Barrier tables are intrabar, adverse-first when both hit the same bar. EV = probability-weighted outcome of the target/stop pair.</p>
 
 <h3>RSI crossovers alone &mdash; coin flips (1000d sample)</h3>
@@ -208,7 +245,7 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
 <tr><td>Bullish + RSI14&lt;35 at 2nd low</td><td class="num">12</td><td class="num pos">+7.92%</td><td class="num">67%</td></tr>
 <tr><td>Bearish divergence</td><td class="num">41</td><td class="num pos">+5.75%</td><td class="num">54%</td></tr>
 </tbody></table>
-<div class="callout"><p><strong>Correction:</strong> an earlier figure of "62% win" was wrong. It came from a shorter 2024&ndash;2026 sample and a definition that also flagged higher-low/higher-RSI cases, which are not divergences. The numbers above supersede it.</p></div>
+<div class="callout"><p><strong>Correction:</strong> an earlier figure of &ldquo;62% win&rdquo; was wrong. It came from a shorter 2024&ndash;2026 sample and a definition that also flagged higher-low/higher-RSI cases, which are not divergences. The numbers above supersede it.</p></div>
 
 <h3>Short-fade &mdash; fade the bounce at resistance</h3>
 <p>Better odds than the long side, but the edge is thin. Detected by block [8].</p>
@@ -221,7 +258,7 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
 </tbody></table>
 
 <h3>Long the bounce &mdash; do not take this leg</h3>
-<p>Riding a bounce to +7% before a &minus;5% stop happens only <strong>34%</strong> of the time, and every variant is negative-EV. "Buy the bounce then short" loses money on the first leg.</p>
+<p>Riding a bounce to +7% before a &minus;5% stop happens only <strong>34%</strong> of the time, and every variant is negative-EV. &ldquo;Buy the bounce then short&rdquo; loses money on the first leg.</p>
 <table><thead><tr><th>Rule / target</th><th>n</th><th>Forward / EV</th><th>Hit rate</th></tr></thead><tbody>
 <tr><td>+3% before -5%</td><td class="num">41</td><td class="num neg">-1.08% EV</td><td class="num">49%</td></tr>
 <tr><td>+5% before -5%</td><td class="num">41</td><td class="num neg">-0.40% EV</td><td class="num">46%</td></tr>
@@ -229,11 +266,11 @@ If the flow section is bearish, everything below it is a bounce to sell.</p>
 <tr><td>+7% before -7%</td><td class="num">41</td><td class="num neg">-0.60% EV</td><td class="num">37%</td></tr>
 <tr><td>+10% before -7%</td><td class="num">41</td><td class="num neg">-1.15% EV</td><td class="num">15%</td></tr>
 </tbody></table>
+</section>
 
-<h2 id="divergence"><span class="n">05</span>Divergence guide</h2>
-<p class="note"><strong>Where the live reading is:</strong> block <strong>[7b] Divergence</strong>, inside
-section <em>4. MOMENTUM</em> at the top of this page. This section explains how to interpret it &mdash;
-it is the guide, not the reading.</p>
+<section id="guide" class="tab">
+<p class="note"><strong>Where the live reading is:</strong> block <strong>[7b] Divergence</strong> on the
+<em>Dashboard</em> tab, inside section <em>2. MOMENTUM</em>. This tab is the guide, not the reading.</p>
 <p>Price and the RSI stop agreeing. Price keeps going the same way, but the RSI refuses to follow &mdash; the move is running out of force underneath.</p>
 
 <h3>The four types</h3>
@@ -243,7 +280,7 @@ it is the guide, not the reading.</p>
 <tr><td>Hidden bullish</td><td>higher low</td><td>lower low</td><td>uptrend healthy &rarr; CONTINUATION up</td></tr>
 <tr><td>Hidden bearish</td><td>lower high</td><td>higher high</td><td>downtrend healthy &rarr; CONTINUATION down</td></tr>
 </tbody></table>
-<p class="note">"Regular" = the reversal kind. "Hidden" = continuation. Getting these backwards is how people buy tops.</p>
+<p class="note">&ldquo;Regular&rdquo; = the reversal kind. &ldquo;Hidden&rdquo; = continuation. Getting these backwards is how people buy tops.</p>
 
 <h3>Regular bullish &mdash; step by step</h3>
 <p>1. Two clear price lows, the second <strong>lower</strong>. &nbsp; 2. Add RSI(14). &nbsp; 3. RSI at the second (lower) low is <strong>higher</strong> than at the first. &nbsp; 4. Price line slopes <em>down</em>, RSI line slopes <em>up</em>.</p>
@@ -262,10 +299,22 @@ it is the guide, not the reading.</p>
 <p><strong>Expectation:</strong> divergence marks a <em>zone</em>, not a moment. Price often makes one final spike before turning &mdash; that spike is the last seller capitulating and it is where stops get hunted. Every variant tested dipped ~5&ndash;6% before it paid.</p>
 <p><strong>Never measure from the pivot date.</strong> Look-ahead flatters this to 86% win / +7.95% &mdash; that is how backtests lie.</p>
 </div>
+</section>
 
 <footer>
-<p>Generated automatically from keyless public APIs (Coinbase, Binance, DeFiLlama, cryptoetf.today, Look Into Bitcoin, BGeometrics). No credentials, no subscription feeds.</p>
+<p>Generated automatically from keyless public APIs (Coinbase, Binance, DeFiLlama, cryptoetf.today, Look Into Bitcoin, BGeometrics, alternative.me). No credentials, no subscription feeds.</p>
 <p>Not financial advice. Backtest figures are historical and samples are small where noted.</p>
-<p>Last build: 2026-11-15 13:36 UTC</p>
+<p>Last build: 2026-11-15 13:45 UTC</p>
 </footer>
+<script>
+document.querySelectorAll('.tabs button').forEach(function(b){
+  b.addEventListener('click', function(){
+    document.querySelectorAll('.tabs button').forEach(function(x){x.classList.remove('on');});
+    document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+    b.classList.add('on');
+    var el = document.getElementById(b.dataset.t);
+    if (el) el.classList.add('on');
+  });
+});
+</script>
 </div></body></html>

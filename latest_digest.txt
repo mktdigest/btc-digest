@@ -1,5 +1,5 @@
-BTC daily read  |  2026-11-15 13:35 UTC
-spot $65,437 (Coinbase)   $65,473 (Binance)   USDT/USD 0.99937
+BTC daily read  |  2026-11-15 13:45 UTC
+spot $65,436 (Coinbase)   $65,476 (Binance)   USDT/USD 0.99937
 blocks use settled DAILY closes unless a line says 'live'
 VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
@@ -14,7 +14,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> ETF money still leaving: -$2,327.7M over 30d.
 
 [1] Coinbase Premium Index - US vs global bid
-    live -0.055%   last close -0.049% (prev -0.113%)
+    live -0.062%   last close -0.049% (prev -0.113%)
     30d avg -0.142%   negative streak 71d   1y low -0.271%
     -> US still discounting to global for 71 straight days: US bid is the missing buyer.
 
@@ -30,20 +30,33 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
 [+] Spot taker flow by venue - net aggressive buying
     Binance  1d -69m   7d -122m (-1.2% of vol)   30d +507m
-    OKX      48h -10m (-0.4% of vol)   (OKX publishes 48h only)
-    Coinbase live +1.1 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    OKX      48h -12m (-0.5% of vol)   (OKX publishes 48h only)
+    Coinbase live +0.7 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
     -> both venues roughly BALANCED (<3% of volume): no directional spot pressure.
     Binance PERP CVD 5d -2,711 BTC | 30d +7,398 BTC
 
 ======================================================================
-2. POSITIONING - who is leveraged
-   Long/short crowding and open interest. Contrarian: crowded longs = squeeze fuel DOWN.
+2. POSITIONING & SENTIMENT - who is leveraged, and how they feel
+   [9] long/short crowding, [10] funding & basis (what leverage costs), [11] Fear & Greed.
+   Contrarian throughout: crowded longs = squeeze fuel DOWN; crowd panic = bounce fuel UP.
 ======================================================================
 [9] Positioning - Binance futures long/short crowding (CONTRARIAN)
     all-acct L/S 3.08 (30d 1.02-3.23, pctile 87%) | top acct 3.68 (pctile 97%) | top pos 1.81 (pctile 43%)
     taker buy/sell 0.92 (prev 0.90) | OI $6.28bn (1d -0.44, 30d 6.28-8.24)
     -> crowd crowded LONG (all-acct pctile 87): squeeze fuel DOWN, bearish confirm; top traders CUTTING longs (2.11->1.81); OI draining = deleveraging/liquidation, not new shorts.
+
+[10] Derivatives cost - funding rate & perp basis
+    funding now +0.0014% /8h  ->  +1.5% annualised
+    30d avg +0.0069% /8h  ->  +7.6% annualised   (positive in 99% of periods)
+    perp basis -0.063%  (mark 65,444 vs index 65,485)
+    perp 24h vol $23.7bn   last 24h -1.93%
+    -> longs pay shorts: leveraged longs still the crowded side, dips get flushed (bearish tilt).
+
+[11] Sentiment - Fear & Greed index
+    now 10 (Extreme Fear)   yesterday 13   30d range 10-68
+    30d avg 40   (current = 3rd percentile of the 30d window)
+    -> EXTREME FEAR (pctile 3): crowd capitulating - contrarian-bullish for a BOUNCE, which is a warning against shorting into it, not a buy signal.
 
 ======================================================================
 3. PRICE STRUCTURE - where supply sits
@@ -52,7 +65,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 [4] Cost basis / URPD: UNAVAILABLE
     (RuntimeError)
 
-[5] Valuation floors - how far is the downside (spot $65,437)
+[5] Valuation floors - how far is the downside (spot $65,436)
     Balanced Price $38,709 (2026-11-14)  -> spot 1.69x
     AVWAP since 2015-07-20 $29,928 (thru 2026-11-14)  -> spot 2.19x
     -> Price is 1.7x the Balanced floor and 2.2x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,709.
@@ -64,7 +77,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 ======================================================================
 [7] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-14
     RSI(6) 9.2 | RSI(14) 20.0 | RSI(24) 28.0   (RSI14 1y percentile 2%)
-    same maths incl today's forming candle (live $65,437): RSI(6) 19.7 | RSI(14) 25.0  <- drifts until the close
+    same maths incl today's forming candle (live $65,436): RSI(6) 19.7 | RSI(14) 24.9  <- drifts until the close
     -> oversold <30: capitulation zone, historically where bounces start; fast < slow = momentum deteriorating, bounces are being sold into.
 
 [7b] Divergence - 20d price low vs RSI14 (the only RSI signal with an edge)
@@ -76,7 +89,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.
 ======================================================================
 [8] Short-fade watch - fade the bounce at resistance (the only positive-EV side)
-    MA200 72,973 | MA50 80,138 | MA10 72,882   -> spot 65,437 is -10.3% vs MA200
+    MA200 72,973 | MA50 80,138 | MA10 72,882   -> spot 65,436 is -10.3% vs MA200
     NOT ARMED - RSI14 20.0, needs to cross 40 (+20 pts). MA200 72,973 is +11.5% from spot
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first
 
@@ -99,6 +112,10 @@ LEGEND  [1] Premium: US vs global bid (+ = US leads, - = US is the missing bid; 
         [9] Positioning: Binance futures L/S ratios - CONTRARIAN. High ratio = crowd long =
              squeeze fuel DOWN; low = crowd short = squeeze fuel UP. Top-trader pos falling =
              smart money exiting longs. OI draining = liquidation, not new shorts. Mid-range = no signal.
+        [10] Funding/basis: cost of leverage. Positive/longs-pay = crowded longs (bearish tilt);
+             negative/shorts-pay = crowded shorts (squeeze fuel UP). Basis = perp premium to index.
+        [11] Fear & Greed: crowd panic/greed 0-100. <20 = capitulation (bounce fuel UP, bad to short);
+             >80 = euphoria (contrarian-bearish). Shows where the crowd sits, not where price goes.
         [+] Venue flow: net spot taker buying per exchange. Only Binance+OKX publish history;
              Coinbase is a live snapshot (context only) and Bybit has none. Verdict uses the deep books.
 
