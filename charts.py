@@ -504,36 +504,53 @@ def build_all(outdir, series_path):
                 r = cov / (sb * sd) if sb and sd else 0.0
                 dpts = dxy[-1] - dxy[0]
                 dpc = dpts / dxy[0] * 100
-                # Where today's level sits inside the window: a 103 print means little on its
-                # own, "103 = top of the 13-month range" is the actionable part.
+                # Where today's level sits inside the window. Written for a reader who does not
+                # know what a percentile is: "P100" and "103.24 vs 96.2-103.2" are MY shorthand,
+                # not the reader's - Ben's rule, if a term needs a glossary it does not ship.
+                # Say the plain fact instead: highest / lowest / middle of the months shown.
                 rank = sum(1 for v in dxy if v <= dxy[-1]) / len(dxy) * 100
+                wm = max(1, round(n / 30.44))                 # window length in months
+                lo_d, hi_d = min(dxy), max(dxy)
+                btc_pc = b[-1] - 100
+                btc_verb = f"fallen {abs(btc_pc):.0f}%" if btc_pc < 0 else f"gained {btc_pc:.0f}%"
+                if rank >= 95:
+                    where = f"the highest level in the {wm} months shown"
+                elif rank >= 80:
+                    where = f"near the top of the {wm}-month range"
+                elif rank <= 5:
+                    where = f"the lowest level in the {wm} months shown"
+                elif rank <= 20:
+                    where = f"near the bottom of the {wm}-month range"
+                else:
+                    where = f"the middle of the {wm}-month range"
+                # Every verdict states the same three things in the same order: where the dollar
+                # is, what that means for BTC, and what to do about it.
+                tail = ("A stronger dollar pulls money out of risk assets, so treat BTC rallies as "
+                        "fades while this holds." if rank >= 80 and dpc > 0 else
+                        "A weaker dollar is a tailwind, so the macro is not what is holding BTC "
+                        "down right now." if rank <= 20 else
+                        "No strong push either way, so the dollar is not the reason to take or "
+                        "skip a trade today.")
                 add("c_dxy.png", "Dollar strength - macro headwind or tailwind",
-                    [f"DXY {dxy[-1]:.2f}", f"{dpc:+.1f}% / {dpts:+.1f} pts",
-                     f"range {min(dxy):.1f}-{max(dxy):.1f}", f"BTC {b[-1] - 100:+.1f}%",
-                     f"daily corr {r:+.2f}"],
-                    "DXY is the US dollar against six currencies; EUR alone is 57.6% of it. The "
-                    "blue line is DXY's ACTUAL level, read off the right-hand axis, which is "
-                    "zoomed to the range it actually traded - so the line's slope is not on the "
-                    "same scale as BTC's and the two lines' heights cannot be compared "
-                    "positionally. What IS comparable is the percentage column above. The usual "
-                    "regime relationship is inverse - dollar up, BTC down. Correlation is on "
-                    "DAILY RETURNS, not price levels: two trending series can look tightly "
-                    "linked while having no day-to-day link at all. A headwind/tailwind gauge, "
-                    "not a timing trigger. Rebuilt from ECB reference rates, so it can sit "
-                    "~0.1-0.2% off the ICE print.",
-                    (f"Dollar is at the TOP of its range (P{rank:.0f}, {dxy[-1]:.2f} vs "
-                     f"{min(dxy):.1f}-{max(dxy):.1f}, +{dpc:.1f}% to date): a rising dollar drains "
-                     f"liquidity from BTC, so treat rallies as fades while this holds."
-                     if rank >= 80 and dpc > 0 else
-                     f"Dollar is at the BOTTOM of its range (P{rank:.0f}, {dxy[-1]:.2f}): a "
-                     f"falling dollar is a tailwind - the macro backdrop is not what is "
-                     f"holding BTC down." if rank <= 20 else
-                     f"Dollar mid-range (P{rank:.0f}, {dxy[-1]:.2f} in {min(dxy):.1f}-"
-                     f"{max(dxy):.1f}, {dpc:+.1f}%): no strong macro push either way. Daily "
-                     f"return correlation {r:+.2f} - "
-                     + (f"the inverse is live, dollar ticks are pressuring BTC." if r <= -0.3 else
-                        f"weak day-to-day link, so the {dpc:+.0f}% dollar move is slow regime "
-                        f"drift rather than a tradeable signal.")),
+                    [f"DXY now {dxy[-1]:.1f}", f"{dpc:+.1f}% in {wm} months",
+                     f"{wm}-month range {lo_d:.1f}-{hi_d:.1f}",
+                     f"BTC {btc_pc:+.0f}% same window", f"move-together {r:+.2f}"],
+                    "DXY is the dollar measured against six major currencies. It is an INDEX, "
+                    "not a price: it was set to 100 when the basket started, so 103.2 means the "
+                    "dollar is a bit stronger than that starting point - the number only means "
+                    "something next to its own range, which is the 96.2-103.2 band in the chips "
+                    "above. Orange line = BTC price on the LEFT axis (in $, log scale). Blue line "
+                    "= DXY on the RIGHT axis. Each axis is zoomed to its own data, so the two "
+                    "lines' heights and steepness are NOT comparable - read direction, and use "
+                    "the percentages above to compare. Usual relationship: dollar up, BTC down. "
+                    "'Move-together' measures whether their DAILY changes went the same way: +1 "
+                    "= always together, -1 = always opposite, 0 = no link. Below about -0.3 is a "
+                    "real day-to-day link; -0.12 means almost none, so this is slow pressure, "
+                    "not a trigger. Rebuilt from ECB reference rates, so it can sit ~0.1-0.2% "
+                    "off the official ICE print.",
+                    (f"The dollar is at {where}: {dxy[-1]:.1f} today against a low of {lo_d:.1f} "
+                     f"in the same stretch, so it has risen {dpc:.1f}% while BTC has {btc_verb}. "
+                     f"{tail}"),
                     "wide")
     except Exception:
         pass
