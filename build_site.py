@@ -350,18 +350,22 @@ def kpi_tiles(raw):
         # while the block text used 85/15, so at an 82nd-pctile reading the tile said "mid-range,
         # no signal" while the block directly beneath it said "crowded LONG".
         crowd_long, crowd_short = lsp >= 85, lsp <= 15
+        # Written for a first-time reader: the label says what the number IS, the delta says how
+        # unusual it is in plain words, and the note names the band so the two ranges in this
+        # tile cannot be mistaken for the same kind of fact. "83rd pctile" and a bare
+        # "1.02-3.23" next to "1.75-3.07" both required prior knowledge to interpret.
         if crowd_long:
-            verdict = f"above the {c85} crowded-long line - squeeze fuel down"
+            note = (f"{lsv} is ABOVE the normal {c15}-{c85} band: crowded long, so a squeeze "
+                    f"DOWN has fuel.")
         elif crowd_short:
-            verdict = f"below the {c15} crowded-short line - squeeze fuel up"
+            note = (f"{lsv} is BELOW the normal {c15}-{c85} band: crowded short, so a squeeze "
+                    f"UP has fuel.")
         else:
-            verdict = f"mid-range {c15}-{c85} - no crowding signal"
-        # chartmod._ord, not "{n}th": 83 renders as "83th" otherwise. The helper exists for
-        # exactly this and the pitfall is even written down - restoring the terse tile wording
-        # restored this typo along with it.
-        t.append(tile("Long/short ratio", lsv,
-                      f"30d {lo}-{hi} \u00b7 {chartmod._ord(lsp)} pctile",
-                      f"Neutral {med} \u00b7 {verdict}",
+            note = (f"{lsv} sits inside the normal {c15}-{c85} band, so no crowding signal. "
+                    f"Crowded long starts above {c85}.")
+        t.append(tile("Longs per short", lsv,
+                      f"higher than {lsp}% of the last 30 days",
+                      note,
                       "neg" if crowd_long else ("pos" if crowd_short else "")))
 
     fng = _grab(r"now (\d+) \(([^)]+)\)", raw)
