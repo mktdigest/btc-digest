@@ -356,7 +356,11 @@ def kpi_tiles(raw):
             verdict = f"below the {c15} crowded-short line - squeeze fuel up"
         else:
             verdict = f"mid-range {c15}-{c85} - no crowding signal"
-        t.append(tile("Long/short ratio", lsv, f"30d {lo}-{hi} \u00b7 {lsp}th pctile",
+        # chartmod._ord, not "{n}th": 83 renders as "83th" otherwise. The helper exists for
+        # exactly this and the pitfall is even written down - restoring the terse tile wording
+        # restored this typo along with it.
+        t.append(tile("Long/short ratio", lsv,
+                      f"30d {lo}-{hi} \u00b7 {chartmod._ord(lsp)} pctile",
                       f"Neutral {med} \u00b7 {verdict}",
                       "neg" if crowd_long else ("pos" if crowd_short else "")))
 
