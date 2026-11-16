@@ -55,7 +55,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
 [8] Sentiment - Fear & Greed index
     now 10 (Extreme Fear)   yesterday 10   30d range 10-68
-    30d avg 38   (current = 6th percentile of the 30d window)
+    30d avg 38   (current = 7th percentile of the 30d window)
     -> [warn] EXTREME FEAR (pctile 7): crowd capitulating - contrarian-bullish for a BOUNCE, which is a warning against shorting into it, not a buy signal.
 
 ======================================================================

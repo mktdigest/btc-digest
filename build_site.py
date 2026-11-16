@@ -509,7 +509,15 @@ def ref_section(raw):
 
 def build(raw=None):
     if raw is None:
-        raw = run_digest()
+        # NEVER run the digest from here. Two reasons, both learned the hard way:
+        #   1. it doubles every API call - bitcoin-data.com allows 10/hour, and the wrapper
+        #      already ran the digest once for this build;
+        #   2. the page would then be built from a DIFFERENT run than latest_digest.txt, so the
+        #      cached text and the page disagree (premium -0.122% on the page vs -0.112% in the
+        #      cache) and there is no way to tell which is current.
+        # Read the text the wrapper just captured instead.
+        with open(os.path.join(HERE, "latest_digest.txt")) as fh:
+            raw = fh.read()
     blocks_html = render_digest(raw)
     kpis = kpi_tiles(raw)
     heads = block_heads(raw)   # [(printed number, title)] - inline refs use these, never literals
@@ -518,7 +526,11 @@ def build(raw=None):
     bnpx = _grab(r"\(Coinbase\)\s*\$([\d,]+)", raw, 1, "")
     usdt = _grab(r"USDT/USD\s+([\d.]+)", raw, 1, "")
     verdict = _grab(r"^VERDICT: (.+)$", raw, 1, "")
-    updated = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    # The digest stamps its own run time; the page must quote THAT as the data time. Using the
+    # build clock made a page built from a 40-minute-old digest claim to be up to the minute.
+    digest_ts = _grab(r"BTC daily read\s*\|\s*([\d\-]+ [\d:]+ UTC)", raw, 1, "")
+    updated = digest_ts or datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+    built_ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     # Secondary venues for the header strip. The big figure IS the Coinbase print, so repeating it
     # would be the same duplication we just deleted - the spread is the genuinely new number
@@ -711,7 +723,7 @@ Colour is the stance, not the tone of the wording:
 <footer>
 <p>Generated automatically from keyless public APIs (Coinbase, Binance, DeFiLlama, cryptoetf.today, Look Into Bitcoin, BGeometrics, alternative.me). No credentials, no subscription feeds.</p>
 <p>Not financial advice. Backtest figures are historical and samples are small where noted.</p>
-<p>Last build: {updated}</p>
+<p>Data as of {updated} &middot; page built {built_ts}</p>
 </footer>
 <script>
 document.querySelectorAll('.tabs button').forEach(function(b){{

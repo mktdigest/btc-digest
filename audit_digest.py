@@ -1,0 +1,292 @@
+#!/usr/bin/env python3
+"""Cross-check the digest page: does every number agree with the digest text, and does the
+arithmetic hold up when re-derived from the raw series?
+
+Three layers can drift apart:
+  1. the digest text (coinbase_premium_daily.py stdout) - the source of truth
+  2. the KPI tiles      (build_site.py, parsed out of that text with regexes)
+  3. the chart cards    (charts.py, computed from digest_series.json and the text)
+
+A number that appears in two places and disagrees is worse than a missing number: the reader
+cannot tell which one to trust. This script exists because exactly that shipped twice (a
+crowding gate of 80/20 against the digest's 85/15, and "83th pctile" against "83rd").
+
+Usage: python3 audit_digest.py
+Exit code 1 if any HARD check fails.
+"""
+import json
+import re
+import sys
+
+SITE = "/root/btc-digest-site"
+DIGEST = f"{SITE}/latest_digest.txt"
+HTML = f"{SITE}/index.html"
+SERIES = "/root/.hermes/state/digest_series.json"
+
+fails, warns, oks = [], [], []
+
+
+def check(name, got, want, tol=None):
+    """tol=None -> compare as strings after normalising; else numeric comparison."""
+    if want is None or got is None:
+        warns.append(f"{name}: missing on one side (got={got!r} want={want!r})")
+        return
+    if tol is None:
+        if str(got).strip() == str(want).strip():
+            oks.append(name)
+        else:
+            fails.append(f"{name}: page says {got!r}, digest says {want!r}")
+        return
+    try:
+        g, w = float(str(got).replace(",", "").replace("$", "")), float(str(want).replace(",", "").replace("$", ""))
+    except ValueError:
+        fails.append(f"{name}: unparseable got={got!r} want={want!r}")
+        return
+    if abs(g - w) <= tol:
+        oks.append(name)
+    else:
+        fails.append(f"{name}: page says {g}, digest says {w} (diff {g - w:+.4f}, tol {tol})")
+
+
+def num(s):
+    """Last number in a string: '30-day change -$11.56B' -> -11.56.
+
+    Stripping every non-digit character turned that into '30-11.56' and raised. Take the final
+    numeric token instead, so a leading label can never corrupt the value.
+    """
+    found = re.findall(r"[-+]?\d[\d,]*(?:\.\d+)?", str(s))
+    if not found:
+        return None
+    try:
+        return float(found[-1].replace(",", ""))
+    except ValueError:
+        return None
+
+
+raw = open(DIGEST).read()
+html = open(HTML).read()
+S = json.load(open(SERIES))
+
+# ---------------------------------------------------------------- parse tiles
+tiles = {}
+for m in re.finditer(r'<span class="k">(.*?)</span><span class="v[^"]*">(.*?)</span>'
+                     r'<span class="d[^"]*">(.*?)</span><span class="n">(.*?)</span>', html):
+    label = m.group(1).replace("&amp;", "&")
+    tiles[label] = {"value": m.group(2), "delta": m.group(3), "note": m.group(4)}
+
+# ------------------------------------------------------- digest source values
+d = {
+    "spot": re.search(r"spot \$([\d,]+) \(Coinbase\)", raw).group(1),
+    "etf5": re.search(r"5d (-?\$[\d,\.]+M)\s+10d", raw).group(1),
+    "etf30": re.search(r"30d (-?\$[\d,\.]+M)\s*\n", raw).group(1),
+    "prem_live": re.search(r"live ([+-][\d\.]+)%", raw).group(1),
+    "prem_avg": re.search(r"30d avg ([+-][\d\.]+)%", raw).group(1),
+    "streak": re.search(r"negative streak (\d+)d", raw).group(1),
+    "stbl": re.search(r"combined \$([\d\.]+B)", raw).group(1),
+    "stbl30": re.search(r"combined \$[\d\.]+B\s+7d (-?\$[\d\.]+B)\s+30d (-?\$[\d\.]+B)", raw).group(2),
+    "rsi14": re.search(r"RSI\(14\) ([\d\.]+)", raw).group(1),
+    "rsi_pct": re.search(r"RSI14 1y percentile (\d+)%", raw).group(1),
+    "fund_ann": re.search(r"30d avg [+-][\d\.]+% /8h\s*->\s*([+-][\d\.]+)% annualised", raw).group(1),
+    "oi": re.search(r"OI \$([\d\.]+)bn", raw).group(1),
+    "oi_1d": re.search(r"OI \$[\d\.]+bn \(1d ([+-][\d\.]+)", raw).group(1),
+    "ls": re.search(r"all-acct L/S ([\d\.]+)", raw).group(1),
+    "ls_pct": re.search(r"all-acct L/S [\d\.]+ \([^)]*pctile (\d+)%\)", raw).group(1),
+    "ls_c15": re.search(r"crowd lines ([\d\.]+)/", raw).group(1),
+    "ls_c85": re.search(r"crowd lines [\d\.]+/([\d\.]+)", raw).group(1),
+    "fng": re.search(r"now (\d+) \(", raw).group(1),
+}
+
+print(f"parsed {len(tiles)} tiles, {len(cards) if 'cards' in dir() else 0} cards")
+print("=" * 78)
+print("LAYER 1 — KPI TILES vs DIGEST TEXT")
+print("=" * 78)
+t = tiles.get("ETF flows", {})
+check("tile ETF 30d", t.get("value"), d["etf30"])
+check("tile ETF 5d", (t.get("delta") or "").replace("5d ", ""), d["etf5"])
+
+t = tiles.get("US premium", {})
+check("tile premium live", t.get("value"), d["prem_live"] + "%")
+check("tile premium streak", t.get("delta"), f"{d['streak']} days negative")
+
+t = tiles.get("Stablecoins", {})
+check("tile stables level", t.get("value"), "$" + d["stbl"])
+check("tile stables 30d", (t.get("delta") or "").replace("30d ", ""), d["stbl30"])
+
+t = tiles.get("RSI(14)", {})
+check("tile RSI", t.get("value"), d["rsi14"])
+check("tile RSI percentile", t.get("delta"), f"1y pctile {d['rsi_pct']}%")
+
+t = tiles.get("Funding rate", {})
+check("tile funding", t.get("value"), d["fund_ann"] + "%")
+
+t = tiles.get("Perp open interest", {})
+check("tile OI", t.get("value"), "$" + d["oi"] + "bn")
+check("tile OI 1d", (t.get("delta") or "").replace("1d ", ""), d["oi_1d"] + "bn")
+
+t = tiles.get("Longs per short", {})
+check("tile L/S value", t.get("value"), d["ls"])
+check("tile L/S percentile word", t.get("delta"), f"higher than {d['ls_pct']}% of the last 30 days")
+
+t = tiles.get("Fear & Greed", {})
+check("tile F&G", t.get("value"), d["fng"])
+
+# ------------------------------------------------------- chart card chips
+print()
+print("=" * 78)
+print("LAYER 2 — CHART CARD CHIPS vs DIGEST TEXT")
+print("=" * 78)
+cards = {}
+for m in re.finditer(r'<h4>(.*?)</h4><div class="cnow">(.*?)</div>', html):
+    cards[m.group(1)] = re.findall(r'<span class="chip">(.*?)</span>', m.group(2))
+
+
+def chip(title, needle):
+    for c in cards.get(title, []):
+        if needle in c:
+            return c
+    return None
+
+
+# The card quotes the last SETTLED close (the series excludes the forming day), so compare it
+# to the digest's "last close", not to the live tick. Comparing to live made a correct chip look
+# like a bug.
+c = chip("US vs global premium - is America paying up?", "last close")
+d["prem_close"] = re.search(r"last close ([+-][\d\.]+)%", raw).group(1)
+check("card premium last close", c.split()[-1].rstrip("%"), d["prem_close"], tol=1e-9)
+
+c = chip("Momentum score (RSI) - how hard is it moving?", "momentum")
+check("card RSI", c.split()[1], d["rsi14"], tol=1e-9)
+
+c = chip("Open interest - how much leverage is in the system", "of positions open")
+check("card OI", num(c), float(d["oi"]), tol=0.005)
+
+c = chip("Long/short ratios - who is betting which way", "ordinary accounts")
+check("card L/S", c.split()[2], d["ls"], tol=1e-9)
+
+c = chip("US spot ETF flows - are institutions buying?", "last 30 days")
+check("card ETF 30d", num(c), num(d["etf30"]) / 1000.0, tol=0.006)
+
+c = chip("Stablecoin supply - is cash waiting to buy?", "total stablecoin")
+check("card stables", num(c), float(d["stbl"].rstrip("B")), tol=0.05)
+
+# ------------------------------------------------------- arithmetic re-derivation
+print()
+print("=" * 78)
+print("LAYER 3 — ARITHMETIC RE-DERIVED FROM THE RAW SERIES")
+print("=" * 78)
+close = S.get("cb_close", [])
+ra = S.get("ratios_all", [])
+
+# MA200 straight from the closes the digest itself used
+ma200 = sum(close[-200:]) / 200
+dig_ma200 = num(re.search(r"MA200 ([\d,]+)", raw).group(1))
+if dig_ma200:
+    check("MA200 vs recomputed", ma200, dig_ma200, tol=1.5)
+
+# L/S crowd lines should be the 15th/85th percentile of the 30-day window
+w = ra[-30:]
+sorted_w = sorted(w)
+p15 = sorted_w[min(len(sorted_w) - 1, int(0.15 * len(sorted_w)))]
+p85 = sorted_w[min(len(sorted_w) - 1, int(0.85 * len(sorted_w)))]
+if abs(p85 - float(d["ls_c85"])) > 0.02:
+    fails.append(f"L/S crowded-long line: digest prints {d['ls_c85']}, series 85th pctile = {p85:.2f}")
+else:
+    oks.append("L/S 85th line vs series")
+if abs(p15 - float(d["ls_c15"])) > 0.02:
+    warns.append(f"L/S crowded-short line: digest prints {d['ls_c15']}, series 15th pctile = {p15:.2f}")
+else:
+    oks.append("L/S 15th line vs series")
+
+# the tile's stated percentile must match the series
+tile_pct = int(re.search(r"higher than (\d+)%", tiles["Longs per short"]["delta"]).group(1))
+real_pct = round(100 * sum(1 for v in w if v <= w[-1]) / len(w))
+check("L/S percentile vs recomputed", tile_pct, real_pct, tol=1)
+
+# funding: 30d average 8-hourly rate x3 x365
+fund = S.get("funding", [])
+if fund:
+    ann = sum(fund) / len(fund) * 100 * 3 * 365
+    check("funding annualised vs recomputed", ann, float(d["fund_ann"]), tol=0.15)
+
+# stablecoin combined = USDT + USDC
+stbl_chips = cards.get("Stablecoin supply - is cash waiting to buy?", [])
+if len(stbl_chips) >= 3:
+    lvl = num(stbl_chips[0])
+    d30 = num(stbl_chips[2])
+    check("stables 7d+30d sign agreement", (d30 < 0) == (num(stbl_chips[1]) < 0), True, tol=None)
+
+# RSI percentile claim vs the series
+def rsi_series(vals, n=14):
+    if len(vals) < n + 1:
+        return []
+    r, g, l = [None] * n, 0.0, 0.0
+    for i in range(1, n + 1):
+        ch = vals[i] - vals[i - 1]
+        g += max(ch, 0); l += max(-ch, 0)
+    g /= n; l /= n
+    out = [100 - 100 / (1 + (g / l if l else 1e9))]
+    for i in range(n + 1, len(vals)):
+        ch = vals[i] - vals[i - 1]
+        g = (g * (n - 1) + max(ch, 0)) / n
+        l = (l * (n - 1) + max(-ch, 0)) / n
+        out.append(100 - 100 / (1 + (g / l if l else 1e9)))
+    return out
+
+r = rsi_series(close)
+if r:
+    year = r[-365:]
+    pct = round(100 * sum(1 for x in year if x <= r[-1]) / len(year))
+    check("RSI 1y percentile vs recomputed", int(d["rsi_pct"]), pct, tol=2)
+
+# ------------------------------------------------------- internal contradictions
+print()
+print("=" * 78)
+print("LAYER 4 — INTERNAL CONTRADICTIONS (same stat stated twice)")
+print("=" * 78)
+# the F&G block prints its percentile twice, via _ord() (truncates) and .0f (rounds)
+fng_lines = re.findall(r"current = (\d+)\w\w percentile of the 30d window", raw)
+fng_verdict = re.findall(r"EXTREME FEAR \(pctile (\d+)\)", raw)
+if fng_lines and fng_verdict:
+    check("F&G percentile: block line vs verdict", fng_lines[0], fng_verdict[0])
+
+# every block's stance tag must exist and be one of the four
+tags = re.findall(r"-> \[(\w+)\]", raw)
+bad = [t for t in tags if t not in ("bear", "bull", "warn", "flat")]
+if bad:
+    fails.append(f"unknown stance tag(s): {bad}")
+else:
+    oks.append(f"all {len(tags)} stance tags valid")
+
+# a bare "->" with no tag would silently render grey
+untagged = len(re.findall(r"^\s*-> (?!\[)", raw, re.M))
+check("untagged verdict lines", untagged, 0, tol=0)
+
+# ── section tallies: "NET BEARISH - 1 bearish / 2 caution" must match the tags below it
+secs = re.split(r"^(\d+)\.\s+([A-Z][A-Z &\-]+?)\s{2,}", raw, flags=re.M)
+for i in range(1, len(secs) - 2, 3):
+    num, name, body = secs[i], secs[i + 1].strip(), secs[i + 2]
+    head = body.split("\n", 1)[0]
+    tally = re.search(r"(NET (?:BEARISH|BULLISH)|MIXED|NO SIGNAL)\s*-\s*(.+)", head)
+    if not tally:
+        warns.append(f"section {num} {name}: no tally in header ({head[:60]!r})")
+        continue
+    counts = {k: int(v) for v, k in re.findall(r"(\d+)\s+(bearish|bullish|caution)", tally.group(2))}
+    actual = {}
+    for t in re.findall(r"-> \[(bear|bull|warn|flat)\]", body):
+        actual[{"bear": "bearish", "bull": "bullish", "warn": "caution"}.get(t, "flat")] = \
+            actual.get({"bear": "bearish", "bull": "bullish", "warn": "caution"}.get(t, "flat"), 0) + 1
+    if counts != {k: v for k, v in actual.items() if k != "flat"}:
+        fails.append(f"section {num} {name}: header says {counts}, tags say {actual}")
+    else:
+        oks.append(f"section {num} tally {counts} matches its tags")
+
+print()
+for o in oks:
+    print(f"  PASS  {o}")
+for w in warns:
+    print(f"  WARN  {w}")
+for f in fails:
+    print(f"  FAIL  {f}")
+print()
+print(f"{len(oks)} passed, {len(warns)} warnings, {len(fails)} failures")
+sys.exit(1 if fails else 0)

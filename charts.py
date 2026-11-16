@@ -614,7 +614,10 @@ def build_all(outdir, series_path):
                 else:
                     break
             add("c_premium.png", "US vs global premium - is America paying up?",
-                [f"right now {prem[-1]:+.3f}%", f"30-day average {m30[-1]:+.3f}%",
+                # prem[-1] is the last SETTLED daily close - the series excludes the forming
+                # day. Calling it "right now" (as this chip did) claimed a live tick that it is
+                # not, and disagreed with the digest's live line on the same screen.
+                [f"last close {prem[-1]:+.3f}%", f"30-day average {m30[-1]:+.3f}%",
                  f"below zero for {streak} days straight"],
                 "The premium is Coinbase's BTC price minus Binance's, in percent: it answers "
                 "'are US buyers paying more or less than the rest of the world?'. Above zero = "
