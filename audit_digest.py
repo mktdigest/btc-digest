@@ -74,8 +74,10 @@ S = json.load(open(SERIES))
 tiles = {}
 for m in re.finditer(r'<span class="k">(.*?)</span><span class="v[^"]*">(.*?)</span>'
                      r'<span class="d[^"]*">(.*?)</span><span class="n">(.*?)</span>', html):
-    label = m.group(1).replace("&amp;", "&")
-    tiles[label] = {"value": m.group(2), "delta": m.group(3), "note": m.group(4)}
+    from html import unescape as _unesc
+    label = _unesc(m.group(1))
+    tiles[label] = {"value": m.group(2), "delta": _unesc(m.group(3)),
+                    "note": _unesc(m.group(4))}
 
 # ------------------------------------------------------- digest source values
 d = {
@@ -117,7 +119,12 @@ check("tile stables 30d", (t.get("delta") or "").replace("30d ", ""), d["stbl30"
 
 t = tiles.get("RSI(14)", {})
 check("tile RSI", t.get("value"), d["rsi14"])
-check("tile RSI percentile", t.get("delta"), f"1y pctile {d['rsi_pct']}%")
+_rp = int(d["rsi_pct"])
+check("tile RSI percentile", t.get("delta"),
+      (f"bottom {_rp}% of the past year" if _rp <= 50
+       else f"top {100 - _rp}% of the past year"))
+check("tile RSI note states the same rank", f"{_rp}% of the past year's daily closes were lower"
+      in (t.get("note") or ""), True)
 
 t = tiles.get("Funding rate", {})
 check("tile funding", t.get("value"), d["fund_ann"] + "%")
@@ -128,7 +135,10 @@ check("tile OI 1d", (t.get("delta") or "").replace("1d ", ""), d["oi_1d"] + "bn"
 
 t = tiles.get("Longs per short", {})
 check("tile L/S value", t.get("value"), d["ls"])
-check("tile L/S percentile word", t.get("delta"), f"higher than {d['ls_pct']}% of the last 30 days")
+_lp = int(d["ls_pct"])
+check("tile L/S percentile word", t.get("delta"),
+      (f"bottom {_lp}% of its own month" if _lp <= 50
+       else f"top {100 - _lp}% of its own month"))
 
 t = tiles.get("Fear & Greed", {})
 check("tile F&G", t.get("value"), d["fng"])
@@ -200,10 +210,27 @@ if abs(p15 - float(d["ls_c15"])) > 0.02:
 else:
     oks.append("L/S 15th line vs series")
 
-# the tile's stated percentile must match the series
-tile_pct = int(re.search(r"higher than (\d+)%", tiles["Longs per short"]["delta"]).group(1))
+# the tile's stated percentile must match the series. Wording is "top N% of its own month", i.e.
+# N is the complement of the percentile rank, so a pad of 1 is still the right tolerance.
+m_tail = re.search(r"(top|bottom) (\d+)% of its own month", tiles["Longs per short"]["delta"])
+if not m_tail:
+    fails.append("L/S tile sub-line no longer readable as 'top/bottom N% of its own month'")
+    tile_pct = None
+else:
+    tile_pct = (100 - int(m_tail.group(2))) if m_tail.group(1) == "top" else int(m_tail.group(2))
 real_pct = round(100 * sum(1 for v in w if v <= w[-1]) / len(w))
 check("L/S percentile vs recomputed", tile_pct, real_pct, tol=1)
+
+# the note spells the rank out as a day count ("25 of the last 30 daily readings were lower").
+# That count is a second, independent rendering of the same fact - if the wording is ever
+# re-derived by hand it must still agree with the series.
+m_lower = re.search(r"(\d+) of the last 30 daily readings were lower",
+                    tiles["Longs per short"].get("note", ""))
+if m_lower:
+    check("L/S 'N of 30 lower' vs recomputed",
+          int(m_lower.group(1)), sum(1 for v in w if v <= w[-1]), tol=0)
+else:
+    fails.append("L/S tile note no longer states how many of the 30 readings were lower")
 
 # funding: 30d average 8-hourly rate x3 x365
 fund = S.get("funding", [])
@@ -211,12 +238,23 @@ if fund:
     ann = sum(fund) / len(fund) * 100 * 3 * 365
     check("funding annualised vs recomputed", ann, float(d["fund_ann"]), tol=0.15)
 
-# stablecoin combined = USDT + USDC
+# stablecoin combined = USDT + USDC. The card's three chips must quote the digest VERBATIM:
+# charts.py used to sum a LIVE DeFiLlama fetch at build time, so a rebuild hours after the digest
+# printed $244.6B under a text that said $244.7B. Exact string match, not a tolerance, because
+# these are the same fact rendered twice.
 stbl_chips = cards.get("Stablecoin supply - is cash waiting to buy?", [])
 if len(stbl_chips) >= 3:
-    lvl = num(stbl_chips[0])
     d30 = num(stbl_chips[2])
     check("stables 7d+30d sign agreement", (d30 < 0) == (num(stbl_chips[1]) < 0), True, tol=None)
+    m_dig = re.search(r"USDT\+USDC combined \$([\d\.,]+B)\s+7d\s+(-?\+?\$[\d\.,]+B)\s+"
+                      r"30d\s+(-?\+?\$[\d\.,]+B)", raw)
+    if m_dig:
+        for i, (label, printed) in enumerate(zip(("total", "7d", "30d"), m_dig.groups())):
+            m_chip = re.search(r"[-+]?\$?[\d\.,]+B", stbl_chips[i])
+            got = (m_chip.group(0) if m_chip else "").replace("$", "")
+            check(f"stables card {label} quotes digest", got, printed.replace("$", ""))
+    else:
+        fails.append("stables: digest's combined line unparseable - card cannot be verified")
 
 # RSI percentile claim vs the series
 def rsi_series(vals, n=14):

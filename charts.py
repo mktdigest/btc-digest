@@ -10,6 +10,7 @@ apparent size instead of being scaled down into illegibility.
 import json
 import math
 import os
+import re
 import statistics
 import urllib.request
 
@@ -457,8 +458,13 @@ def stablecoin_series(days=120):
     return labels, [v[1] / 1e9 for _, v in rows], [v[2] / 1e9 for _, v in rows]
 
 
-def build_all(outdir, series_path):
-    """Render every chart. Returns metadata for the page. Never raises."""
+def build_all(outdir, series_path, digest_text=None):
+    """Render every chart. Returns metadata for the page. Never raises.
+
+    digest_text (the digest's own stdout) is the source of truth for any displayed number that
+    can also be computed from a LIVE fetch. Charts fetch, the digest prints; the card must quote
+    the digest, or a rebuild hours later disagrees with the text above it.
+    """
     with open(series_path) as fh:
         S = json.load(fh)
     os.makedirs(outdir, exist_ok=True)
@@ -755,9 +761,21 @@ def build_all(outdir, series_path):
             comb = usdt[-1] + usdc[-1]
             d7 = comb - (usdt[-8] + usdc[-8]) if len(usdt) > 8 else 0
             d30 = comb - (usdt[-31] + usdc[-31]) if len(usdt) > 31 else 0
+            # The series above is fetched LIVE from DeFiLlama at build time, while the digest
+            # text was printed when the digest ran. Rebuilding hours later therefore produced a
+            # card reading $244.6B under a digest that printed $244.7B - the exact "page
+            # disagrees with the text" class the audit exists to catch. The DIGEST is the source
+            # of truth, so prefer its printed figures verbatim; the live series is only pixels.
+            total_chip = f"total stablecoin supply ${comb:,.1f}B"
+            d7_chip, d30_chip = f"7-day change {_usd(d7)}", f"30-day change {_usd(d30)}"
+            m = re.search(r"USDT\+USDC combined \$([\d\.,]+B)\s+7d\s+(-?\+?\$[\d\.,]+B)\s+"
+                          r"30d\s+(-?\+?\$[\d\.,]+B)", digest_text or "")
+            if m:
+                total_chip = f"total stablecoin supply ${m.group(1)}"
+                d7_chip, d30_chip = (f"7-day change {m.group(2)}",
+                                     f"30-day change {m.group(3)}")
             add("c_stables.png", "Stablecoin supply - is cash waiting to buy?",
-                [f"total stablecoin supply ${comb:,.1f}B", f"7-day change {_usd(d7)}",
-                 f"30-day change {_usd(d30)}"],
+                [total_chip, d7_chip, d30_chip],
                 "Stablecoins (USDT, USDC) are the cash pile of crypto - what you hold when you "
                 "want out of bitcoin but stay inside the system. Growing supply = new fiat "
                 "arriving, dry powder building. Shrinking supply = people redeeming for real "
@@ -974,5 +992,6 @@ if __name__ == "__main__":
     import sys
     d = sys.argv[1] if len(sys.argv) > 1 else "."
     s = sys.argv[2] if len(sys.argv) > 2 else "/root/.hermes/state/digest_series.json"
-    for m in build_all(d, s):
+    for m in build_all(d, s, digest_text=open(
+            os.path.join(os.path.dirname(os.path.abspath(__file__)), "latest_digest.txt")).read()):
         print("rendered", m["file"], "-", m["title"])

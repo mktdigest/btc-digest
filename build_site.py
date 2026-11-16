@@ -320,9 +320,17 @@ def kpi_tiles(raw):
     if r14:
         pct = _grab(r"RSI14 1y percentile (\d+)%", raw, 1, "")
         v = float(r14)
-        t.append(tile("RSI(14)", r14, f"1y pctile {pct}%" if pct else "daily close",
-                      "Oversold - capitulation zone" if v < 30 else
-                      ("Overbought - stretched" if v > 70 else "Neutral, no extreme"),
+        # Plain-language sub-line. "1y pctile 83%" assumed the reader knows the measure and what a
+        # percentile is. The side matters: an RSI of 24 sits in the BOTTOM 4% of the year, and a
+        # naive "top (100-pct)%" printed that as "top 96%", which reads as a high reading. Name
+        # the smaller side, then spell the rank out as a percentage of days in the note.
+        sub = ("bottom %s%% of the past year" % pct if int(pct) <= 50
+               else "top %d%% of the past year" % (100 - int(pct))) if pct else "daily close"
+        state = ("Oversold - capitulation zone" if v < 30 else
+                 ("Overbought - stretched" if v > 70 else "Neutral, no extreme"))
+        note = (f"14-day RSI. {pct}% of the past year's daily closes were lower. {state}."
+                if pct else state)
+        t.append(tile("RSI(14)", r14, sub, note,
                       "neg" if v < 30 else ("pos" if v > 70 else "")))
 
     # --- row 2: positioning / sentiment ------------------------------------
@@ -350,21 +358,26 @@ def kpi_tiles(raw):
         # while the block text used 85/15, so at an 82nd-pctile reading the tile said "mid-range,
         # no signal" while the block directly beneath it said "crowded LONG".
         crowd_long, crowd_short = lsp >= 85, lsp <= 15
-        # Written for a first-time reader: the label says what the number IS, the delta says how
-        # unusual it is in plain words, and the note names the band so the two ranges in this
-        # tile cannot be mistaken for the same kind of fact. "83rd pctile" and a bare
-        # "1.02-3.23" next to "1.75-3.07" both required prior knowledge to interpret.
+        # Written for a first-time reader: the sub-line says the rank in plain words and names
+        # what is being ranked ("of its own month") instead of "higher than 83% of the last 30
+        # days", which read like a count of days rather than a rank within 30 daily readings.
+        # The note defines the measure BEFORE the percentile, spells the rank out as a count,
+        # and says where the normal band comes from (p15-p85 = the middle 70% of the month).
+        n_lower = round(lsp * 30 / 100)
+        head = (f"Binance accounts long vs short. {n_lower} of the last 30 daily readings were "
+                f"lower. Normal band {c15}-{c85} = the middle 70% of the month, ")
         if crowd_long:
-            note = (f"{lsv} is ABOVE the normal {c15}-{c85} band: crowded long, so a squeeze "
-                    f"DOWN has fuel.")
+            note = head + f"and {lsv} is ABOVE it: crowded long, so a squeeze DOWN has fuel."
         elif crowd_short:
-            note = (f"{lsv} is BELOW the normal {c15}-{c85} band: crowded short, so a squeeze "
-                    f"UP has fuel.")
+            note = head + f"and {lsv} is BELOW it: crowded short, so a squeeze UP has fuel."
         else:
-            note = (f"{lsv} sits inside the normal {c15}-{c85} band, so no crowding signal. "
-                    f"Crowded long starts above {c85}.")
+            note = head + f"so no crowding signal yet; crowded long starts above {c85}."
+        # Same side rule as the RSI tile: name the smaller tail, so a 10th-pctile reading says
+        # "bottom 10% of its own month" instead of a technically-true-but-useless "top 90%".
+        sub = (f"bottom {lsp}% of its own month" if lsp <= 50
+               else f"top {100 - lsp}% of its own month")
         t.append(tile("Longs per short", lsv,
-                      f"higher than {lsp}% of the last 30 days",
+                      sub,
                       note,
                       "neg" if crowd_long else ("pos" if crowd_short else "")))
 
@@ -615,7 +628,7 @@ def build(raw=None):
     # indicator charts
     chart_meta = []
     try:
-        chart_meta = chartmod.build_all(HERE, SERIES_PATH)
+        chart_meta = chartmod.build_all(HERE, SERIES_PATH, digest_text=raw)
     except Exception as e:
         chart_meta = [{"file": "", "title": f"charts unavailable ({type(e).__name__})", "caption": ""}]
 
