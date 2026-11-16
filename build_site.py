@@ -518,6 +518,12 @@ def build(raw=None):
         # Read the text the wrapper just captured instead.
         with open(os.path.join(HERE, "latest_digest.txt")) as fh:
             raw = fh.read()
+    # Provenance stamps. The audit verifies these, so a page can never be built from a digest
+    # other than latest_digest.txt (that is how the page once showed premium -0.122% while the
+    # cache said -0.112%), and so "data as of" can never silently become the build clock.
+    digest_md5 = hashlib.md5(raw.encode()).hexdigest()[:12]
+    built_stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
+
     blocks_html = render_digest(raw)
     kpis = kpi_tiles(raw)
     heads = block_heads(raw)   # [(printed number, title)] - inline refs use these, never literals
@@ -622,6 +628,8 @@ def build(raw=None):
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BTC Daily Digest</title>
+<meta name="digest-md5" content="{digest_md5}">
+<meta name="page-built" content="{built_stamp}">
 <meta name="description" content="Daily Bitcoin flow, positioning and momentum digest with backtested rules.">
 <style>{CSS}</style></head><body><div class="wrap">
 <header>

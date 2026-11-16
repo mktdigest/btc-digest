@@ -14,7 +14,9 @@ crowding gate of 80/20 against the digest's 85/15, and "83th pctile" against "83
 Usage: python3 audit_digest.py
 Exit code 1 if any HARD check fails.
 """
+import hashlib
 import json
+from datetime import datetime
 import re
 import sys
 
@@ -22,6 +24,7 @@ SITE = "/root/btc-digest-site"
 DIGEST = f"{SITE}/latest_digest.txt"
 HTML = f"{SITE}/index.html"
 SERIES = "/root/.hermes/state/digest_series.json"
+datetime_now = datetime.now().strftime("%Y-%m-%dT%H:%M:%S")
 
 fails, warns, oks = [], [], []
 
@@ -279,6 +282,61 @@ for i in range(1, len(secs) - 2, 3):
         fails.append(f"section {num} {name}: header says {counts}, tags say {actual}")
     else:
         oks.append(f"section {num} tally {counts} matches its tags")
+
+# ── LAYER 5 — provenance, data time, and "did the builder fetch behind our back"
+print()
+print("=" * 78)
+print("LAYER 5 — PROVENANCE / DETERMINISM GUARDS")
+print("=" * 78)
+
+digest_md5_now = hashlib.md5(raw.encode()).hexdigest()[:12]
+meta_md5 = re.search(r'<meta name="digest-md5" content="([0-9a-f]+)">', html)
+if meta_md5 is None:
+    # A missing meta is worse than a wrong one: nothing on the page says which run built it,
+    # so every number below could belong to a different digest. Hard fail, not a warn.
+    fails.append("page has no digest-md5 meta - cannot prove which digest run built it")
+else:
+    check("page built from the cached digest", meta_md5.group(1), digest_md5_now)
+
+# Data time must be the DIGEST's stamp, never the build clock.
+page_data_ts = re.search(r'updated ([\d\-]+ [\d:]+ UTC)', html)
+digest_ts = re.search(r"BTC daily read\s*\|\s*([\d\-]+ [\d:]+ UTC)", raw)
+if page_data_ts is None or digest_ts is None:
+    fails.append("data-time unreadable (page=%s digest=%s) - staleness would be invisible"
+                 % (bool(page_data_ts), bool(digest_ts)))
+else:
+    check("header data-time = digest timestamp", page_data_ts.group(1), digest_ts.group(1))
+
+page_built = re.search(r'<meta name="page-built" content="([^"]+)">', html)
+if page_built and digest_ts:
+    oks.append("page build stamp present: " + page_built.group(1))
+else:
+    fails.append("page build stamp missing - staleness would be invisible")
+
+# Static guard: the builder must never call run_digest() again. One occurrence is the
+# definition; a second means someone restored the implicit fetch.
+src = open(f"{SITE}/build_site.py").read()
+calls = len(re.findall(r"run_digest\s*\(", src))
+if calls <= 1:
+    oks.append("builder does not call run_digest() (no hidden fetch)")
+else:
+    fails.append(f"build_site.py calls run_digest() {calls - 1}x - the builder is fetching "
+                 f"again, so the page can come from a different run than the cache")
+
+# A settled figure must not move between the 08:30 and 21:00 builds of the same UTC day.
+try:
+    snap = json.load(open("/root/.hermes/state/btc_digest_snapshot.json"))
+    if snap.get("ts", "")[:10] == datetime_now[:10]:
+        for k, label in (("rsi14", "RSI14 settled"), ("streak", "premium streak")):
+            if str(snap.get(k)) != str(d.get(k)):
+                warns.append(f"{label} moved intraday ({snap.get(k)} -> {d.get(k)}); "
+                             f"settled figures should only change when the UTC day rolls")
+        if str(snap.get("ls")) != str(d["ls"]):
+            warns.append(f"long/short ratio moved intraday ({snap.get('ls')} -> {d['ls']}) "
+                         f"- fine if positioning genuinely re-printed, check it is not a "
+                         f"different series (all-acct vs top-trader)")
+except Exception:
+    pass
 
 print()
 for o in oks:
