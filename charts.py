@@ -92,11 +92,11 @@ def _rank_name(p):
     """A percentile in plain words. '87th pctile' is meaningless to anyone who has not met one."""
     if p >= 95:
         return "the highest in 30 days"
-    if p >= 80:
+    if p >= 85:
         return "near the top of its 30-day range"
     if p <= 5:
         return "the lowest in 30 days"
-    if p <= 20:
+    if p <= 15:
         return "near the bottom of its 30-day range"
     return "mid-range for the last 30 days"
 
@@ -840,20 +840,22 @@ def build_all(outdir, series_path):
                 "fuel for a squeeze DOWN, a crowded short book is fuel for a squeeze UP. When "
                 "ordinary traders are long but big traders' money is shrinking, the informed "
                 "side is handing risk to the crowd.",
-                (f"The crowd is heavily long: ordinary accounts hold {ra[-1]:.2f} longs for "
-                 f"every short, which is {_rank_name(pa)}. Crowded longs are fuel for a squeeze "
-                 f"DOWN. Meanwhile big traders' position size is {rp[-1]:.2f} ({_rank_name(pp)}), "
-                 f"so the money is not adding to that long - the informed side is handing risk to "
-                 f"the crowd. The pain trade is lower."
-                 if pa >= 80 else
-                 f"The crowd is heavily short: ordinary accounts hold only {ra[-1]:.2f} longs per "
-                 f"short, which is {_rank_name(pa)}. Crowded shorts are fuel for a squeeze UP, so "
-                 f"a fresh short here is fighting the positioning."
-                 if pa <= 20 else
-                 f"Positioning is unremarkable: ordinary accounts hold {ra[-1]:.2f} longs per "
-                 f"short, which is {_rank_name(pa)}, and big traders' position size is "
-                 f"{rp[-1]:.2f}. Nobody is crowded, so there is no contrarian squeeze to trade "
-                 f"off this chart."))
+                (f"The crowd is CROWDED long: ordinary accounts hold {ra[-1]:.2f} longs for "
+                 f"every short, which is {_rank_name(pa)} - past the 85-of-100 line we treat as "
+                 f"crowded. Crowded longs are fuel for a squeeze DOWN. Big traders' position "
+                 f"size is {rp[-1]:.2f} ({_rank_name(pp)}), so the money is not adding to that "
+                 f"long either way. The pain trade is lower."
+                 if pa >= 85 else
+                 f"The crowd is CROWDED short: ordinary accounts hold only {ra[-1]:.2f} longs per "
+                 f"short, which is {_rank_name(pa)} - below the 15-of-100 line we treat as "
+                 f"crowded. Crowded shorts are fuel for a squeeze UP, so a fresh short here is "
+                 f"fighting the positioning."
+                 if pa <= 15 else
+                 f"No crowding signal: ordinary accounts lean long at {ra[-1]:.2f} longs per "
+                 f"short, but that is {_rank_name(pa)} - and we only call it crowded past 85 of "
+                 f"100. Big traders' position size is {rp[-1]:.2f} ({_rank_name(pp)}). So the "
+                 f"book leans long without being stretched, which gives no contrarian squeeze to "
+                 f"trade - this is a background condition, not a reason to take a side."))
     except Exception:
         pass
 
@@ -884,11 +886,18 @@ def build_all(outdir, series_path):
                     (f"All three sit high - {qa[-1]:.0f}, {qt[-1]:.0f} and {qp[-1]:.0f} out of "
                      f"100. Every group is leaning long at once, so the squeeze risk downward is "
                      f"broad rather than concentrated in one type of trader."
-                     if min(qa[-1], qt[-1], qp[-1]) >= 80 else
+                     if min(qa[-1], qt[-1], qp[-1]) >= 85 else
+                     # A headcount/size SPLIT is only a squeeze setup when the crowd is actually
+                     # stretched. At 83 of 100 it is not, and calling that "setup for a squeeze
+                     # down" contradicted the tile saying "no crowding signal" one inch away.
                      f"Ordinary accounts score {qa[-1]:.0f} out of 100 while big traders' "
                      f"position size scores {qp[-1]:.0f} - "
-                     + ("lots of small longs with big money not behind them. Retail is long, the "
-                        "money is not: that is the setup for a squeeze down."
+                     + (("lots of small longs with big money not behind them. Retail is long and "
+                         "stretched, the money is not: that is the setup for a squeeze down."
+                         if qa[-1] >= 85 else
+                         f"lots of small longs with big money not behind them. But at "
+                         f"{qa[-1]:.0f} of 100 the crowd is not stretched yet - under the 85 "
+                         f"line - so this is a tilt to watch, not a squeeze setup.")
                         if qa[-1] > qp[-1] + 20 else
                         "no wide split between the crowd and the money, so there is no standout "
                         "contrarian read here.")))
