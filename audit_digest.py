@@ -18,6 +18,7 @@ import hashlib
 import json
 from datetime import datetime
 import re
+import statistics
 import sys
 
 SITE = "/root/btc-digest-site"
@@ -96,6 +97,7 @@ d = {
     "oi_1d": re.search(r"OI \$[\d\.]+bn \(1d ([+-][\d\.]+)", raw).group(1),
     "ls": re.search(r"all-acct L/S ([\d\.]+)", raw).group(1),
     "ls_pct": re.search(r"all-acct L/S [\d\.]+ \([^)]*pctile (\d+)%\)", raw).group(1),
+    "ls_med": re.search(r"median ([\d\.]+), crowd lines", raw).group(1),
     "ls_c15": re.search(r"crowd lines ([\d\.]+)/", raw).group(1),
     "ls_c85": re.search(r"crowd lines [\d\.]+/([\d\.]+)", raw).group(1),
     "fng": re.search(r"now (\d+) \(", raw).group(1),
@@ -196,11 +198,24 @@ dig_ma200 = num(re.search(r"MA200 ([\d,]+)", raw).group(1))
 if dig_ma200:
     check("MA200 vs recomputed", ma200, dig_ma200, tol=1.5)
 
-# L/S crowd lines should be the 15th/85th percentile of the 30-day window
+# L/S crowd lines should be the 15th/85th percentile of the 30-day window.
+def _pctl(v, q):
+    """Percentile by linear interpolation between order statistics.
+
+    This MUST match the definition in the runner (`_pctl` in coinbase_premium_daily.py). The
+    earlier nearest-rank form - sorted[int(0.85 * n)] - snapped to a real sample instead, so on
+    2026-11-20 it reported 3.1322 against the digest's interpolated 3.1145 -> printed "3.11".
+    That gap equalled the 0.02 tolerance and floating-point dust tipped it into a false FAIL on a
+    page that was correct. An audit that flags correct data trains you to ignore it.
+    """
+    s = sorted(v)
+    k = (len(s) - 1) * q / 100
+    lo, hi = int(k), min(int(k) + 1, len(s) - 1)
+    return s[lo] + (s[hi] - s[lo]) * (k - lo)
+
+
 w = ra[-30:]
-sorted_w = sorted(w)
-p15 = sorted_w[min(len(sorted_w) - 1, int(0.15 * len(sorted_w)))]
-p85 = sorted_w[min(len(sorted_w) - 1, int(0.85 * len(sorted_w)))]
+p15, p85 = _pctl(w, 15), _pctl(w, 85)
 if abs(p85 - float(d["ls_c85"])) > 0.02:
     fails.append(f"L/S crowded-long line: digest prints {d['ls_c85']}, series 85th pctile = {p85:.2f}")
 else:
@@ -209,6 +224,8 @@ if abs(p15 - float(d["ls_c15"])) > 0.02:
     warns.append(f"L/S crowded-short line: digest prints {d['ls_c15']}, series 15th pctile = {p15:.2f}")
 else:
     oks.append("L/S 15th line vs series")
+check("L/S median vs series", float(d["ls_med"]) if w else None,
+      round(statistics.median(w), 2) if w else None, tol=0.02)
 
 # the tile's stated percentile must match the series. Wording is "top N% of its own month", i.e.
 # N is the complement of the percentile rank, so a pad of 1 is still the right tolerance.

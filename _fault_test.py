@@ -13,6 +13,7 @@ import sys
 
 SITE = pathlib.Path("/root/btc-digest-site")
 HTML, BS = SITE / "index.html", SITE / "build_site.py"
+DIGEST = SITE / "latest_digest.txt"
 
 
 def run_audit():
@@ -57,8 +58,13 @@ results.append(trial(
 # B. build clock presented as data time - the header lie that shipped
 digest_ts = re.search(r"BTC daily read\s*\|\s*([\d\-]+ [\d:]+ UTC)",
                       (SITE / "latest_digest.txt").read_text()).group(1)
-build_ts = re.search(r'<meta name="page-built" content="([^"]+)"', HTML.read_text()).group(1)
-assert build_ts != digest_ts, "fixture stale: build stamp equals digest stamp"
+# A deliberately wrong "data as of" stamp: the digest's own stamp shifted by +7 minutes. Deriving
+# it beats borrowing page-built, which is legitimately IDENTICAL to the digest stamp when the cron
+# builds in the same minute the digest stamps (08:30 SGT = 00:30 UTC).
+_d, _hm = digest_ts.split(" ", 1)          # "2026-11-20 00:30 UTC" -> date, "00:30 UTC"
+_h, _mi = (int(x) for x in _hm.split(" ")[0].split(":"))
+build_ts = f"{_d} {(_h + (_mi + 7) // 60) % 24:02d}:{(_mi + 7) % 60:02d} UTC"
+assert build_ts != digest_ts, "fixture stale: generated stamp equals the digest stamp"
 results.append(trial(
     "header shows build time instead of data time",
     HTML,
@@ -92,6 +98,19 @@ results.append(trial(
     "header timestamp removed",
     HTML,
     lambda p: replace_in(p, "updated " + digest_ts, "updated (unknown)"),
+))
+
+# G. arithmetic layer: the printed 85th percentile no longer matches the series. Values move
+# daily, so derive the anchor from today's digest instead of hardcoding 3.11.
+_dig = DIGEST.read_text()
+_m = re.search(r"crowd lines ([\d\.]+)/([\d\.]+)", _dig)
+assert _m, "fixture stale: no crowd lines in the digest"
+_c15, _c85 = _m.group(1), _m.group(2)
+_bogus = f"{float(_c85) + 0.20:.2f}"
+results.append(trial(
+    "crowd-line 85th percentile disagrees with the series",
+    DIGEST,
+    lambda p: replace_in(p, f"crowd lines {_c15}/{_c85}", f"crowd lines {_c15}/{_bogus}"),
 ))
 
 for f in SITE.glob("*.faultbak"):
