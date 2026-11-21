@@ -1,7 +1,7 @@
-BTC daily read  |  2026-11-20 13:00 UTC
-spot $61,492 (Coinbase)   $61,556 (Binance)   USDT/USD 0.99892
+BTC daily read  |  2026-11-21 00:30 UTC
+spot $58,954 (Coinbase)   $59,084 (Binance)   USDT/USD 0.99774
 blocks use settled DAILY closes unless a line says 'live'
-VERDICT: US bid ABSENT - premium negative, 30d mean at lows
+VERDICT: US bid ABSENT - premium negative, 30d mean at lows; ETF outflows confirm
 
 ======================================================================
 1. FLOW - where the money is going
@@ -9,32 +9,32 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Read this first. If flow is bearish, everything below is a bounce to sell.
 ======================================================================
 [1] US spot BTC ETF net flow (T+1) - institutional demand
-    latest 2026-11-20 +$0.0M   prev -$582.3M
-    5d -$1,120.7M   10d -$1,890.2M   30d -$3,915.8M
-    -> [bear] ETF money still leaving: -$3,915.8M over 30d. (Prior run was 3d, latest day flat.)
+    latest 2026-11-20 -$52.1M   prev -$582.3M
+    5d -$1,172.8M   10d -$1,942.3M   30d -$4,496.3M
+    -> [bear] ETF money still leaving: -$4,496.3M over 30d. Current run: 4d of outflows.
 
 [2] Coinbase Premium Index - US vs global bid
-    live -0.103%   last close -0.119% (prev -0.137%)
-    30d avg -0.139%   negative streak 76d   1y low -0.271%
-    -> [bear] US still discounting to global for 76 straight days: US bid is the missing buyer.
+    live -0.220%   last close -0.232% (prev -0.119%)
+    30d avg -0.144%   negative streak 77d   1y low -0.271%
+    -> [bear] US still discounting to global for 77 straight days: US bid is the missing buyer.
 
 [3] Coinbase Premium net of Tether - 30d mean (regime)
-    -0.013%  (prev -0.014%)   1y percentile 5%   streak 34d
+    -0.013%  (prev -0.013%)   1y percentile 5%   streak 35d
     -> [bear] Discount is a multi-week regime, not a one-day blip.
 
 [4] Stablecoin supply - is money coming back into crypto? (2026-11-20)
-    USDT $175.1B   1d +$0.06B   7d -$0.45B   30d -$7.73B
-    USDC $68.8B   1d +$0.23B   7d -$0.65B   30d -$3.44B
-    USDT+USDC combined $243.9B   7d -$1.10B   30d -$11.17B
+    USDT $174.9B   1d -$0.14B   7d -$0.65B   30d -$7.94B
+    USDC $68.8B   1d +$0.23B   7d -$0.65B   30d -$3.43B
+    USDT+USDC combined $243.7B   7d -$1.30B   30d -$11.37B
     -> [bear] Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.
 
 [5] Spot taker flow by venue - net aggressive buying
-    Binance  1d +19m   7d -157m (-1.5% of vol)   30d +337m
-    OKX      48h +40m (+2.9% of vol)   (OKX publishes 48h only)
-    Coinbase live +2.3 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    Binance  1d -11m   7d -247m (-2.5% of vol)   30d +243m
+    OKX      48h -122m (-6.0% of vol)   (OKX publishes 48h only)
+    Coinbase live -1.4 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
-    -> [flat] both venues roughly BALANCED (<3% of volume): no directional spot pressure.
-    Binance PERP CVD 5d -378 BTC | 30d +3,215 BTC
+    -> [bear] OKX net SELLING while Binance is flat.
+    Binance PERP CVD 5d -1,272 BTC | 30d -193 BTC
 
 ======================================================================
 2. POSITIONING & SENTIMENT - who is leveraged, and how they feel
@@ -42,50 +42,46 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Contrarian throughout: crowded longs = squeeze fuel DOWN; crowd panic = bounce fuel UP.
 ======================================================================
 [6] Positioning - Binance futures long/short crowding (CONTRARIAN)
-    all-acct L/S 3.44 (30d 1.02-3.60, median 2.64, crowd lines 2.11/3.11, pctile 97%) | top acct 3.92 (median 2.98, pctile 97%) | top pos 1.95 (median 1.87, pctile 73%)
-    taker buy/sell 0.98 (prev 0.97) | OI $6.01bn (1d -0.06, 30d 5.97-8.24)
-    -> [bear] crowd crowded LONG (all-acct pctile 97): squeeze fuel DOWN, bearish confirm; OI draining = deleveraging/liquidation, not new shorts.
+    all-acct L/S 3.48 (30d 1.39-3.60, median 2.71, crowd lines 2.14/3.16, pctile 97%) | top acct 4.02 (median 3.03, pctile 97%) | top pos 1.68 (median 1.87, pctile 13%)
+    taker buy/sell 0.95 (prev 0.98) | OI $5.66bn (1d -0.35, 30d 5.66-7.81)
+    -> [bear] crowd crowded LONG (all-acct pctile 97): squeeze fuel DOWN, bearish confirm; top traders CUTTING longs (1.95->1.68); OI draining = deleveraging/liquidation, not new shorts.
 
 [7] Derivatives cost - funding rate & perp basis
-    funding now +0.0040% /8h  ->  +4.4% annualised
-    30d avg +0.0063% /8h  ->  +6.9% annualised   (positive in 94% of periods)
-    perp basis -0.044%  (mark 61,518 vs index 61,545)
-    perp 24h vol $18.4bn   last 24h -3.63%
-    -> [bear] longs pay shorts: leveraged longs still the crowded side, dips get flushed (bearish tilt).
+    funding now -0.0064% /8h  ->  -7.0% annualised
+    30d avg +0.0062% /8h  ->  +6.8% annualised   (positive in 93% of periods)
+    perp basis -0.040%  (mark 59,051 vs index 59,075)
+    perp 24h vol $24.7bn   last 24h -4.82%
+    -> [warn] funding flipped negative: longs capitulating, shorts now paying to stay short.
 
 [8] Sentiment - Fear & Greed index
-    now 12 (Extreme Fear)   yesterday 10   30d range 10-68
-    30d avg 32   (current = 20th percentile of the 30d window)
-    -> [warn] EXTREME FEAR (pctile 20): crowd capitulating - contrarian-bullish for a BOUNCE, which is a warning against shorting into it, not a buy signal.
+    now 12 (Extreme Fear)   yesterday 12   30d range 10-54
+    30d avg 30   (current = 23rd percentile of the 30d window)
+    -> [warn] EXTREME FEAR (pctile 23): crowd capitulating - contrarian-bullish for a BOUNCE, which is a warning against shorting into it, not a buy signal.
 
 ======================================================================
 3. PRICE STRUCTURE - where supply sits
    Cost-basis clusters and valuation floors. Levels to lean on, not timing triggers.
 ======================================================================
-[9] Cost basis / URPD (2026-11-19) - where supply sits
-    top: 84K-86K 4.9% | 62K-64K 4.9% | 64K-66K 3.9% | 80K-82K 3.7% | 76K-78K 3.1% | 78K-80K 2.4%
-    62-64K band: 1,018,880 BTC (4.85% of supply)
-    STH supply in loss 3,812,026 / profit 149,466 BTC (96% underwater)
-    -> [bear] Short-term holders are largely underwater: capitulation zone; watch whether the 62-64K shelf holds.
+[9] Cost basis / URPD: no rows returned
 
-[10] Valuation floors - how far is the downside (spot $61,492)
-    Balanced Price $38,319 (2026-11-20)  -> spot 1.60x
-    AVWAP since 2015-07-20 $29,969 (thru 2026-11-19)  -> spot 2.05x
-    -> [bear] Price is 1.6x the Balanced floor and 2.1x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,319.
+[10] Valuation floors - how far is the downside (spot $58,954)
+    Balanced Price $38,319 (2026-11-20)  -> spot 1.54x
+    AVWAP since 2015-07-20 $29,982 (thru 2026-11-20)  -> spot 1.97x
+    -> [bear] Price is 1.5x the Balanced floor and 2.0x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,319.
 
 ======================================================================
 4. MOMENTUM - how it is moving
    [11] RSI reads force; [12] divergence reads exhaustion. They describe, they do not trigger.
    Divergence guide (what the four types mean, and the invalidators) is on the page.
 ======================================================================
-[11] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-19
-    RSI(6) 12.6 | RSI(14) 20.5 | RSI(24) 27.5   (RSI14 1y percentile 2%)
-    same maths incl today's forming candle (live $61,492): RSI(6) 11.9 | RSI(14) 20.0  <- drifts until the close
+[11] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-20
+    RSI(6) 8.8 | RSI(14) 17.4 | RSI(24) 24.8   (RSI14 1y percentile 1%)
+    same maths incl today's forming candle (live $58,954): RSI(6) 10.3 | RSI(14) 18.0  <- drifts until the close
     -> [warn] oversold <30: capitulation zone, historically where bounces start; fast < slow = momentum deteriorating, bounces are being sold into.
 
 [12] Divergence - 20d price low vs RSI14 (the only RSI signal with an edge)
     none - last 20d lows: 2026-11-10 73,698/RSI 34.2 -> 2026-11-18 62,982/RSI 21.8
-    watch (bullish): a NEW 20d CLOSE below 61,913 (last one today) - but only AFTER a bounce. The chart's wick low is 61,350, but this trigger is CLOSE-basis - a wick down and back up does not count. A straight-down close lowers RSI14 too (would print ~20.2 vs 20.5 = no divergence), so it takes a RALLY THAT FAILS, not just a drop.
+    watch (bullish): a NEW 20d CLOSE below 58,815 (last one today) - but only AFTER a bounce. The chart's wick low is 57,655, but this trigger is CLOSE-basis - a wick down and back up does not count. A straight-down close lowers RSI14 too (would print ~17.2 vs 17.4 = no divergence), so it takes a RALLY THAT FAILS, not just a drop.
     -> [flat] no divergence active - nothing to act on
 
 ======================================================================
@@ -93,8 +89,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.
 ======================================================================
 [13] Short-fade watch - fade the bounce at resistance (the only positive-EV side)
-    MA200 72,635 | MA50 78,145 | MA10 67,125   -> spot 61,492 is -15.3% vs MA200
-    -> [flat] NOT ARMED - RSI14 20.5, needs to cross 40 (+19 pts). MA200 72,635 is +18.1% from spot
+    MA200 72,530 | MA50 77,625 | MA10 65,637   -> spot 58,954 is -18.7% vs MA200
+    -> [flat] NOT ARMED - RSI14 17.4, needs to cross 40 (+23 pts). MA200 72,530 is +23.0% from spot
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first
 
 
@@ -123,4 +119,4 @@ LEGEND - what every block means
   [13] Short-fade: RSI14 crosses above 40 while below MA200 = fade the bounce at resistance.
         9y: 64% touch -3% before +5%, but EV ~+0.12% - near break-even. Small size, exit fast.
 
-MEDIA:/root/.hermes/state/charts/btc_daily_2026-11-20.png
+MEDIA:/root/.hermes/state/charts/btc_daily_2026-11-21.png
