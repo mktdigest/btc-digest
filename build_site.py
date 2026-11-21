@@ -637,6 +637,18 @@ def build(raw=None):
               for c in chart_meta if c.get("file")]
     chart_grid = '<div class="cgrid">' + cycle_html + "".join(ccards) + "</div>"
 
+    # Bottom score tab, built by the engine in /root/btc-bottom. If it fails, say so on the page
+    # rather than shipping a silent hole where a headline number should be.
+    try:
+        import sys as _sys
+        if "/root/btc-bottom" not in _sys.path:
+            _sys.path.insert(0, "/root/btc-bottom")
+        import render_section as _bottom
+        bottom_html = _bottom.render(HERE, verdict=verdict)
+    except Exception as _e:
+        bottom_html = (f'<p class="note">Bottom score unavailable this build '
+                       f'({type(_e).__name__}: {_e}). The rest of the digest is unaffected.</p>')
+
     doc = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -654,6 +666,7 @@ def build(raw=None):
   {kpis}
   <nav class="tabs">
     <button class="on" data-t="dash">Dashboard</button>
+    <button data-t="bottom">Bottom Score</button>
     <button data-t="charts">Charts</button>
     <button data-t="ref">Reference</button>
     <button data-t="ev">Evidence</button>
@@ -674,6 +687,10 @@ Colour is the stance, not the tone of the wording:
 <span class="stag warn">CAUTION</span> contrarian or bounce risk &mdash; act on it carefully &middot;
 <span class="stag flat">NO SIGNAL</span> nothing directional, do not force a trade.</p>
 {blocks_html}
+</section>
+
+<section id="bottom" class="tab">
+{bottom_html}
 </section>
 
 <section id="charts" class="tab">
