@@ -429,6 +429,34 @@ REF_CARDS = [
      '<p class="note">The Binance perp CVD line is the same idea on futures: '
      '<code>2&times;(taker buy vol) &minus; total vol</code>.</p>'),
 
+    ("MVRV &mdash; market value vs realised value", "MVRV",
+     '<p><strong>What it is.</strong> Every coin has a last-moved price, and the sum of those is the '
+     '<em>realised cap</em> &mdash; the <strong>average price the whole market actually paid</strong>. '
+     'Divide market cap by realised cap and you get MVRV. So <code>1.00</code> means the market is '
+     'exactly at break-even, and <code>0.80</code> means the average holder is down 20%.</p>'
+     '<p><strong>Why it matters.</strong> Below 1.00 the average holder is under water &mdash; which in '
+     'BTC history has only happened near cycle bottoms. That is why it reads bear-market cheapness '
+     'better than any single price level: it says nothing about where price goes next week, but it '
+     'does say whether the market is being handed to buyers at cost or below it.</p>'
+     '<p><strong>Two ways the level can be read, and they disagree.</strong> The floor multiple rises '
+     'each cycle &mdash; but by less each time (+0.177, +0.127, +0.063). If that keeps halving, the '
+     'next floor is ~0.79; if the last increment simply repeats, ~0.82. Against today&rsquo;s realised '
+     'price that is a <strong>zone of roughly $42k&ndash;$44k</strong>, and a straight-line fit on the '
+     'same four floors instead gives ~0.91 / $48k. Both are printed on the block on purpose: any single '
+     'number for this is a guess dressed as a forecast.</p>'
+     '<p><strong>The structural caveat.</strong> The <em>multiple</em> is the stable thing, not the '
+     'dollars. In capitulation, coins change hands at lower prices, so realised cap falls and the '
+     'dollar floor drops with it. Expect the floor price to move down as the bottom approaches.</p>'
+     '<p><strong>The clock.</strong> The more usable part is timing. Across four cycles the MVRV low '
+     'came <strong>26&ndash;149 days after</strong> the first sub-1.00 print, and MVRV then stayed '
+     'below 1.00 for <strong>7&ndash;16 months</strong>. It does not bottom on the cross &mdash; it '
+     'grinds. So the trigger is not a price target, it is the first close with MVRV below 1.00: that '
+     'starts the clock.</p>'
+     '<p class="note"><strong>Limits.</strong> Four completed observations, all from one asset with a '
+     'structural adoption trend underneath it &mdash; the rising floors are partly just that. The '
+     'series is Look Into Bitcoin, keyless, and the block recomputes the floors on every run rather '
+     'than quoting them.</p>'),
+
     ("Bitfinex margin longs &mdash; the price the leveraged bid is paying", "Bitfinex margin longs",
      '<p><strong>What it is.</strong> Bitfinex publishes, hourly, how much BTC is held in '
      '<em>margin longs</em> &mdash; positions where someone borrowed dollars to buy BTC. It is '
