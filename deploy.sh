@@ -1,11 +1,12 @@
 #!/bin/bash
-# Build -> commit -> push -> wait for Pages -> prove the live file matches local.
-# Every UI change goes through this. Skipping the push is how Ben ended up looking at a stale page
-# three times in a row.
+# Build -> commit -> push -> verify the LIVE page actually contains this change.
+# md5 alone lied once (compared against a stale CDN copy), so pass a marker string that only exists
+# in the new build. Usage: ./deploy.sh "commit message" 'unique-marker'
 set -e
 cd /root/btc-digest-site
 
 MSG="${1:-site update}"
+MARKER="${2:-}"
 python3 build_site.py | tail -1
 
 if git diff --quiet && git diff --cached --quiet; then
@@ -17,16 +18,19 @@ else
   echo "pushed: $(git log --oneline -1)"
 fi
 
-echo "waiting for GitHub Pages..."
 LOCAL=$(md5sum index.html | cut -c1-32)
-for i in $(seq 1 30); do
-  sleep 10
-  LIVE=$(curl -s -H 'Cache-Control: no-cache' "https://mktdigest.github.io/btc-digest/?cb=$(date +%s)" | md5sum | cut -c1-32)
+echo "waiting for GitHub Pages (local md5 ${LOCAL:0:10})..."
+for i in $(seq 1 40); do
+  sleep 8
+  BODY=$(curl -s -H 'Cache-Control: no-cache' "https://mktdigest.github.io/btc-digest/?cb=$(date +%s%N)")
+  LIVE=$(printf '%s' "$BODY" | md5sum | cut -c1-32)
   if [ "$LIVE" = "$LOCAL" ]; then
-    echo "LIVE MATCHES: ${LOCAL:0:10} (after $((i*10))s)"
-    grep -o 'position:sticky' index.html | head -1 | sed 's/^/  /'
-    exit 0
+    if [ -z "$MARKER" ] || printf '%s' "$BODY" | grep -qF "$MARKER"; then
+      echo "LIVE OK after $((i*8))s (md5 ${LIVE:0:10}${MARKER:+, marker found})"
+      exit 0
+    fi
+    echo "  md5 matches but marker '$MARKER' missing - still waiting"
   fi
 done
-echo "STILL STALE after 300s: local ${LOCAL:0:10} vs live ${LIVE:0:10}"
+echo "FAILED after 320s: local ${LOCAL:0:10} vs live ${LIVE:0:10}"
 exit 1

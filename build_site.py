@@ -49,7 +49,13 @@ h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
 h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-height:1.35}
 h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
-p.note{color:var(--dim);font-size:16.5px}
+p.note{color:var(--dim);font-size:15.5px;line-height:1.6;margin:var(--s2) 0 0}
+h3.cardh{font-size:20px;margin:0 0 var(--s2);color:#fff}
+h4.sub{font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:#8b949e;
+margin:var(--s3) 0 var(--s1);font-weight:700}
+ol.steps{margin:var(--s2) 0 0;padding-left:22px;color:#c3ccd6;line-height:1.75;font-size:16px}
+ol.steps li{margin:0 0 var(--s1)}
+p.bnote{color:#9aa7b4;font-size:15.5px;line-height:1.65;margin:var(--s2) 0 0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:var(--s3) 0}
 .card pre{font-family:var(--mono);font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .card{padding:22px 24px}
@@ -91,8 +97,9 @@ font-size:15px;color:#a9b4c0;line-height:1.55}
 @media(max-width:640px){.keyrow{grid-template-columns:1fr}}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
-table{width:100%;border-collapse:collapse;margin:13px 0;font-size:16.5px;display:block;overflow-x:auto}
-th,td{border:1px solid var(--line);padding:10px 13px;text-align:left;white-space:nowrap}
+table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:16px;display:table}
+th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
+@media(max-width:720px){table{display:block;overflow-x:auto;font-size:15px}th,td{white-space:nowrap;padding:8px 10px}}
 th{background:#1c2128;font-weight:650;font-size:15px;color:#c9d1d9}
 td.num{font-family:var(--mono);text-align:right}
 .neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
@@ -137,9 +144,9 @@ p.sdesc{color:var(--dim);font-size:17.5px;margin:0 0 var(--s3);font-style:italic
 .kpi .n{display:block;font-size:14.5px;color:var(--dim);margin-top:5px;line-height:1.45}
 .tabbar{position:sticky;top:0;z-index:80;max-width:none;background:rgba(13,17,23,.94);
 backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
-border-bottom:1px solid var(--line);padding:14px 20px;margin:var(--s3) -20px}
+border:0;padding:14px 20px;margin:var(--s3) -20px}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;
-margin:0 auto;padding:0;background:none;border:0;border-radius:0;
+margin:0 auto;padding:8px;background:#11161d;border:1px solid var(--line);border-radius:14px;
 width:fit-content;max-width:100%}
 section[id]{scroll-margin-top:92px}
 .tab > :first-child{margin-top:0}
@@ -1055,75 +1062,115 @@ def build(raw=None):
 </section>
 
 <section id="ev" class="tab">
-<p class="note">BTCUSDT daily. Forward returns measured from the day you could act. Barrier tables are intrabar, adverse-first when both hit the same bar. EV = probability-weighted outcome of the target/stop pair.</p>
 
-<h3>RSI crossovers alone &mdash; coin flips (1000d sample)</h3>
-<p>Fires often and loses more often than it wins. Useful for <em>describing</em> momentum, not for triggering entries.</p>
+<div class="card">
+<h3 class="cardh">How these numbers were measured</h3>
+<p class="bline">BTCUSDT daily. Forward returns are measured from the day you could actually act.
+Barrier tables are intrabar, and when both sides are touched in the same bar the adverse one is counted
+first. EV is the probability-weighted outcome of the target and stop pair.</p>
+</div>
+
+<div class="card">
+<h3 class="cardh">RSI crossovers alone are coin flips</h3>
+<p class="bline">Sample: 1000 days. These fire often and lose more often than they win, so they are useful
+for describing momentum, not for triggering entries.</p>
 {ev_table(EVIDENCE["rsi_rules"])}
+</div>
 
-<h3>Divergence &mdash; 9 years, 3378 days</h3>
-<p>A textbook bullish divergence by itself did <strong>not</strong> beat simply holding. Only the oversold-constrained variant has an edge, and n=12 is small.</p>
+<div class="card">
+<h3 class="cardh">Divergence over nine years</h3>
+<p class="bline">Sample: 3378 days. A textbook bullish divergence on its own did not beat simply holding.
+Only the oversold-constrained variant has an edge, and that sample is only 12 events.</p>
 {ev_table(EVIDENCE["divergence"])}
-<div class="callout"><p><strong>Correction:</strong> an earlier figure of &ldquo;62% win&rdquo; was wrong. It came from a shorter 2024&ndash;2026 sample and a definition that also flagged higher-low/higher-RSI cases, which are not divergences. The numbers above supersede it.</p></div>
+<div class="callout"><p><strong>Correction:</strong> an earlier figure of "62% win" was wrong. It came
+from a shorter 2024 to 2026 sample and a definition that also flagged higher-low, higher-RSI cases, which
+are not divergences. The numbers above replace it.</p></div>
+</div>
 
-<h3>Short-fade &mdash; fade the bounce at resistance</h3>
-<p>Better odds than the long side, but the edge is thin. Detected by block {num_of(heads, "Short-fade watch")}.</p>
+<div class="card">
+<h3 class="cardh">Short-fade: selling the bounce at resistance</h3>
+<p class="bline">Better odds than the long side, but the edge is thin. Detected by block
+{num_of(heads, "Short-fade watch")}.</p>
 {ev_table(EVIDENCE["short_fade"])}
+</div>
 
-<h3>Long the bounce &mdash; do not take this leg</h3>
-<p>Riding a bounce to +7% before a &minus;5% stop happens only <strong>34%</strong> of the time, and every variant is negative-EV. &ldquo;Buy the bounce then short&rdquo; loses money on the first leg.</p>
+<div class="card">
+<h3 class="cardh">Long the bounce: do not take this leg</h3>
+<p class="bline">Riding a bounce to +7% before a minus 5% stop happens only 34% of the time, and every
+variant is negative EV. Buying the bounce and then shorting loses money on the first leg.</p>
 {ev_table(EVIDENCE["long_bounce"])}
+</div>
+
 </section>
 
 <section id="guide" class="tab">
+
 <div class="card">
-<h3>How to read this page</h3>
-<div class="bbody">
-<p class="bline">Sections are ordered by importance: <b>flow</b> first (where the money is going), then
-positioning and sentiment, then price structure, momentum, and finally the trading signals.</p>
-<p class="bline">If flow is bearish, everything below it is a bounce to sell. Every block ends with a
-tagged verdict, and each section header carries its tally.</p>
-<p class="bline">Every block ends with a coloured tag. The colour is the stance, not the tone of the
-wording.</p>
+<h3 class="cardh">How to read this page</h3>
+<p class="bline">Sections are ordered by importance: flow first (where the money is going), then
+positioning and sentiment, then price structure, momentum, and finally the trading signals. If flow is
+bearish, everything below it is a bounce to sell.</p>
+<p class="bline">Each section header carries a tally, and every block ends with a coloured tag. The colour
+is the stance, not the tone of the wording:</p>
 <div class="keys">
   <div class="keyrow"><span class="stag bear">BEARISH</span><span>Money or demand is leaving, or the crowd is leaning the wrong way.</span></div>
   <div class="keyrow"><span class="stag bull">BULLISH</span><span>Money or demand is arriving.</span></div>
   <div class="keyrow"><span class="stag warn">CAUTION</span><span>Contrarian or bounce risk. Act carefully, if at all.</span></div>
   <div class="keyrow"><span class="stag flat">NO SIGNAL</span><span>Nothing directional. Do not force a trade.</span></div>
 </div>
-<p class="bline">All blocks use settled daily closes unless a line says "live".</p>
+<p class="bnote">All blocks use settled daily closes unless a line says "live".</p>
 </div>
-</div>
-<p class="note"><strong>Where the live reading is:</strong> block <strong>{num_of(heads, "Divergence")} &mdash; Divergence</strong> on the
-<em>Dashboard</em> tab, inside section <em>4. MOMENTUM</em>. This tab is the guide, not the reading.</p>
-<p>Price and the RSI stop agreeing. Price keeps going the same way, but the RSI refuses to follow &mdash; the move is running out of force underneath.</p>
 
-<h3>The four types</h3>
-<table><thead><tr><th>type</th><th>price</th><th>RSI</th><th>means</th></tr></thead><tbody>
-<tr><td>Regular <strong>bullish</strong></td><td>lower low</td><td>HIGHER low</td><td>downtrend losing force &rarr; bounce up</td></tr>
-<tr><td>Regular <strong>bearish</strong></td><td>higher high</td><td>LOWER high</td><td>uptrend losing force &rarr; drop</td></tr>
-<tr><td>Hidden bullish</td><td>higher low</td><td>lower low</td><td>uptrend healthy &rarr; CONTINUATION up</td></tr>
-<tr><td>Hidden bearish</td><td>lower high</td><td>higher high</td><td>downtrend healthy &rarr; CONTINUATION down</td></tr>
+<div class="card">
+<h3 class="cardh">Divergence</h3>
+<p class="bline">Price and the RSI stop agreeing. Price keeps going the same way, but the RSI refuses to
+follow, so the move is running out of force underneath.</p>
+<p class="bnote"><strong>Live reading:</strong> block {num_of(heads, "Divergence")} &mdash; Divergence, on
+the Dashboard tab inside section 4. Momentum. This tab explains how to read it; it does not show today's
+value.</p>
+<h4 class="sub">The four types</h4>
+<table><thead><tr><th>Type</th><th>Price</th><th>RSI</th><th>What it means</th></tr></thead><tbody>
+<tr><td>Regular <strong>bullish</strong></td><td>lower low</td><td>higher low</td><td>Downtrend losing force, so a bounce is likely</td></tr>
+<tr><td>Regular <strong>bearish</strong></td><td>higher high</td><td>lower high</td><td>Uptrend losing force, so a drop is likely</td></tr>
+<tr><td>Hidden bullish</td><td>higher low</td><td>lower low</td><td>Uptrend is healthy, so the rise continues</td></tr>
+<tr><td>Hidden bearish</td><td>lower high</td><td>higher high</td><td>Downtrend is healthy, so the fall continues</td></tr>
 </tbody></table>
-<p class="note">&ldquo;Regular&rdquo; = the reversal kind. &ldquo;Hidden&rdquo; = continuation. Getting these backwards is how people buy tops.</p>
+<p class="bnote">Regular means reversal, hidden means continuation. Getting these two backwards is how
+people buy tops.</p>
+</div>
 
-<h3>Regular bullish &mdash; step by step</h3>
-<p>1. Two clear price lows, the second <strong>lower</strong>. &nbsp; 2. Add RSI(14). &nbsp; 3. RSI at the second (lower) low is <strong>higher</strong> than at the first. &nbsp; 4. Price line slopes <em>down</em>, RSI line slopes <em>up</em>.</p>
-<p class="note">Plain reading: sellers keep pushing to new lows but with less force each time. Fewer sellers, same effort, less result.</p>
+<div class="card">
+<h3 class="cardh">Regular bullish, step by step</h3>
+<ol class="steps">
+<li>Two clear price lows, the second one lower than the first.</li>
+<li>Add RSI(14) to the same chart.</li>
+<li>The RSI at the second, lower price low is higher than it was at the first.</li>
+<li>The price line slopes down while the RSI line slopes up.</li>
+</ol>
+<p class="bnote">In plain words: sellers keep pushing price to new lows, but with less force each time.
+Same effort, less result.</p>
+</div>
 
-<h3>What to look out for</h3>
+<div class="card">
+<h3 class="cardh">What to look out for</h3>
 <table><thead><tr><th>Good signs</th><th>Invalidators</th></tr></thead><tbody>
-<tr><td>Lows 10+ candles apart, both at obvious swing lows</td><td>Two adjacent candles &mdash; that is noise</td></tr>
-<tr><td>RSI oversold (&lt;30, ideal &lt;25) at both lows</td><td>RSI only fractionally higher (18 &rarr; 19)</td></tr>
-<tr><td>Second low has a long lower wick / quick snap-back</td><td>Price blows through on rising volume, RSI keeps falling</td></tr>
-<tr><td>Volume lighter on the second low (selling drying up)</td><td>Small-timeframe divergence inside a strong trend</td></tr>
-<tr><td>Happens at a known level (URPD shelf, MA200)</td><td>You have to squint to see it</td></tr>
+<tr><td>Lows 10 or more candles apart, both at obvious swing lows</td><td>Two adjacent candles, which is noise</td></tr>
+<tr><td>RSI oversold at both lows, below 30 and ideally below 25</td><td>RSI only fractionally higher, for example 18 to 19</td></tr>
+<tr><td>Second low has a long lower wick or a quick snap back</td><td>Price blows through on rising volume while RSI keeps falling</td></tr>
+<tr><td>Volume lighter on the second low, so selling is drying up</td><td>Small-timeframe divergence inside a strong trend</td></tr>
+<tr><td>Happens at a known level such as a URPD shelf or the 200-day average</td><td>You have to squint to see it</td></tr>
 </tbody></table>
-
-<div class="callout">
-<p><strong>Expectation:</strong> divergence marks a <em>zone</em>, not a moment. Price often makes one final spike before turning &mdash; that spike is the last seller capitulating and it is where stops get hunted. Every variant tested dipped ~5&ndash;6% before it paid.</p>
-<p><strong>Never measure from the pivot date.</strong> Look-ahead flatters this to 86% win / +7.95% &mdash; that is how backtests lie.</p>
 </div>
+
+<div class="card">
+<h3 class="cardh">Expectation and limits</h3>
+<p class="bline">A divergence marks a zone, not a moment. Price often makes one final spike before it
+turns, and that spike is the last seller capitulating, which is also where stops get hunted. Every variant
+tested dipped roughly 5 to 6% before it paid.</p>
+<p class="bnote"><strong>Never measure from the pivot date.</strong> Doing that flatters the result to an
+86% win rate and +7.95%, which is how backtests lie.</p>
+</div>
+
 </section>
 
 <footer>
