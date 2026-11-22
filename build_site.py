@@ -435,6 +435,16 @@ def section_stance(body_lines):
 _LEGEND = {"html": ""}
 
 
+def _ensure_diagrams():
+    """Regenerate the two explanatory images if missing, so a fresh clone still builds."""
+    import subprocess
+    d = os.path.dirname(os.path.abspath(__file__))
+    for f in ("img_divergence_types.png", "img_evidence_divergence.png"):
+        if not os.path.exists(os.path.join(d, f)):
+            subprocess.run([sys.executable, os.path.join(d, "diagrams.py")], check=False)
+            break
+
+
 def _stamp():
     """Build time + a hash of the digest the page was built from.
 
@@ -880,6 +890,7 @@ def build(raw=None):
     built_stamp = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M UTC")
 
     blocks_html = render_digest(raw)
+    _ensure_diagrams()
     kpis = kpi_tiles(raw)
     heads = block_heads(raw)   # [(printed number, title)] - inline refs use these, never literals
 
@@ -1081,6 +1092,9 @@ for describing momentum, not for triggering entries.</p>
 <p class="bline">Sample: 3378 days. A textbook bullish divergence on its own did not beat simply holding.
 Only the oversold-constrained variant has an edge, and that sample is only 12 events.</p>
 {ev_table(EVIDENCE["divergence"])}
+<figure class="bchart"><img src="img_evidence_divergence.png?v=0e195436"
+alt="Win rate of each divergence variant against the 53 percent baseline" loading="lazy">
+<figcaption>The table above, drawn. Only the oversold version clears the baseline bar.</figcaption></figure>
 <div class="callout"><p><strong>Correction:</strong> an earlier figure of "62% win" was wrong. It came
 from a shorter 2024 to 2026 sample and a definition that also flagged higher-low, higher-RSI cases, which
 are not divergences. The numbers above replace it.</p></div>
@@ -1134,6 +1148,10 @@ value.</p>
 <tr><td>Hidden bullish</td><td>higher low</td><td>lower low</td><td>Uptrend is healthy, so the rise continues</td></tr>
 <tr><td>Hidden bearish</td><td>lower high</td><td>higher high</td><td>Downtrend is healthy, so the fall continues</td></tr>
 </tbody></table>
+<figure class="bchart"><img src="img_divergence_types.png?v=77688c56"
+alt="The four divergence types drawn out: regular and hidden, bullish and bearish" loading="lazy">
+<figcaption>The same four types as lines. Price is the top line, RSI the bottom one, and the circles mark
+the two pivots that disagree.</figcaption></figure>
 <p class="bnote">Regular means reversal, hidden means continuation. Getting these two backwards is how
 people buy tops.</p>
 </div>
