@@ -154,6 +154,13 @@ section[id]{scroll-margin-top:92px}
 font:inherit;font-size:16px;padding:12px 22px;cursor:pointer;font-weight:650;
 border-radius:9px;transition:background .12s,color .12s,border-color .12s;letter-spacing:.01em}
 .tabs button:hover{color:#e6edf3;background:#1d2530;border-color:#2f3a47}
+
+@media(max-width:600px){
+.tabbar{padding:8px 10px;margin-left:-15px;margin-right:-15px}
+.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:none;padding:6px}
+.tabs button{padding:10px 4px;font-size:13.5px;white-space:nowrap;overflow:hidden;
+text-overflow:ellipsis;border-radius:8px}
+}
 .tabs button.on{color:#0b0f14;background:var(--accent);border-color:var(--accent);
 box-shadow:0 2px 10px rgba(88,166,255,.25)}
 .tab{display:none}.tab.on{display:block}
