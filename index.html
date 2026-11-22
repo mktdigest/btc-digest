@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BTC Daily Digest</title>
 <meta name="digest-md5" content="b4f4ef57554e">
-<meta name="page-built" content="2026-11-22 12:52 UTC">
+<meta name="page-built" content="2026-11-22 12:54 UTC">
 <meta name="description" content="Daily Bitcoin flow, positioning and momentum digest with backtested rules.">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -162,7 +162,7 @@ font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
 </style></head><body><div class="wrap">
 <header>
   <h1>BTC Daily Digest</h1>
-  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated 2026-11-22 11:45 UTC &middot; build 2026-11-22 12:52Z &middot; digest b4f4ef</span></div>
+  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated 2026-11-22 11:45 UTC &middot; build 2026-11-22 12:54Z &middot; digest b4f4ef</span></div>
   <div class="spotpx">$60,893</div>
   <div class="spotrow"><span><b>Binance</b>$60,999</span><span><b>Coinbase &minus; Binance</b>-106 (-0.17%)</span><span><b>USDT/USD</b>0.99839</span></div>
   <div class="verdict-card bear"><span class="stag bear">BEARISH</span><span>US bid ABSENT - premium negative, 30d mean at lows</span></div>
@@ -277,7 +277,7 @@ not the next 48 hours.</p>
   (1.10x), 21% of the market cap under water,
   Fear &amp; Greed at 12, and the capital-flow divergence trigger is active.</p>
   <p class="bmeta">Scored on the settled 2026-11-20 close &middot; S1-S5 sum to the headline &middot;
-  model run 2026-11-22 12:52 UTC</p>
+  model run 2026-11-22 12:54 UTC</p>
   <p class="btension">Read this next to the flow verdict above, which is bearish. That combination &mdash; cheap on-chain, money still leaving &mdash; is what the marked cycle bottoms looked like: price reaches fair value before flow turns.</p>
 </div>
 
@@ -299,6 +299,22 @@ a claim you can check against our own history, not a belief.</p>
   <b>strong</b>. One caveat that matters: when the capital-flow card shows <i>no divergence</i>
   it sits mid-scale rather than bottom-scale, so the total reads lower than a flow-driven score would.</p>
 </div>
+
+<h3>Where each grade comes from</h3>
+<p class="note">Every card is graded 0-20 by the grid below, five cards summing to 100. 20 is the most
+capitulation-like reading that signal has printed in our data; 0 is the most expensive. The middle
+column is read out of the scoring code at build time.</p>
+<table>
+  <thead><tr><th style="width:44px">signal</th><th style="width:190px">input</th>
+    <th>what it pays at real values</th><th style="width:250px">source</th></tr></thead>
+  <tbody><tr><td><b>S1</b></td><td>price / average holder cost</td><td class="blamon">0.9 &rarr; 15.5 &middot; 1 &rarr; 13.0 &middot; 1.1 &rarr; 7.2 &middot; 1.2 &rarr; 3.5 &middot; 1.35 &rarr; 1.0</td><td>Coinbase settled close divided by the realised price (LITB)</td></tr><tr><td><b>S2</b></td><td>MVRV (price / realised price)</td><td class="blamon">0.8 &rarr; 16.8 &middot; 1 &rarr; 16.4 &middot; 1.2 &rarr; 15.1 &middot; 1.6 &rarr; 8.5 &middot; 2.4 &rarr; 2.0</td><td>same ratio; cross-checked against BGeometrics MVRV over 1,454 days (mean gap 0.003, r = 1.000)</td></tr><tr><td><b>S3</b></td><td>% of market cap under water</td><td class="blamon">5 &rarr; 2.2 &middot; 10 &rarr; 6.0 &middot; 20 &rarr; 13.2 &middot; 30 &rarr; 17.4 &middot; 45 &rarr; 19.5</td><td>BGeometrics loss supply divided by CoinMetrics market cap</td></tr><tr><td><b>S5</b></td><td>Fear &amp; Greed index</td><td class="blamon">0 &rarr; 20.0 &middot; 10 &rarr; 18.5 &middot; 20 &rarr; 9.5 &middot; 40 &rarr; 0.5 &middot; 60 &rarr; 0.0</td><td>alternative.me daily index</td></tr><tr><td><b>S4</b></td><td>capital-flow divergence</td><td class="blamon">a rule, not a grid: an outflow wave smaller than the previous one while price makes a lower low &rarr; 16; otherwise scored on the size of the outflow</td><td>BGeometrics 30-day net capital flow plus our own price series</td></tr></tbody>
+</table>
+<p class="note">Three honest limits. The grid knots for S1, S3 and S5 are our own conventions,
+anchored where possible on published bands (1.00 = break-even, bull tops near 2% loss, bear bottoms
+50%+). S4 is a rule rather than a curve, so it pays out on a divergence or an outflow and never in
+between. And S2's grid only reaches 20 at a negative MVRV, which cannot happen &mdash; its practical
+ceiling is about 17, so that card can never register a maximum.</p>
+
 
 <div class="bgrid2"><div class="bcard2">
   <div class="bhead"><span class="btitle">S1 &middot; Holder cost</span><span class="bchip" style="color:#d29922;border-color:#d29922">above cost basis</span></div>
@@ -359,7 +375,7 @@ a claim you can check against our own history, not a belief.</p>
 
 <div class="bcard3">
   <h4>Price against the score, 2018-2026</h4>
-  <img src="bottom_chart.png?v=1795351933" alt="BTC price vs bottom score with accumulate zones shaded">
+  <img src="bottom_chart.png?v=1795352049" alt="BTC price vs bottom score with accumulate zones shaded">
   <p class="bnote">The shaded top strip is the score-60-to-100 zone, and the solid green bars inside it
   are the 17 stretches where the score held 60 or above - 101 days in total, roughly 2.5% of the series.
   A bar's width is how long the condition lasted, its height has no meaning. Amber dots are the marked
@@ -586,7 +602,7 @@ tested dipped roughly 5 to 6% before it paid.</p>
 <footer>
 <p>Generated automatically from keyless public APIs (Coinbase, Binance, DeFiLlama, cryptoetf.today, Look Into Bitcoin, BGeometrics, alternative.me). No credentials, no subscription feeds.</p>
 <p>Not financial advice. Backtest figures are historical and samples are small where noted.</p>
-<p>Data as of 2026-11-22 11:45 UTC &middot; page built 2026-11-22 12:52 UTC</p>
+<p>Data as of 2026-11-22 11:45 UTC &middot; page built 2026-11-22 12:54 UTC</p>
 </footer>
 <script>
 document.querySelectorAll('.tabs button').forEach(function(b){
