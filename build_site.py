@@ -429,10 +429,12 @@ REF_CARDS = [
      '<p class="note">The Binance perp CVD line is the same idea on futures: '
      '<code>2&times;(taker buy vol) &minus; total vol</code>.</p>'),
 
-    ("Bitfinex whale longs &mdash; the level they are willing to buy at", "Bitfinex whale longs",
+    ("Bitfinex margin longs &mdash; the price the leveraged bid is paying", "Bitfinex margin longs",
      '<p>Bitfinex BTC/USD <strong>margin long size</strong> (public <code>stats1</code> series, hourly) '
-     'plus its premium against Binance. Bitfinex is the venue where large, patient, often leveraged '
-     'buyers sit, so its long count is read as whale positioning.</p>'
+     'plus its premium against Binance.</p>'
+     '<p class="note"><strong>Not identified whales.</strong> Bitfinex publishes one aggregate long book '
+     '&mdash; no account sizes, no holders. &ldquo;Whales&rdquo; is the tweets&rsquo; word, and the venue '
+     'is where large leveraged buyers are known to sit; the series cannot show who is behind it.</p>'
      '<p>The line worth acting on is not the size &mdash; it is the <strong>average entry of the '
      'adds</strong>: every hour the position grew, weighted by that hour&rsquo;s price. That is the '
      'level they actually paid, and therefore where their bid sits. If spot is below it, the adds are '

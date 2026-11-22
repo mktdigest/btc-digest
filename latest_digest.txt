@@ -1,5 +1,5 @@
-BTC daily read  |  2026-11-21 23:45 UTC
-spot $60,104 (Coinbase)   $60,231 (Binance)   USDT/USD 0.99795
+BTC daily read  |  2026-11-22 00:14 UTC
+spot $60,183 (Coinbase)   $60,303 (Binance)   USDT/USD 0.99792
 blocks use settled DAILY closes unless a line says 'live'
 VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
@@ -10,11 +10,11 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 ======================================================================
 [1] US spot BTC ETF net flow (T+1) - institutional demand
     latest 2026-11-21 +$0.0M   prev -$124.5M
-    5d -$1,249.4M   10d -$1,714.7M   30d -$4,568.6M
-    -> [bear] ETF money still leaving: -$4,568.6M over 30d. (Prior run was 4d, latest day flat.)
+    5d -$1,249.4M   10d -$1,714.7M   30d -$3,933.1M
+    -> [bear] ETF money still leaving: -$3,933.1M over 30d. (Prior run was 4d, latest day flat.)
 
 [2] Coinbase Premium Index - US vs global bid
-    live -0.210%   last close -0.211% (prev -0.232%)
+    live -0.200%   last close -0.216% (prev -0.232%)
     30d avg -0.146%   negative streak 78d   1y low -0.271%
     -> [bear] US still discounting to global for 78 straight days: US bid is the missing buyer.
 
@@ -29,43 +29,46 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> [bear] Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.
 
 [5] Spot taker flow by venue - net aggressive buying
-    Binance  1d -201m   7d -437m (-3.4% of vol)   30d +53m
+    Binance  1d +2m   7d -257m (-2.4% of vol)   30d +42m
     OKX      48h -118m (-4.2% of vol)   (OKX publishes 48h only)
-    Coinbase live -2.4 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    Coinbase live +0.2 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
-    -> [bear] Binance and OKX both net SELLING: broad spot pressure across venues, not one book.
-    Binance PERP CVD 5d -5,375 BTC | 30d -1,869 BTC
+    -> [bear] OKX net SELLING while Binance is flat.
+    Binance PERP CVD 5d -5,366 BTC | 30d -1,860 BTC
 
 ======================================================================
 2. POSITIONING & SENTIMENT - who is leveraged, and how they feel
    [6] long/short crowding, [7] funding & basis (what leverage costs), [8] Fear & Greed.
    Contrarian throughout: crowded longs = squeeze fuel DOWN; crowd panic = bounce fuel UP.
-   [9] Bitfinex whale longs: where the leveraged bid actually sits.
+   [9] Bitfinex margin longs: where the leveraged bid actually sits, one aggregate book.
 ======================================================================
 [6] Positioning - Binance futures long/short crowding (CONTRARIAN)
-    all-acct L/S 3.48 (30d 1.39-3.60, median 2.71, crowd lines 2.14/3.16, pctile 97%) | top acct 4.02 (median 3.03, pctile 97%) | top pos 1.68 (median 1.87, pctile 13%)
-    taker buy/sell 0.95 (prev 0.98) | OI $5.66bn (1d -0.35, 30d 5.66-7.81)
-    -> [bear] crowd crowded LONG (all-acct pctile 97): squeeze fuel DOWN, bearish confirm; top traders CUTTING longs (1.95->1.68); OI draining = deleveraging/liquidation, not new shorts.
+    all-acct L/S 2.19 (30d 1.39-3.60, median 2.71, crowd lines 2.18/3.16, pctile 20%) | top acct 2.48 (median 3.03, pctile 33%) | top pos 1.78 (median 1.87, pctile 33%)
+    taker buy/sell 0.99 (prev 0.95) | OI $5.53bn (1d -0.14, 30d 5.53-7.79)
+    -> [flat] crowd mid-range (all-acct pctile 20): no crowding extreme; top traders ADDING longs (1.68->1.78); OI draining = deleveraging/liquidation, not new shorts.
 
 [7] Derivatives cost - funding rate & perp basis
-    funding now -0.0036% /8h  ->  -4.0% annualised
-    30d avg +0.0062% /8h  ->  +6.8% annualised   (positive in 94% of periods)
-    perp basis -0.048%  (mark 60,204 vs index 60,233)
-    perp 24h vol $21.3bn   last 24h +2.10%
+    funding now -0.0021% /8h  ->  -2.3% annualised
+    30d avg +0.0061% /8h  ->  +6.7% annualised   (positive in 93% of periods)
+    perp basis -0.046%  (mark 60,280 vs index 60,308)
+    perp 24h vol $21.2bn   last 24h +2.22%
     -> [warn] funding flipped negative: longs capitulating, shorts now paying to stay short.
 
 [8] Sentiment - Fear & Greed index
-    now 12 (Extreme Fear)   yesterday 12   30d range 10-54
-    30d avg 30   (current = 23rd percentile of the 30d window)
-    -> [warn] EXTREME FEAR (pctile 23): crowd capitulating - contrarian-bullish for a BOUNCE, which is a warning against shorting into it, not a buy signal.
+    now 11 (Extreme Fear)   yesterday 12   30d range 10-54
+    30d avg 29   (current = 17th percentile of the 30d window)
+    -> [warn] EXTREME FEAR (pctile 17): crowd capitulating - contrarian-bullish for a BOUNCE, which is a warning against shorting into it, not a buy signal.
 
-[9] Bitfinex whale longs - the level they are willing to buy at
+[9] Bitfinex margin longs - the price the leveraged bid is paying
     longs 92,178 BTC  (record in 417 days of hourly history; sample low 55,229)
     their adds, weighted by the price they paid: 7d $59,335 (+1,808 BTC) | 30d $68,998 (+4,591 BTC) | 90d $74,357 (+8,131 BTC)
-    Bitfinex 60,297 against their average entry -> last week's adds +1.6% ; the 30d adds -12.6% ; the 90d adds -18.9%
-    Bitfinex premium +0.136% vs Binance (60,296 vs 60,214) - they are paying up on that venue
-    history: 10 surges this size in the sample; 30 days later the median best was +2.9%, median worst -19.5%, the single worst -29.0%
--> [warn] their live bid is $59,335 (what last week's adds paid, +1.6% so far); the 30d tranche at $68,998 is -12.6% under water and becomes overhead supply on the way back. Record-sized crowded long = support below, drawdown risk first: not an entry signal
+    Bitfinex 60,413 against their average entry -> last week's adds +1.8% ; the 30d adds -12.4% ; the 90d adds -18.8%
+    Bitfinex premium +0.185% vs Binance (60,436 vs 60,324) - paying up on that venue
+    one aggregate long book, not account-level: 'whales' is an inference from the venue, not something this series can show
+    history: 10 surges this size (7d adds >= 2,170 BTC); 30d later median best +2.4%, median worst -20.4%
+    same measure for a RANDOM hour in this sample: median best +6.1%, median worst -7.0% (n=1587)
+    so surges are not noise: 70% of them saw a -10% drawdown inside 30d vs 38% baseline; 0% reached +10% vs 32% baseline
+-> [warn] the live bid is $59,335 (what last week's adds paid, +1.8% so far) and the 30d tranche at $68,998 is -12.4% under water - overhead supply on any rally. Historically these surges were followed by drawdowns far more often than rallies, so: support below, not an entry signal
 
 ======================================================================
 3. PRICE STRUCTURE - where supply sits
@@ -77,9 +80,9 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     STH supply in loss 3,916,742 / profit 63,982 BTC (98% underwater)
     -> [bear] Short-term holders are largely underwater: capitulation zone; watch whether the 62-64K shelf holds.
 
-[11] Valuation floors - how far is the downside (spot $60,104)
-    Balanced Price $38,169 (2026-11-21)  -> spot 1.57x
-    AVWAP since 2015-07-20 $29,991 (thru 2026-11-21)  -> spot 2.00x
+[11] Valuation floors - how far is the downside (spot $60,183)
+    Balanced Price $38,169 (2026-11-21)  -> spot 1.58x
+    AVWAP since 2015-07-20 $29,991 (thru 2026-11-21)  -> spot 2.01x
     -> [bear] Price is 1.6x the Balanced floor and 2.0x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,169.
 
 ======================================================================
@@ -88,8 +91,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Divergence guide (what the four types mean, and the invalidators) is on the page.
 ======================================================================
 [12] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-21
-    RSI(6) 20.9 | RSI(14) 22.6 | RSI(24) 27.8   (RSI14 1y percentile 3%)
-    same maths incl today's forming candle (live $60,104): RSI(6) 20.9 | RSI(14) 22.6  <- drifts until the close
+    RSI(6) 20.7 | RSI(14) 22.6 | RSI(24) 27.8   (RSI14 1y percentile 3%)
+    same maths incl today's forming candle (live $60,183): RSI(6) 21.7 | RSI(14) 23.0  <- drifts until the close
     -> [warn] oversold <30: capitulation zone, historically where bounces start; fast < slow = momentum deteriorating, bounces are being sold into.
 
 [13] Divergence - 20d price low vs RSI14 (the only RSI signal with an edge)
@@ -102,8 +105,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.
 ======================================================================
 [14] Short-fade watch - fade the bounce at resistance (the only positive-EV side)
-    MA200 72,426 | MA50 77,136 | MA10 64,254   -> spot 60,104 is -17.0% vs MA200
-    -> [flat] NOT ARMED - RSI14 22.6, needs to cross 40 (+17 pts). MA200 72,426 is +20.5% from spot
+    MA200 72,426 | MA50 77,136 | MA10 64,253   -> spot 60,183 is -16.9% vs MA200
+    -> [flat] NOT ARMED - RSI14 22.6, needs to cross 40 (+17 pts). MA200 72,426 is +20.3% from spot
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first
 
 
@@ -123,10 +126,10 @@ LEGEND - what every block means
         negative/shorts-pay = crowded shorts (squeeze fuel UP). Basis = perp premium to index.
   [8] Fear & Greed: crowd panic/greed 0-100. <20 = capitulation (bounce fuel UP, bad to short);
         >80 = euphoria (contrarian-bearish). Shows where the crowd sits, not where price goes.
-  [9] Bitfinex whale longs: hourly margin-long size, and the AVERAGE PRICE of the adds
-        (each hour the position grew, weighted by that hour's price). That level is their bid;
-        if spot is below it the adds are underwater and become supply overhead. Records this
-        crowded are squeeze fuel DOWN - the block prints how past surges of this size resolved.
+  [9] Bitfinex margin longs: hourly margin-long size (ONE aggregate book, no account detail)
+        (each hour it grew, weighted by that hour's price) = the average price of the adds, i.e.
+        the bid. Spot below it means those adds are underwater and it is supply overhead. The
+        block also prints how past surges of this size resolved against a random-hour baseline.
   [10] URPD: supply by cost basis (bars above spot = resistance, at/below = support)
   [11] Floors: 1.0x Balanced = where past cycle bottoms landed; AVWAP = market break-even
   [12] RSI (daily): momentum 0-100 (>70 overbought, <30 oversold; fast>slow = uptrend intact)
