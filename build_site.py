@@ -417,6 +417,17 @@ def section_stance(body_lines):
 _LEGEND = {"html": ""}
 
 
+def _stamp():
+    """Short hash + build time, printed in the header. Stops the 'is this the old page?' question."""
+    try:
+        h = subprocess.check_output(["git", "-C", os.path.dirname(os.path.abspath(__file__)),
+                                     "rev-parse", "--short", "HEAD"],
+                                    stderr=subprocess.DEVNULL).decode().strip()
+    except Exception:
+        h = "dev"
+    return f'build {h} &middot; {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")}Z'
+
+
 def render_digest(raw):
     lines = [l for l in raw.splitlines() if not l.startswith("MEDIA:")]
     bar = "=" * 70
@@ -450,8 +461,8 @@ def render_digest(raw):
         if s["title"].startswith("LEGEND"):
             # the legend is reference material: it belongs on the Reference tab, not under the blocks,
             # where it made page one twice as long for no reason
-            _LEGEND["html"] = ('<h3 class="sec">LEGEND - what every block means</h3>'
-                               + render_legend(s["body"]))
+            out.append('<h3 class="sec">LEGEND - what every block means</h3>')
+            out.append(render_legend(s["body"]))
             continue
         else:
             out.append(render_blocks(s["body"]))
@@ -954,7 +965,7 @@ def build(raw=None):
         bottom_html = (f'<p class="note">Bottom score unavailable this build '
                        f'({type(_e).__name__}: {_e}). The rest of the digest is unaffected.</p>')
 
-    legend_html = _LEGEND["html"]
+    build_stamp = _stamp()
     doc = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -965,7 +976,7 @@ def build(raw=None):
 <style>{CSS}</style></head><body><div class="wrap">
 <header>
   <h1>BTC Daily Digest</h1>
-  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated {updated}</span></div>
+  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated {updated} &middot; {build_stamp}</span></div>
   <div class="spotpx">${spot}</div>
   <div class="spotrow">{spot_extra}</div>
   <div class="verdict-card">VERDICT: {esc(verdict)}</div>
@@ -1005,7 +1016,6 @@ def build(raw=None):
 <p class="note">What each block is for, and how to read it. Numbered in the order they appear on the Dashboard, so the legend, the page and this guide always agree.</p>
 
 {ref_section(raw)}
-{legend_html}
 </section>
 
 <section id="ev" class="tab">
