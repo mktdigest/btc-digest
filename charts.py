@@ -669,10 +669,9 @@ def build_all(outdir, series_path, digest_text=None):
             if ladder_chart(pth, spot, lv):
                 add("c_levels.png", "Where price sits - every level on one ladder",
                     [f"spot ${spot:,.0f}"] + [f"{l} ${v:,.0f}" for v, _c, l in lv[:3]],
-                    "Read top-down: everything above the blue spot line is overhead supply that "
-                    "rallies have to eat through; everything below is a floor different cohorts or "
-                    "models say value starts at. The distance percentages are what matters - a "
-                    "floor 30% lower is not a plan, it is a boundary.",
+                    "The blue line is today's price. Levels above it are where people who bought "
+                    "higher are waiting to sell. Levels below it are prices where buyers have stepped "
+                    "in before. The percentage next to each level is how far price is from it today.",
                     f"nearest floor {min(((abs(v/spot-1), l, v) for v, _c, l in lv if v < spot), default=(0,'',0))[1]}"
                     f" at ${min(((abs(v/spot-1), l, v) for v, _c, l in lv if v < spot), default=(0,'',0))[2]:,.0f}",
                     " wide")

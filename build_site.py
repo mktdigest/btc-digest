@@ -49,7 +49,7 @@ h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-heigh
 h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:16.5px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px;margin:13px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:20px 0}
 .card pre{font-family:var(--mono);font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .card{padding:19px 21px 17px}
 .card h3{font-size:17px;line-height:1.4;margin:0 0 4px}
@@ -59,7 +59,7 @@ p.note{color:var(--dim);font-size:16.5px}
 .frow:first-of-type{border-top:0}
 .fk{color:#8b949e;font-size:13px;line-height:1.55;letter-spacing:.01em}
 .fv{color:#e6edf3;line-height:1.6}
-.bline{margin:0 0 13px}
+.bline{margin:0 0 15px}
 .bline:last-of-type{margin-bottom:0}
 .bsec{margin:16px 0 0;padding:13px 15px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.05);border-radius:8px}
 .bsec p{margin:5px 0 0;line-height:1.62}
@@ -84,6 +84,11 @@ padding:4px 12px;border-radius:7px;margin-left:10px;vertical-align:3px;white-spa
 .sbadge.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
 .sbadge.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
 .key{margin:16px 0 2px;font-size:16px;color:var(--dim);line-height:2.1}
+.legend{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:6px 0 22px;
+padding:14px 18px;background:#11161d;border:1px solid var(--line);border-radius:10px;
+font-size:14.5px;color:#a9b4c0}
+.legend .lg{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
+.legend .lg.dim{color:#78838f;font-style:normal}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
 table{width:100%;border-collapse:collapse;margin:13px 0;font-size:16.5px;display:block;overflow-x:auto}
@@ -98,6 +103,15 @@ img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px
 .bchart{margin:11px 0 0}
 .bchart img{width:100%;border:1px solid var(--line);border-radius:8px;display:block}
 .bchart figcaption{margin-top:6px;font-size:12px;color:var(--dim)}
+.legcard{padding:8px 22px}
+.legrow{display:grid;grid-template-columns:46px 1fr;gap:2px 14px;padding:17px 0;
+border-top:1px solid rgba(255,255,255,.07)}
+.legrow:first-child{border-top:0}
+.legnum{grid-row:1/span 2;display:flex;align-items:flex-start;justify-content:center;
+width:30px;height:30px;border-radius:8px;background:#1b2430;border:1px solid #2c3846;
+color:var(--accent);font-size:14px;font-weight:700;line-height:28px;text-align:center}
+.legtxt h4{margin:2px 0 6px;font-size:16px;color:#e6edf3;letter-spacing:.01em}
+.legtxt p{margin:0;font-size:14.8px;line-height:1.68;color:#a9b4c0;max-width:78ch}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:15px}
@@ -115,11 +129,15 @@ p.sdesc{color:var(--dim);font-size:17.5px;margin:6px 0 18px;font-style:italic;li
 .kpi .v{display:block;font-size:26px;font-weight:650;font-family:var(--mono);margin-top:6px;line-height:1.15}
 .kpi .d{display:block;font-size:16.5px;font-weight:650;font-family:var(--mono);margin-top:4px}
 .kpi .n{display:block;font-size:14.5px;color:var(--dim);margin-top:5px;line-height:1.45}
-.tabs{display:flex;gap:4px;flex-wrap:wrap;margin:22px 0 0;border-bottom:1px solid var(--line)}
-.tabs button{background:none;border:none;border-bottom:2px solid transparent;color:var(--dim);
-font:inherit;font-size:17px;padding:11px 18px;cursor:pointer;font-weight:600}
-.tabs button:hover{color:var(--txt)}
-.tabs button.on{color:var(--accent);border-bottom-color:var(--accent)}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;
+margin:30px auto 8px;padding:8px;background:#11161d;border:1px solid var(--line);
+border-radius:14px;width:fit-content;max-width:100%}
+.tabs button{background:#161c25;border:1px solid #222b36;color:#a9b4c0;
+font:inherit;font-size:16px;padding:12px 22px;cursor:pointer;font-weight:650;
+border-radius:9px;transition:background .12s,color .12s,border-color .12s;letter-spacing:.01em}
+.tabs button:hover{color:#e6edf3;background:#1d2530;border-color:#2f3a47}
+.tabs button.on{color:#0b0f14;background:var(--accent);border-color:var(--accent);
+box-shadow:0 2px 10px rgba(88,166,255,.25)}
 .tab{display:none}.tab.on{display:block}
 .cgrid{display:grid;grid-template-columns:1fr;gap:22px;margin-top:18px}
 .ccard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
@@ -203,6 +221,25 @@ LEAD_LABELS = ("ONE LINE", "WHAT THIS IS", "WHAT IT IS")
 SECTION_LABELS = ("HISTORY", "LIMITS", "GAP", "CLOCK", "FLOOR PRICE")
 
 
+# Wrapped input means many lines end mid-sentence - but so do complete data rows. Join only when the
+# text actually dangles: the previous line ends on a connector/comma/dash, or this line STARTS on one
+# ("at. 1.00 = break-even ..." belongs above; "cycle floors, our own ..." does not).
+DANGLING_END = {"and", "or", "the", "a", "an", "of", "to", "in", "with", "that", "but", "than", "as",
+                "for", "from", "by", "at", "is", "are", "was", "were", "\u2014", "=", "+"}
+DANGLING_START = {"at", "and", "or", "but", "then", "is", "are", "was", "were", "to", "of", "in",
+                  "with", "than", "as", "for", "from", "by", "a", "an", "the"}
+
+
+def _is_continuation(prev, line):
+    if prev.rstrip().endswith((".", "!", "?")):
+        return False
+    if prev.rstrip()[-1:] in ",;-\u2014":
+        return True
+    if re.split(r"\s+", prev.strip())[-1].rstrip(",.;:").lower() in DANGLING_END:
+        return True
+    return re.split(r"\s+", line.strip())[0].rstrip(",.;:").lower() in DANGLING_START
+
+
 def render_body(lines):
     """Simple, reliable reflow.
 
@@ -227,11 +264,9 @@ def render_body(lines):
         if head and head.group(1) in SECTION_LABELS:
             items.append(("sec", head.group(1), head.group(2)))
             continue
-        if items and items[-1][0] in ("text", "lead", "sec"):
-            prev = items[-1][2]
-            if not prev.rstrip().endswith((".", "!", "?", ":", "-")):
-                items[-1] = (items[-1][0], items[-1][1], (prev + " " + line).strip())
-                continue
+        if items and items[-1][0] in ("text", "lead", "sec") and _is_continuation(items[-1][2], line):
+            items[-1] = (items[-1][0], items[-1][1], (items[-1][2] + " " + line).strip())
+            continue
         items.append(("text", "", line))
 
     out = []
@@ -281,6 +316,29 @@ BLOCK_FIELDS = {
     "15": "a new 20d price low versus RSI14 at that low; needs a failed rally, not just a drop",
     "16": "moving averages (200/50/10-day); armed = the conditions that make fading positive-EV",
 }
+
+
+def render_legend(body_lines):
+    """LEGEND entries as numbered rows, not one pre block.
+
+    Each entry is "[N] Title: sentence..." with wrapped continuation lines. Parse, then render a
+    badge + title + paragraph so sixteen explanations read as sixteen things rather than as a wall.
+    """
+    entries = []
+    for raw in body_lines:
+        line = raw.strip()
+        if not line:
+            continue
+        m = re.match(r"^\[(\d+)\]\s*([^:]{2,40}):\s*(.+)$", line)
+        if m:
+            entries.append([m.group(1), m.group(2).strip(), m.group(3).strip()])
+        elif entries:
+            entries[-1][2] = (entries[-1][2] + " " + line).strip()
+    rows = "".join(
+        f'<div class="legrow"><span class="legnum">{n}</span>'
+        f'<div class="legtxt"><h4>{esc(t)}</h4><p>{esc(d)}</p></div></div>'
+        for n, t, d in entries)
+    return f'<div class="card legcard">{rows}</div>'
 
 
 def render_blocks(lines):
@@ -356,6 +414,9 @@ def section_stance(body_lines):
     return "flat", "NO SIGNAL - nothing directional"
 
 
+_LEGEND = {"html": ""}
+
+
 def render_digest(raw):
     lines = [l for l in raw.splitlines() if not l.startswith("MEDIA:")]
     bar = "=" * 70
@@ -387,8 +448,11 @@ def render_digest(raw):
         for d in s["desc"]:
             out.append(f'<p class="sdesc">{esc(d)}</p>')
         if s["title"].startswith("LEGEND"):
-            body = "\n".join(l for l in s["body"] if l.strip())
-            out.append(f'<div class="card"><pre>{esc(body)}</pre></div>')
+            # the legend is reference material: it belongs on the Reference tab, not under the blocks,
+            # where it made page one twice as long for no reason
+            _LEGEND["html"] = ('<h3 class="sec">LEGEND - what every block means</h3>'
+                               + render_legend(s["body"]))
+            continue
         else:
             out.append(render_blocks(s["body"]))
     return "\n".join(out)
@@ -890,6 +954,7 @@ def build(raw=None):
         bottom_html = (f'<p class="note">Bottom score unavailable this build '
                        f'({type(_e).__name__}: {_e}). The rest of the digest is unaffected.</p>')
 
+    legend_html = _LEGEND["html"]
     doc = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -916,17 +981,13 @@ def build(raw=None):
 </header>
 
 <section id="dash" class="tab on">
-<p class="note">Sections run in order of importance: <strong>flow first</strong> (where the money is going),
-then positioning &amp; sentiment, price structure, momentum, and finally the actionable signals.
-If the flow section is bearish, everything below it is a bounce to sell. All blocks are settled
-<strong>daily closes</strong> unless a line says &ldquo;live&rdquo;.</p>
-
-<p class="key">Every block ends in a tagged verdict, and each section header carries its net tally.
-Colour is the stance, not the tone of the wording:
-<span class="stag bear">BEARISH</span> capital or demand leaking, or the crowd leaning the wrong way &middot;
-<span class="stag bull">BULLISH</span> capital or demand arriving &middot;
-<span class="stag warn">CAUTION</span> contrarian or bounce risk &mdash; act on it carefully &middot;
-<span class="stag flat">NO SIGNAL</span> nothing directional, do not force a trade.</p>
+<div class="legend">
+  <span class="lg"><b class="stag bear">BEARISH</b> money leaving</span>
+  <span class="lg"><b class="stag bull">BULLISH</b> money arriving</span>
+  <span class="lg"><b class="stag warn">CAUTION</b> risky either way</span>
+  <span class="lg"><b class="stag flat">NO SIGNAL</b> nothing to act on</span>
+  <span class="lg dim">prices are daily closes unless marked live</span>
+</div>
 {ladder_html}
 {blocks_html}
 </section>
@@ -944,6 +1005,7 @@ Colour is the stance, not the tone of the wording:
 <p class="note">What each block is for, and how to read it. Numbered in the order they appear on the Dashboard, so the legend, the page and this guide always agree.</p>
 
 {ref_section(raw)}
+{legend_html}
 </section>
 
 <section id="ev" class="tab">
@@ -968,6 +1030,20 @@ Colour is the stance, not the tone of the wording:
 </section>
 
 <section id="guide" class="tab">
+<div class="card">
+<h3>How to read this page</h3>
+<div class="bbody">
+<p class="bline">Sections are ordered by importance: <b>flow</b> first (where the money is going), then
+positioning and sentiment, then price structure, momentum, and finally the trading signals.</p>
+<p class="bline">If flow is bearish, everything below it is a bounce to sell. Every block ends with a
+tagged verdict, and each section header carries its tally.</p>
+<p class="bline">The tag colour is the stance, not the tone of the wording: BEARISH means capital or
+demand is leaking, or the crowd is leaning the wrong way. BULLISH means capital or demand is arriving.
+CAUTION means contrarian or bounce risk - act carefully. NO SIGNAL means nothing directional, so do not
+force a trade.</p>
+<p class="bline">All blocks use settled daily closes unless a line says "live".</p>
+</div>
+</div>
 <p class="note"><strong>Where the live reading is:</strong> block <strong>{num_of(heads, "Divergence")} &mdash; Divergence</strong> on the
 <em>Dashboard</em> tab, inside section <em>4. MOMENTUM</em>. This tab is the guide, not the reading.</p>
 <p>Price and the RSI stop agreeing. Price keeps going the same way, but the RSI refuses to follow &mdash; the move is running out of force underneath.</p>

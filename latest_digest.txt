@@ -145,38 +145,60 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 ======================================================================
 LEGEND - what every block means
 ======================================================================
-  [1] ETF flow: institutional demand (read the 5d/30d sums, never one day)
-  [2] Premium: US vs global bid (+ = US leads, - = US is the missing bid; 20d+ streak = regime)
-  [3] 30d mean net of Tether: is the US discount a regime or just noise?
-  [4] Stables: money in/out of crypto (7d AND 30d up = capital returning)
-  [5] Venue flow: net spot taker buying per exchange. Only Binance+OKX publish history;
-        Coinbase is a live snapshot (context only) and Bybit has none. Verdict uses the deep books.
-  [6] Positioning: Binance futures L/S ratios - CONTRARIAN. High ratio = crowd long =
-        squeeze fuel DOWN; low = crowd short = squeeze fuel UP. Top-trader pos falling =
-        smart money exiting longs. OI draining = liquidation, not new shorts. Mid-range = no signal.
-  [7] Funding/basis: cost of leverage. Positive/longs-pay = crowded longs (bearish tilt);
-        negative/shorts-pay = crowded shorts (squeeze fuel UP). Basis = perp premium to index.
-  [8] Fear & Greed: crowd panic/greed 0-100. <20 = capitulation (bounce fuel UP, bad to short);
-        >80 = euphoria (contrarian-bearish). Shows where the crowd sits, not where price goes.
-  [9] Bitfinex margin longs: hourly margin-long size (ONE aggregate book, no account detail)
-        (each hour it grew, weighted by that hour's price) = the average price of the adds, i.e.
-        the bid. Spot below it means those adds are underwater and it is supply overhead. The
-        block also prints how past surges of this size resolved against a random-hour baseline.
-  [10] URPD: supply by cost basis (bars above spot = resistance, at/below = support)
-  [11] Floors: 1.0x Balanced = where past cycle bottoms landed; AVWAP = market break-even
-  [12] MVRV: market value / realised value. 1.00 = market at break-even; below 1.00 the average
-        holder is under water, which only happens near bottoms. The floor multiple rises each
-        cycle, so the dollar floor is a ZONE (two fits printed, they disagree by design). The
-        clock starts at the first sub-1.00 print - the low lands 26-149 days later, not on it.
-  [13] Holder cost basis: average price paid by coins last moved >155 days ago (LTH) vs within
-        155 days (STH). Price above LTH cost = patient holders in profit, not sellers. Price under
-        STH cost = recent buyers underwater = the selling pressure. The LTH level is the floor with
-        real holders behind it, but the free-tier series starts 2022-11, so no cycle claim is made.
-  [14] RSI (daily): momentum 0-100 (>70 overbought, <30 oversold; fast>slow = uptrend intact)
-  [15] Divergence: 20d low + HIGHER RSI14 (lows >=5d apart). 9y test: plain BULLISH has NO
-        edge (55% vs 53% baseline); BULLISH with RSI14<35 at the 2nd low = 67% win vs 53%.
-        BEARISH showed no edge. Act ONLY on the oversold variant; ~5% dip first is normal.
-  [16] Short-fade: RSI14 crosses above 40 while below MA200 = fade the bounce at resistance.
-        9y: 64% touch -3% before +5%, but EV ~+0.12% - near break-even. Small size, exit fast.
+  [1] ETF flow: How much money went into or out of US spot bitcoin ETFs each day. Read the 5-day and
+      30-day totals rather than a single day, because one day is mostly noise. Negative means money is
+      leaving the funds: that is demand being withdrawn, not holders selling.
+  [2] Premium: Whether US buyers are paying more or less than buyers elsewhere. When the premium is
+      negative, American buyers are the missing demand. When it stays negative for weeks, it is a trend
+      rather than a single quiet day.
+  [3] Premium net of Tether: The same premium with stablecoin noise removed, averaged over 30 days.
+      It answers whether the US discount is a lasting regime or a passing distortion.
+  [4] Stablecoins: How much money is sitting in stablecoins, waiting to be deployed. When both the
+      7-day and 30-day changes are rising, new money is arriving in crypto; when both fall, money is
+      leaving.
+  [5] Venue flow: Whether buyers or sellers were the aggressor on each exchange. Only Binance and
+      OKX publish a full history. Coinbase is a live snapshot covering a few minutes, and Bybit publishes
+      nothing, so the verdict rests on the two exchanges with real data.
+  [6] Positioning: How many Binance futures accounts are long versus short. Read it against the
+      crowd, not with it: when almost everyone is long, a drop is more likely because there are more
+      positions to be forced out. Falling long exposure among the largest traders means they are leaving.
+      In the middle of the range there is nothing to act on.
+  [7] Funding and basis: What it costs to hold a leveraged position. When funding is positive, longs
+      pay shorts, which tells you the crowd is positioned long. Basis is the perpetual price compared with
+      spot.
+  [8] Fear and Greed: A 0 to 100 index of crowd sentiment. Below 20 is capitulation, which has
+      historically come before bounces. Above 80 is euphoria. It describes how people feel, not where
+      price is going.
+  [9] Bitfinex margin longs: The total size of leveraged long positions on Bitfinex, as one combined
+      book with no account detail. The block calculates the average price at which those positions were
+      added. If price sits below that average, the recent buyers are losing money and their positions
+      become supply that meets every rally. It also shows how past surges of this size resolved.
+  [10] Cost basis / URPD: How much bitcoin was last bought at each price level. Bars above the
+      current price are holders waiting to break even, which is where selling appears. Bars at or below
+      the price show where support has formed before.
+  [11] Valuation floors: The current price compared with three historical reference levels. One
+      times Balanced Price is where previous cycle bottoms landed. The all-time VWAP is the average price
+      paid across the whole history of the market.
+  [12] MVRV: Market value divided by realised value: the current price compared with the average
+      price every coin last moved at. At 1.00 the market trades at break-even for the average holder.
+      Below 1.00 the average holder is losing money, which has only happened near cycle bottoms. The floor
+      rises each cycle, so the likely bottom is a zone rather than one number. After the first reading
+      below 1.00, past cycles bottomed 26 to 149 days later: the crossing starts a clock, it does not mark
+      the low.
+  [13] Holder cost basis: The average price paid by long-term holders, meaning coins last moved more
+      than 155 days ago, compared with short-term holders, meaning coins moved within 155 days. Price
+      above the long-term cost means patient holders are in profit and are not the sellers. Price below
+      the short-term cost means recent buyers are losing money, which is where selling pressure comes
+      from. The free data starts in November 2022, so this block cannot speak for earlier cycles.
+  [14] RSI: A 0 to 100 momentum reading. Above 70 is overbought and below 30 is oversold. When the
+      fast average sits below the slow one, the trend is still down and bounces are being sold.
+  [15] Divergence: A lower price low with a higher RSI at that low, which suggests sellers are
+      running out of strength. Tested over nine years, a plain bullish divergence has no edge. The version
+      that works needs RSI below 35 at the second low, and it won 67% of the time against a 53% baseline.
+      A bearish divergence showed no edge. Only act on the oversold version, and expect roughly a 5% dip
+      first.
+  [16] Short-fade: When RSI crosses back above 40 while price is still below its 200-day average,
+      the bounce usually fails at resistance. Over nine years it touched minus 3% before plus 5% in 64% of
+      cases, but the average result is close to zero. Treat it as a small position with a fast exit.
 
 MEDIA:/root/.hermes/state/charts/btc_daily_2026-11-22.png
