@@ -439,9 +439,11 @@ REF_CARDS = [
      'adds</strong>: every hour the position grew, weighted by that hour&rsquo;s price. That is the '
      'level they actually paid, and therefore where their bid sits. If spot is below it, the adds are '
      'under water and that price becomes supply on the way back up.</p>'
-     '<p><strong>Contrarian check:</strong> the block also prints how previous surges of the same size '
-     'resolved 30 days later. A record long is squeeze fuel DOWN as much as a vote of confidence, '
-     'which is why the verdict is a caution rather than a buy.</p>'),
+     '<p><strong>Contrarian check:</strong> the block prints what followed the 10 past windows that '
+     'added at least 2,170 BTC net in 7 days, plus the same measure for a random hour in the same '
+     'sample &mdash; so a big build is compared against the regime, not against zero. It also states '
+     'today&rsquo;s build against that bar. A record long is squeeze fuel DOWN as much as a vote of '
+     'confidence, which is why the verdict is a caution rather than a buy.</p>'),
 
     ("Positioning &mdash; Binance futures long/short crowding", "Positioning",
      '<p>Three Binance futures ratios, all <strong>contrarian</strong>:</p>'
