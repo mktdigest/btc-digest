@@ -26,7 +26,8 @@ DIGEST = os.path.join(SCRIPTS, "coinbase_premium_daily.py")
 
 CSS = """
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;
+:root{
+--s1:10px;--s2:16px;--s3:24px;--s4:36px;--s5:52px;--bg:#0d1117;--card:#161b22;--line:#30363d;--txt:#e6edf3;--dim:#8b949e;
 --accent:#58a6ff;--green:#3fb950;--red:#f85149;--amber:#d29922;
 --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
 body{background:var(--bg);color:var(--txt);font:18px/1.65 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -49,22 +50,22 @@ h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-heigh
 h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:16.5px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:20px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:var(--s3) 0}
 .card pre{font-family:var(--mono);font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
-.card{padding:19px 21px 17px}
+.card{padding:22px 24px}
 .card h3{font-size:17px;line-height:1.4;margin:0 0 4px}
 .bbody{margin:15px 0 0;font-size:15.5px;line-height:1.68;color:#cdd6e0}
-.blead{margin:0 0 16px;padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:14.5px;line-height:1.6}
+.blead{margin:0 0 var(--s2);padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:14.5px;line-height:1.6}
 .frow{display:grid;grid-template-columns:minmax(112px,168px) 1fr;gap:4px 16px;padding:8px 0;border-top:1px solid rgba(255,255,255,.055)}
 .frow:first-of-type{border-top:0}
 .fk{color:#8b949e;font-size:13px;line-height:1.55;letter-spacing:.01em}
 .fv{color:#e6edf3;line-height:1.6}
-.bline{margin:0 0 15px}
+.bline{margin:0 0 var(--s2)}
 .bline:last-of-type{margin-bottom:0}
-.bsec{margin:16px 0 0;padding:13px 15px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.05);border-radius:8px}
+.bsec{margin:var(--s2) 0 0;padding:13px 15px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.05);border-radius:8px}
 .bsec p{margin:5px 0 0;line-height:1.62}
 .bseck{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8b949e}
-.vbox{margin:18px 0 0;padding:13px 15px;border-radius:8px;border-left:3px solid;background:rgba(255,255,255,.028)}
+.vbox{margin:var(--s2) 0 0;padding:13px 15px;border-radius:8px;border-left:3px solid;background:rgba(255,255,255,.028)}
 .vtext{margin:6px 0 0;font-size:15px;line-height:1.6;color:#dfe6ee}
 .vbox.bear{border-color:#f85149}.vbox.bull{border-color:#3fb950}
 .vbox.warn{border-color:#d29922}.vbox.flat{border-color:#6e7681}
@@ -99,7 +100,7 @@ td.num{font-family:var(--mono);text-align:right}
 img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px 0;display:block}
 .bfields{margin:9px 0 0;font-size:12.5px;color:var(--dim);line-height:1.45}
 .bfields b{color:var(--tx)}
-.bchart{margin:11px 0 0}
+.bchart{margin:var(--s3) 0 0}
 .bchart img{width:100%;border:1px solid var(--line);border-radius:8px;display:block}
 .bchart figcaption{margin-top:6px;font-size:12px;color:var(--dim)}
 .legcard{padding:8px 22px}
@@ -115,7 +116,8 @@ color:var(--accent);font-size:14px;font-weight:700;line-height:28px;text-align:c
 .callout p{margin:4px 0;color:#e6d7a8}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:15px}
 code{font-family:var(--mono);background:#1c2128;padding:2px 6px;border-radius:4px;font-size:15px}
-.hrow{font-family:var(--mono);font-size:15.5px;color:var(--dim);margin:3px 0}
+.hrow{font-family:var(--mono);font-size:15.5px;color:var(--dim);margin:4px 0}
+.tab .hrow:last-of-type{margin-bottom:var(--s3)}
 .verdict-card{border-radius:9px;padding:13px 17px;margin:18px 0 4px;font-size:17px;font-weight:650;
 display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .verdict-card.bear{background:#2a1013;border:1px solid #6e2126;color:#ff8a80}
@@ -123,19 +125,24 @@ display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .verdict-card.warn{background:#2b2210;border:1px solid #6b5320;color:#e3b341}
 .verdict-card.flat{background:#161b22;border:1px solid var(--line);color:#c3ccd6}
 .verdict-card .stag{flex:0 0 auto}
-h3.sec{font-size:27px;color:#fff;font-weight:700;margin:48px 0 5px;padding-top:22px;
+h3.sec{font-size:27px;color:#fff;font-weight:700;margin:var(--s5) 0 var(--s2);padding-top:var(--s3);
 border-top:1px solid var(--line);letter-spacing:-.02em;line-height:1.28}
-p.sdesc{color:var(--dim);font-size:17.5px;margin:6px 0 18px;font-style:italic;line-height:1.6}
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:18px 0 0}
+p.sdesc{color:var(--dim);font-size:17.5px;margin:0 0 var(--s3);font-style:italic;line-height:1.6}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:var(--s3) 0 0}
 @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 16px}
 .kpi .k{display:block;font-size:14px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-weight:650}
 .kpi .v{display:block;font-size:26px;font-weight:650;font-family:var(--mono);margin-top:6px;line-height:1.15}
 .kpi .d{display:block;font-size:16.5px;font-weight:650;font-family:var(--mono);margin-top:4px}
 .kpi .n{display:block;font-size:14.5px;color:var(--dim);margin-top:5px;line-height:1.45}
+.tabbar{position:sticky;top:0;z-index:80;max-width:none;background:rgba(13,17,23,.94);
+backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+border-bottom:1px solid var(--line);padding:14px 20px;margin:var(--s3) -20px}
 .tabs{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;align-items:center;
-margin:30px auto 8px;padding:8px;background:#11161d;border:1px solid var(--line);
-border-radius:14px;width:fit-content;max-width:100%}
+margin:0 auto;padding:0;background:none;border:0;border-radius:0;
+width:fit-content;max-width:100%}
+section[id]{scroll-margin-top:92px}
+.tab > :first-child{margin-top:0}
 .tabs button{background:#161c25;border:1px solid #222b36;color:#a9b4c0;
 font:inherit;font-size:16px;padding:12px 22px;cursor:pointer;font-weight:650;
 border-radius:9px;transition:background .12s,color .12s,border-color .12s;letter-spacing:.01em}
@@ -1014,6 +1021,9 @@ def build(raw=None):
   <div class="spotrow">{spot_extra}</div>
   <div class="verdict-card {verdict_cls}"><span class="stag {verdict_cls}">{verdict_tag}</span><span>{esc(verdict)}</span></div>
   {kpis}
+</header>
+
+<div class="tabbar">
   <nav class="tabs">
     <button class="on" data-t="dash">Dashboard</button>
     <button data-t="bottom">Bottom Score</button>
@@ -1022,7 +1032,7 @@ def build(raw=None):
     <button data-t="ev">Evidence</button>
     <button data-t="guide">Guide</button>
   </nav>
-</header>
+</div>
 
 <section id="dash" class="tab on">
 {ladder_html}
