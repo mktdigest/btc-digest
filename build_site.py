@@ -118,7 +118,7 @@ border-top:1px solid rgba(255,255,255,.07)}
 width:30px;height:30px;border-radius:8px;background:#1b2430;border:1px solid #2c3846;
 color:var(--accent);font-size:14px;font-weight:700;line-height:28px;text-align:center}
 .legtxt h4{margin:2px 0 6px;font-size:16px;color:#e6edf3;letter-spacing:.01em}
-.legtxt p{margin:0;font-size:14.8px;line-height:1.68;color:#a9b4c0;max-width:78ch}
+.legtxt p{margin:0;font-size:15px;line-height:1.68;color:#a9b4c0;max-width:none}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:15px}
@@ -484,7 +484,6 @@ def render_digest(raw):
         if s["title"].startswith("LEGEND"):
             # the legend is reference material: it belongs on the Reference tab, not under the blocks,
             # where it made page one twice as long for no reason
-            out.append('<h3 class="sec">LEGEND - what every block means</h3>')
             out.append(render_legend(s["body"]))
             continue
         else:
