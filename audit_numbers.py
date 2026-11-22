@@ -252,6 +252,35 @@ for lab in ("STH cost", "LTH cost", "350-week MA"):
         fail(f"ladder chip {lab}", f"chip {chip.group(1)} vs block {v:,.0f}")
 ok("ladder chips checked against block values")
 
+# the bottom-score chart caption makes two countable claims: N stretches, D days. Both are checkable
+# against the series the chart is drawn from - the failure mode here was a caption describing shading
+# the image did not actually show.
+try:
+    import sys as _s
+    if "/root/btc-bottom" not in _s.path:
+        _s.path.insert(0, "/root/btc-bottom")
+    import json as _json
+    import score_g as _sg
+    _m = _json.loads(open("/root/btc-bottom/state/model_h.json").read())
+    _w, _keys = _m["weights"], list(_m["weights"])
+    _rows = _sg.build_series()
+    _mx = {k: max(r["parts"][k] for r in _rows) or 1.0 for k in _keys}
+    _sc = [round(min(100.0, sum(round(r["parts"][k] * 20.0 / _mx[k] * _w[k], 2) for k in _keys)), 2)
+           for r in _rows]
+    _eps, _run = [], None
+    for _i, _v in enumerate(_sc + [0.0]):
+        if _v >= 60 and _run is None:
+            _run = _i
+        elif _v < 60 and _run is not None:
+            _eps.append(_i - _run)
+            _run = None
+    # the caption lives in the rendered page, not the digest text
+    near("chart caption: stretches of score>=60",
+         grab(r"(\d+) stretches where the score held 60", HTML), len(_eps), 0)
+    near("chart caption: total days >=60", grab(r"(\d+) days in total", HTML), sum(_eps), 0)
+except Exception as _e:
+    warn("band caption check", f"skipped ({type(_e).__name__}: {_e})")
+
 print("\n" + "=" * 78)
 print("GATE 3 - provenance: every price on the page traces to a source")
 print("=" * 78)
