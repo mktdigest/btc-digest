@@ -29,7 +29,7 @@ for i in $(seq 1 40); do
        "https://mktdigest.github.io/btc-digest/?cb=$(date +%s%N)"
   LIVE=$(md5sum /tmp/live_page.html | cut -c1-32)
   if [ "$LIVE" = "$LOCAL" ]; then
-    if [ -z "$MARKER" ] || grep -qF "$MARKER" /tmp/live_page.html; then
+    if [ -z "$MARKER" ] || python3 -c "import sys,re;h=re.sub(r'\\s+',' ',open(sys.argv[1]).read());m=re.sub(r'\\s+',' ',sys.argv[2]);sys.exit(0 if m in h else 1)" /tmp/live_page.html "$MARKER"; then
       echo "LIVE OK after $((i*8))s (md5 ${LIVE:0:10}${MARKER:+, marker found})"
       exit 0
     fi
