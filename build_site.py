@@ -75,6 +75,11 @@ td.num{font-family:var(--mono);text-align:right}
 .neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
 .warn{color:var(--amber);font-weight:650}
 img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px 0;display:block}
+.bfields{margin:9px 0 0;font-size:12.5px;color:var(--dim);line-height:1.45}
+.bfields b{color:var(--tx)}
+.bchart{margin:11px 0 0}
+.bchart img{width:100%;border:1px solid var(--line);border-radius:8px;display:block}
+.bchart figcaption{margin-top:6px;font-size:12px;color:var(--dim)}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:15px}
@@ -177,6 +182,43 @@ def fmt_line(line):
     return e
 
 
+# One relevant chart per block, shown INSIDE the card on the dashboard. The chart is the same PNG the
+# Charts tab uses - no second copy, no chance of the two disagreeing.
+BLOCK_CHARTS = {
+    "1":  ("c_etf.png", "Daily net ETF flow, $M - bars in, bars out"),
+    "2":  ("c_premium.png", "Coinbase premium over Binance, % - the US bid line"),
+    "4":  ("c_stables.png", "USDT + USDC supply, $B - the dry-powder line"),
+    "6":  ("c_ratios.png", "Long/short ratios and open interest - crowd positioning"),
+    "7":  ("c_funding.png", "Funding rate, annualised % - what leverage costs"),
+    "10": ("c_urpd.png", "Supply by cost-basis band - the shelves price sits on"),
+    "11": ("chart.png", "Price vs Balanced Price and the all-time anchored VWAP"),
+    "12": ("c_mvrv.png", "MVRV with 1.00 marked - the shaded band is holders underwater"),
+    "13": ("c_cost.png", "Price vs LTH and STH cost basis - who paid what"),
+    "14": ("c_rsi.png", "RSI, daily - the oversold line is 30"),
+}
+
+# What the numbers in each block ARE - one line, in the reader's language. The Reference tab keeps
+# the long version; this is the key so a block can never be a wall of unexplained figures.
+BLOCK_FIELDS = {
+    "1":  "latest = yesterday's net creation (T+1 = published a day late); 5d/10d/30d = running sums",
+    "2":  "live = now, last close = settled; 30d avg = the trend; streak = days one sign; 1y low = the extreme",
+    "3":  "the premium with USDT noise removed; percentile vs the past year; streak = days in this regime",
+    "4":  "supply in $B; 1d/7d/30d = the change over that window; combined = stablecoin dry powder",
+    "5":  "net aggressive buying per venue; % of vol = its size against that venue's total volume",
+    "6":  "L/S = accounts long per short; pctile = rank in its own 30d; OI = open interest in $bn",
+    "7":  "rate per 8h and the annualised equivalent; basis = perp vs index; positive = longs pay shorts",
+    "8":  "0-100 crowd index: <20 capitulation, >80 euphoria; percentile = rank within the 30d window",
+    "9":  "longs = BTC held in margin longs; avg price = volume-weighted entry of the adds; premium = vs Binance",
+    "10": "supply by cost-basis band, as % of total; the band at spot is the shelf that matters",
+    "11": "spot as a multiple of each floor; 1.0x Balanced = where past cycle bottoms landed",
+    "12": "market value / realised value: 1.00 = break-even for the average holder; floors = cycle lows",
+    "13": "average price each age cohort paid; gap = how far the long-term base sits under recent buyers",
+    "14": "0-100 momentum, <30 oversold; the 'forming' line drifts until the daily close",
+    "15": "a new 20d price low versus RSI14 at that low; needs a failed rally, not just a drop",
+    "16": "moving averages (200/50/10-day); armed = the conditions that make fading positive-EV",
+}
+
+
 def render_blocks(lines):
     blocks, cur = [], None
     for l in lines:
@@ -197,8 +239,25 @@ def render_blocks(lines):
         title, body = b[0], b[1:]
         if not any(x.strip() for x in body):
             continue
+        num = (re.match(r"\[(\d+[a-z]?)\]", title) or [None, ""])[1]
+        extra = ""
+        fields = BLOCK_FIELDS.get(num)
+        if fields:
+            extra += f'<p class="bfields"><b>Fields:</b> {esc(fields)}</p>'
+        ch = BLOCK_CHARTS.get(num)
+        if ch and os.path.exists(os.path.join(HERE, ch[0])):
+            # hash the bytes into the URL: GitHub Pages caches assets hard, and a changed PNG under
+            # the same name served the OLD plot for a day ("am still looking at the old chart")
+            ver = "1"
+            try:
+                with open(os.path.join(HERE, ch[0]), "rb") as fh:
+                    ver = hashlib.md5(fh.read()).hexdigest()[:10]
+            except Exception:
+                pass
+            extra += (f'<figure class="bchart"><img src="{ch[0]}?v={ver}" alt="{esc(ch[1])}" '
+                      f'loading="lazy"><figcaption>{esc(ch[1])}</figcaption></figure>')
         out.append(f'<div class="card"><h3>{esc(title)}</h3><pre>'
-                   + "\n".join(fmt_line(l) for l in body) + "</pre></div>")
+                   + "\n".join(fmt_line(l) for l in body) + f"</pre>{extra}</div>")
     return "\n".join(out)
 
 
@@ -732,6 +791,15 @@ def build(raw=None):
               for c in chart_meta if c.get("file")]
     chart_grid = '<div class="cgrid">' + cycle_html + "".join(ccards) + "</div>"
 
+    # The levels ladder goes on the DASHBOARD, above the blocks: it is the one picture that shows
+    # all of block [11]-[13] at once, and page one was the wall of text being complained about.
+    ladder_html = ""
+    for m in chart_meta:
+        if m.get("file") == "c_levels.png":
+            ladder_html = card(m["title"], esc(m["file"]), m["title"], m.get("now"),
+                               m.get("use", ""), m.get("verdict", ""), " wide")
+            break
+
     # Bottom score tab, built by the engine in /root/btc-bottom. If it fails, say so on the page
     # rather than shipping a silent hole where a headline number should be.
     try:
@@ -781,6 +849,7 @@ Colour is the stance, not the tone of the wording:
 <span class="stag bull">BULLISH</span> capital or demand arriving &middot;
 <span class="stag warn">CAUTION</span> contrarian or bounce risk &mdash; act on it carefully &middot;
 <span class="stag flat">NO SIGNAL</span> nothing directional, do not force a trade.</p>
+{ladder_html}
 {blocks_html}
 </section>
 

@@ -458,6 +458,172 @@ def stablecoin_series(days=120):
     return labels, [v[1] / 1e9 for _, v in rows], [v[2] / 1e9 for _, v in rows]
 
 
+def ladder_chart(path, spot, levels, title="Where price sits: overhead above, floors below"):
+    """Horizontal price ladder. levels = [(value, colour, label)] - drawn against spot.
+
+    One picture replaces the six separate numbers spread across blocks [11]-[13]: the reader sees at
+    a glance how far each level is, and which side of spot it falls on.
+    """
+    vals = [v for v, _c, _l in levels if v]
+    if not vals or not spot:
+        return False
+    lo = min(vals + [spot]) * 0.93
+    hi = max(vals + [spot]) * 1.05
+    rows = len(levels)
+    h = 190 + rows * 46
+    img, d = _frame(title, w=W, h=h)
+    x0, x1 = 250, W - 150
+    y0, y1 = 92, h - 74
+
+    def X(v):
+        return x0 + (x1 - x0) * (v - lo) / (hi - lo)
+
+    # axis ticks
+    for i in range(6):
+        v = lo + (hi - lo) * i / 5
+        x = X(v)
+        d.line([(x, y0 - 8), (x, y1 + 6)], fill=GRID)
+        d.text((x - 26, y1 + 12), f"{v/1000:.0f}k", fill=DIM, font=_font(14))
+
+    f_lbl, f_val = _font(16, True), _font(16)
+    for i, (v, col, label) in enumerate(levels):
+        y = y0 + 26 + i * 46
+        xv, xs = X(v), X(spot)
+        d.line([(min(xv, xs), y), (max(xv, xs), y)], fill=GRID, width=3)
+        d.ellipse([xv - 7, y - 7, xv + 7, y + 7], fill=col)
+        d.text((20, y - 10), label, fill=col, font=f_lbl)
+        dist = (v / spot - 1) * 100
+        txt = f"${v:,.0f}  {dist:+.0f}%"
+        w = d.textlength(txt, font=f_val)
+        tx = xv + 14
+        if tx + w > x1 + 44:                      # only go left when the right edge would clip
+            tx = xv - 14 - w
+        d.text((tx, y - 10), txt, fill=FG, font=f_val)
+
+    # spot line on top of the bars
+    xs = X(spot)
+    d.line([(xs, y0 - 10), (xs, y1 + 6)], fill=ACC, width=2)
+    lab = f"spot ${spot:,.0f}"
+    lw = d.textlength(lab, font=_font(15, True))
+    d.rectangle([xs - lw / 2 - 6, y0 - 34, xs + lw / 2 + 6, y0 - 10], fill=ACC)
+    d.text((xs - lw / 2, y0 - 32), lab, fill=(8, 15, 24), font=_font(15, True))
+    img.save(path)
+    return True
+
+
+def mvrv_chart(path, mv, days, title="MVRV: how far above the average holder's cost"):
+    """MVRV line with 1.00 marked. Below 1.00 the average holder is underwater - that band is shaded.
+
+    1,200 days is chosen so the 2022-23 sub-1.00 episode and today both fit without the chart
+    turning into a full-history smear.
+    """
+    if not mv:
+        return False
+    img, d = _frame(title)
+    x0, x1, y0, y1 = 96, W - 120, 74, H - 56
+    lo, hi = min(mv) * 0.94, max(mv) * 1.04
+    lo = min(lo, 0.95)
+
+    def X(i):
+        return x0 + (x1 - x0) * i / max(1, len(mv) - 1)
+
+    def Y(v):
+        return y1 - (y1 - y0) * (v - lo) / (hi - lo)
+
+    for i in range(4):
+        v = lo + (hi - lo) * i / 3
+        y = Y(v)
+        d.line([(x0, y), (x1, y)], fill=GRID)
+        d.text((30, y - 9), f"{v:.2f}", fill=DIM, font=_font(14))
+
+    # shade everything below 1.00
+    y1x = Y(1.0)
+    under = [(X(i), Y(v)) for i, v in enumerate(mv) if v < 1.0]
+    if under:
+        for i in range(len(mv) - 1):
+            if mv[i] < 1.0 or mv[i + 1] < 1.0:
+                d.rectangle([X(i), y1x, X(i + 1) + 1, y1], fill=(58, 22, 22))
+
+    d.line([(x0, y1x), (x1, y1x)], fill=DN, width=2)
+    # caption on the LEFT under the line: on the right it printed straight through the curve and
+    # the current-value label, and the reader could not separate the three.
+    d.text((x0 + 8, y1x + 6), "1.00 = average holder break-even", fill=DN, font=_font(14, True))
+
+    pts = [(X(i), Y(v)) for i, v in enumerate(mv)]
+    d.line(pts, fill=ACC, width=2)
+    cx, cy = pts[-1]
+    d.ellipse([cx - 6, cy - 6, cx + 6, cy + 6], fill=WHITE)
+    lab = f"{mv[-1]:.2f}"
+    lw = d.textlength(lab, font=_font(17, True))
+    bx = min(cx + 14, x1 - lw - 10)
+    d.rectangle([bx - 6, cy - 26, bx + lw + 6, cy - 2], fill=BG)
+    d.text((bx, cy - 24), lab, fill=WHITE, font=_font(17, True))
+    if days:
+        d.text((x0, H - 40), f"{days[0]}", fill=DIM, font=_font(13))
+        tw = d.textlength(days[-1], font=_font(13))
+        d.text((x1 - tw, H - 40), f"{days[-1]}", fill=DIM, font=_font(13))
+    img.save(path)
+    return True
+
+
+def cost_basis_chart(path, days, price, lth, sth, spot=None, spot_day=None,
+                     title="Holder cost basis: price vs what each cohort paid"):
+    """Price against the LTH and STH cost bases over the window the data actually covers.
+
+    spot/spot_day carry the LIVE price onto the end of the line: the mirrored price file lags a day,
+    and a chart ending at $62k while the page header says $59k reads as a bug even when it is not.
+    """
+    if not days:
+        return False
+    if spot:
+        price = dict(price)
+        price[spot_day or days[-1]] = spot
+    img, d = _frame(title)
+    x0, x1, y0, y1 = 96, W - 130, 74, H - 56
+    allv = [v for d, v in price.items() if d >= days[0]] + [lth[d] for d in days if d in lth]
+    if any(d in sth for d in days):
+        allv += [sth[d] for d in days if d in sth]
+    lo, hi = min(allv) * 0.94, max(allv) * 1.06
+    # x-axis spans every day any series has, so the price line keeps running after the cost-basis
+    # series stop publishing (they lag ~1 week) instead of freezing the chart at a stale price
+    alld = sorted(set(days) | {d for d in price if d >= days[0]})
+    idx = {d: i for i, d in enumerate(alld)}
+
+    def X(i):
+        return x0 + (x1 - x0) * i / max(1, len(alld) - 1)
+
+    def Y(v):
+        return y1 - (y1 - y0) * (v - lo) / (hi - lo)
+
+    for i in range(4):
+        v = lo + (hi - lo) * i / 3
+        y = Y(v)
+        d.line([(x0, y), (x1, y)], fill=GRID)
+        d.text((26, y - 9), f"{v/1000:.0f}k", fill=DIM, font=_font(14))
+
+    ends = []
+    for series, col, lab in ((price, FG, "price"), (sth, AMBER, "STH cost"),
+                             (lth, UP, "LTH cost")):
+        pts = [(X(idx[d]), Y(v)) for d, v in sorted(series.items()) if d in idx]
+        if len(pts) > 1:
+            d.line(pts, fill=col, width=2)
+            lx, ly = pts[-1]
+            d.ellipse([lx - 5, ly - 5, lx + 5, ly + 5], fill=col)
+            last = sorted(series.items())[-1]
+            ends.append([ly, f"{lab} ${last[1]/1000:.0f}k", col, lx])
+    # stagger end labels so two series finishing near the same price do not print on top of each other
+    ends.sort()
+    for i in range(1, len(ends)):
+        if ends[i][0] - ends[i - 1][0] < 20:
+            ends[i][0] = ends[i - 1][0] + 20
+    for ly, txt, col, lx in ends:
+        d.text((min(lx + 10, W - 100), ly - 9), txt, fill=col, font=_font(14, True))
+    d.text((x0, H - 40), alld[0], fill=DIM, font=_font(13))
+    tw = d.textlength(alld[-1], font=_font(13))
+    d.text((x1 - tw, H - 40), alld[-1], fill=DIM, font=_font(13))
+    img.save(path)
+    return True
+
 def build_all(outdir, series_path, digest_text=None):
     """Render every chart. Returns metadata for the page. Never raises.
 
@@ -477,6 +643,93 @@ def build_all(outdir, series_path, digest_text=None):
     days = S.get("days", [])
     close = S.get("cb_close", [])
     spot = S.get("spot") or (close[-1] if close else 0)
+
+    # ---- levels ladder: the whole price structure in one picture.
+    # Numbers come from the DIGEST TEXT, not from a fresh fetch, so the picture and the blocks
+    # above it can never disagree.
+    def _n(pat):
+        m = re.search(pat, digest_text or "")
+        return float(m.group(1).replace(",", "")) if m else None
+
+    lv = [
+        (_n(r"STH cost \$([\d,]+)"), AMBER, "STH cost"),
+        (_n(r"MA200 ([\d,]+)"), DIM, "200-day MA (fade line)"),
+        (_n(r"\$([\d,]+) is the live bid"), PUR, "Bitfinex live bid"),
+        (_n(r"MVRV reaches 1\.00 at \$([\d,]+)"), ACC, "MVRV 1.00"),
+        (_n(r"350-week MA \$([\d,]+)"), TEAL, "350-week MA"),
+        (_n(r"LTH cost \$([\d,]+)"), UP, "LTH cost"),
+        (_n(r"AVWAP since [\d-]+ \$([\d,]+)"), DIM, "all-time AVWAP"),
+        (_n(r"Balanced Price \$([\d,]+)"), DN, "Balanced Price"),
+    ]
+    lv = [x for x in lv if x[0]]
+    lv.sort(key=lambda t: -t[0])
+    if lv and spot:
+        try:
+            pth = os.path.join(outdir, "c_levels.png")
+            if ladder_chart(pth, spot, lv):
+                add("c_levels.png", "Where price sits - every level on one ladder",
+                    [f"spot ${spot:,.0f}"] + [f"{l} ${v:,.0f}" for v, _c, l in lv[:3]],
+                    "Read top-down: everything above the blue spot line is overhead supply that "
+                    "rallies have to eat through; everything below is a floor different cohorts or "
+                    "models say value starts at. The distance percentages are what matters - a "
+                    "floor 30% lower is not a plan, it is a boundary.",
+                    f"nearest floor {min(((abs(v/spot-1), l, v) for v, _c, l in lv if v < spot), default=(0,'',0))[1]}"
+                    f" at ${min(((abs(v/spot-1), l, v) for v, _c, l in lv if v < spot), default=(0,'',0))[2]:,.0f}",
+                    " wide")
+        except Exception:
+            pass
+
+    # ---- MVRV vs 1.00 and the cost-basis lines (local files only - no quota spent here)
+    def _rows(path_):
+        try:
+            dd = json.load(open(path_))
+        except Exception:
+            return {}
+        rs = dd["rows"] if isinstance(dd, dict) and "rows" in dd else dd
+        out = {}
+        for r in rs:
+            try:
+                if isinstance(r, dict):
+                    day = r.get("d") or r.get("day")
+                    val = next((x for k, x in r.items() if k not in ("d", "day", "unixTs")), None)
+                else:
+                    day, val = r[0], r[1]
+                out[str(day)[:10]] = float(val)
+            except (TypeError, ValueError):
+                continue
+        return out
+
+    base = "/root/btc-bottom/state/onchain"
+    pr, rp = _rows(f"{base}/litb_price.json"), _rows(f"{base}/litb_realized_price.json")
+    mvdays = sorted(set(pr) & set(rp))[-1200:]
+    if len(mvdays) > 100:
+        try:
+            mv = [pr[d] / rp[d] for d in mvdays]
+            if mvrv_chart(os.path.join(outdir, "c_mvrv.png"), mv, mvdays):
+                add("c_mvrv.png", "MVRV - market value vs realised value",
+                    [f"MVRV {mv[-1]:.3f}", f"realised ${rp[mvdays[-1]]:,.0f}"],
+                    "The blue line is market cap divided by the average price every coin last moved "
+                    "at. Above 1.00 the average holder is in profit, below it they are underwater - "
+                    "the shaded red band. Every cycle bottom so far sits inside that band.",
+                    f"{mv[-1]:.2f} - {'above' if mv[-1] > 1 else 'below'} break-even",
+                    " wide")
+        except Exception:
+            pass
+    lth, sth = _rows(f"{base}/lth_realized_price.json"), _rows(f"{base}/sth_realized_price.json")
+    cdays = sorted(set(pr) & set(lth))
+    if len(cdays) > 100:
+        try:
+            if cost_basis_chart(os.path.join(outdir, "c_cost.png"), cdays, pr, lth, sth,
+                                spot=spot, spot_day=days[-1] if days else None):
+                add("c_cost.png", "Holder cost basis - price vs what each cohort paid",
+                    [f"LTH ${lth[cdays[-1]]:,.0f}", f"STH ${sth[cdays[-1]]:,.0f}"]
+                    if cdays[-1] in sth else [f"LTH ${lth[cdays[-1]]:,.0f}"],
+                    "Green is what long-term holders paid on average, amber what recent buyers "
+                    "paid. Price between them means recent buyers are underwater and long-term "
+                    "holders are not: the crowd on top is the fragile side.",
+                    "recent cohort underwater, long-term base in profit", " wide")
+        except Exception:
+            pass
 
     def ma(vals, n):
         r = [None] * len(vals)
