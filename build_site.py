@@ -84,11 +84,10 @@ padding:4px 12px;border-radius:7px;margin-left:10px;vertical-align:3px;white-spa
 .sbadge.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
 .sbadge.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
 .key{margin:16px 0 2px;font-size:16px;color:var(--dim);line-height:2.1}
-.legend{display:flex;flex-wrap:wrap;gap:10px 20px;align-items:center;margin:6px 0 22px;
-padding:14px 18px;background:#11161d;border:1px solid var(--line);border-radius:10px;
-font-size:14.5px;color:#a9b4c0}
-.legend .lg{display:inline-flex;align-items:center;gap:7px;white-space:nowrap}
-.legend .lg.dim{color:#78838f;font-style:normal}
+.legend{display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center;margin:10px 0 26px;
+font-size:15px;color:#a9b4c0;padding:0;background:none;border:0;border-radius:0}
+.legend .lg{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;color:#c3ccd6}
+.legend .lg.dim{color:#78838f}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
 table{width:100%;border-collapse:collapse;margin:13px 0;font-size:16.5px;display:block;overflow-x:auto}
@@ -117,8 +116,13 @@ color:var(--accent);font-size:14px;font-weight:700;line-height:28px;text-align:c
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:15px}
 code{font-family:var(--mono);background:#1c2128;padding:2px 6px;border-radius:4px;font-size:15px}
 .hrow{font-family:var(--mono);font-size:15.5px;color:var(--dim);margin:3px 0}
-.verdict-card{background:#0d2818;border:1px solid #238636;border-radius:9px;padding:13px 17px;
-margin:18px 0 4px;font-size:17px;font-weight:650;color:#7ee787}
+.verdict-card{border-radius:9px;padding:13px 17px;margin:18px 0 4px;font-size:17px;font-weight:650;
+display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.verdict-card.bear{background:#2a1013;border:1px solid #6e2126;color:#ff8a80}
+.verdict-card.bull{background:#0d2818;border:1px solid #238636;color:#7ee787}
+.verdict-card.warn{background:#2b2210;border:1px solid #6b5320;color:#e3b341}
+.verdict-card.flat{background:#161b22;border:1px solid var(--line);color:#c3ccd6}
+.verdict-card .stag{flex:0 0 auto}
 h3.sec{font-size:27px;color:#fff;font-weight:700;margin:48px 0 5px;padding-top:22px;
 border-top:1px solid var(--line);letter-spacing:-.02em;line-height:1.28}
 p.sdesc{color:var(--dim);font-size:17.5px;margin:6px 0 18px;font-style:italic;line-height:1.6}
@@ -489,6 +493,27 @@ def _grab(pat, text, group=1, default=None):
     return m.group(group).strip() if m else default
 
 
+VERDICT_WORDS = (
+    ("bear", ("absent", "leaving", "negative", "below", "draining", "sell", "bearish", "risk-off",
+              "underwater", "losing", "contraction", "outflow", "weak")),
+    ("bull", ("returning", "arriving", "positive", "above", "inflow", "bid present", "bullish",
+              "improving", "strong", "buying")),
+    ("warn", ("mixed", "caution", "conflict", "two-sided", "stretched")),
+)
+
+
+def verdict_stance(text):
+    """Colour the verdict by what it says, not by what colour the last build happened to use."""
+    t = (text or "").lower()
+    m = re.match(r"^\s*\[(bearish|bullish|caution|no signal)\]", t)
+    if m:
+        return {"bearish": "bear", "bullish": "bull", "caution": "warn", "no signal": "flat"}[m.group(1)]
+    for cls, words in VERDICT_WORDS:
+        if any(w in t for w in words):
+            return cls
+    return "flat"
+
+
 def kpi_tiles(raw):
     """Headline numbers as eight tiles laid out 4 x 2.
 
@@ -575,15 +600,12 @@ def kpi_tiles(raw):
         # days", which read like a count of days rather than a rank within 30 daily readings.
         # The note defines the measure BEFORE the percentile, spells the rank out as a count,
         # and says where the normal band comes from (p15-p85 = the middle 70% of the month).
-        n_lower = round(lsp * 30 / 100)
-        head = (f"Binance accounts long vs short. {n_lower} of the last 30 daily readings were "
-                f"lower. Normal band {c15}-{c85} = the middle 70% of the month, ")
         if crowd_long:
-            note = head + f"and {lsv} is ABOVE it: crowded long, so a squeeze DOWN has fuel."
+            note = f"Above the normal band ({c15}-{c85}): crowded long, squeeze risk is down."
         elif crowd_short:
-            note = head + f"and {lsv} is BELOW it: crowded short, so a squeeze UP has fuel."
+            note = f"Below the normal band ({c15}-{c85}): crowded short, squeeze risk is up."
         else:
-            note = head + f"so no crowding signal yet; crowded long starts above {c85}."
+            note = f"Inside the normal band ({c15}-{c85}): no crowding signal either way."
         # Same side rule as the RSI tile: name the smaller tail, so a 10th-pctile reading says
         # "bottom 10% of its own month" instead of a technically-true-but-useless "top 90%".
         sub = (f"bottom {lsp}% of its own month" if lsp <= 50
@@ -852,6 +874,9 @@ def build(raw=None):
     bnpx = _grab(r"\(Coinbase\)\s*\$([\d,]+)", raw, 1, "")
     usdt = _grab(r"USDT/USD\s+([\d.]+)", raw, 1, "")
     verdict = _grab(r"^VERDICT: (.+)$", raw, 1, "")
+    verdict_cls = verdict_stance(verdict)
+    verdict_tag = {"bear": "BEARISH", "bull": "BULLISH", "warn": "CAUTION",
+                   "flat": "NO SIGNAL"}[verdict_cls]
     # The digest stamps its own run time; the page must quote THAT as the data time. Using the
     # build clock made a page built from a 40-minute-old digest claim to be up to the minute.
     digest_ts = _grab(r"BTC daily read\s*\|\s*([\d\-]+ [\d:]+ UTC)", raw, 1, "")
@@ -973,6 +998,9 @@ def build(raw=None):
     build_stamp = _stamp()
     doc = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BTC Daily Digest</title>
 <meta name="digest-md5" content="{digest_md5}">
@@ -984,7 +1012,7 @@ def build(raw=None):
   <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated {updated} &middot; {build_stamp}</span></div>
   <div class="spotpx">${spot}</div>
   <div class="spotrow">{spot_extra}</div>
-  <div class="verdict-card">VERDICT: {esc(verdict)}</div>
+  <div class="verdict-card {verdict_cls}"><span class="stag {verdict_cls}">{verdict_tag}</span><span>{esc(verdict)}</span></div>
   {kpis}
   <nav class="tabs">
     <button class="on" data-t="dash">Dashboard</button>
@@ -998,10 +1026,10 @@ def build(raw=None):
 
 <section id="dash" class="tab on">
 <div class="legend">
-  <span class="lg"><b class="stag bear">BEARISH</b> money leaving</span>
-  <span class="lg"><b class="stag bull">BULLISH</b> money arriving</span>
-  <span class="lg"><b class="stag warn">CAUTION</b> risky either way</span>
-  <span class="lg"><b class="stag flat">NO SIGNAL</b> nothing to act on</span>
+  <span class="lg"><span class="stag bear">BEARISH</span> money leaving</span>
+  <span class="lg"><span class="stag bull">BULLISH</span> money arriving</span>
+  <span class="lg"><span class="stag warn">CAUTION</span> risky either way</span>
+  <span class="lg"><span class="stag flat">NO SIGNAL</span> nothing to act on</span>
   <span class="lg dim">prices are daily closes unless marked live</span>
 </div>
 {ladder_html}
