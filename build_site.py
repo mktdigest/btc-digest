@@ -418,14 +418,19 @@ _LEGEND = {"html": ""}
 
 
 def _stamp():
-    """Short hash + build time, printed in the header. Stops the 'is this the old page?' question."""
+    """Build time + a hash of the digest the page was built from.
+
+    The git hash was misleading: the page is built before the commit exists, so it always named the
+    previous commit. The digest hash changes exactly when the content does, which is the question
+    being asked ("am I looking at the old page?").
+    """
+    ts = datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")
     try:
-        h = subprocess.check_output(["git", "-C", os.path.dirname(os.path.abspath(__file__)),
-                                     "rev-parse", "--short", "HEAD"],
-                                    stderr=subprocess.DEVNULL).decode().strip()
+        with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "latest_digest.txt"), "rb") as f:
+            d = hashlib.md5(f.read()).hexdigest()[:6]
     except Exception:
-        h = "dev"
-    return f'build {h} &middot; {datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M")}Z'
+        d = "nofile"
+    return f'build {ts}Z &middot; digest {d}'
 
 
 def render_digest(raw):
