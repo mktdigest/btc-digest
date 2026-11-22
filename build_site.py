@@ -429,6 +429,33 @@ REF_CARDS = [
      '<p class="note">The Binance perp CVD line is the same idea on futures: '
      '<code>2&times;(taker buy vol) &minus; total vol</code>.</p>'),
 
+    ("Holder cost basis &mdash; what long-term and recent buyers actually paid", "Holder cost basis",
+     '<p><strong>What it is.</strong> Every coin carries the price of the last time it moved. Split '
+     'the supply by how long it has sat still &mdash; <strong>155 days</strong> is the standard line '
+     '&mdash; and you get two average purchase prices: <strong>LTH</strong> (long-term holders, coins '
+     'last moved over 155 days ago) and <strong>STH</strong> (short-term holders, moved within 155 '
+     'days). These are cost bases, not forecasts: they say what each group paid.</p>'
+     '<p><strong>Why the split matters.</strong> The two groups behave completely differently. A '
+     'recent buyer sitting 20% underwater is a seller the moment price returns to their entry &mdash; '
+     'that is the overhead supply. A long-term holder sitting in profit has no reason to sell into a '
+     'decline at all. So the same price fall produces selling from one group and nothing from the '
+     'other, which is why price can drop on falling volume.</p>'
+     '<p><strong>How to read the levels.</strong> Price at or below the <strong>STH cost</strong> '
+     'means recent buyers are underwater and rallies meet their break-even orders first. Price above '
+     'the <strong>LTH cost</strong> means the patient base is still in profit and not forced to sell '
+     '&mdash; that is what makes the LTH line the floor with actual holders behind it, rather than a '
+     'line drawn on a chart.</p>'
+     '<p><strong>The gap is the useful bit.</strong> When LTH cost sits far below STH cost, the crowd '
+     'sits on top of a much lower long-term base: the recent cohort is the fragile one, and its '
+     'break-even prices are what every rally has to chew through.</p>'
+     '<p class="note"><strong>Limits, stated on the block itself.</strong> The free tier only carries '
+     'this pair from November 2022 &mdash; 1,445 days &mdash; so the block refuses to make a '
+     'cycle-spanning claim. In that window price closed below the LTH cost basis exactly once '
+     '(Nov 2022&ndash;Jan 2023, reaching 23% below it), and six and twelve months after the start of '
+     'that episode price was up 65% and 131%. That is one observation: it is the only direct evidence '
+     'available, and it is not a statistic. Cost basis is a slow-moving average &mdash; a level to '
+     'lean on, never a trigger.</p>'),
+
     ("MVRV &mdash; market value vs realised value", "MVRV",
      '<p><strong>What it is.</strong> Every coin has a last-moved price, and the sum of those is the '
      '<em>realised cap</em> &mdash; the <strong>average price the whole market actually paid</strong>. '
