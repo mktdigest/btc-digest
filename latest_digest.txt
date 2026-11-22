@@ -1,14 +1,14 @@
-longs now      92,180 BTC   (sample min 55,229, max 92,187)
-  7d   change    +1,190 BTC
-  30d  change    +2,510 BTC
-  90d  change    +1,853 BTC
-cost basis of adds: 7d $59,252 (+1,775 BTC) | 30d $68,988 (+4,592 BTC) | 90d $74,351 (+8,130 BTC)
-premium now    Bitfinex $59,350 vs Binance $59,250 = +0.169%
-7d-add peaks: max +4,341 BTC; episodes n=10; surge median best 2.4% worst -20.4% (-10% hit 70.0%, +10% hit 0.0%) | baseline (n=1587) best 6.0% worst -7.1% (-10% hit 38.0%)
+longs now      92,184 BTC   (sample min 55,229, max 92,187)
+  7d   change    +1,189 BTC
+  30d  change    +2,514 BTC
+  90d  change    +1,850 BTC
+cost basis of adds: 7d $59,244 (+1,777 BTC) | 30d $68,978 (+4,596 BTC) | 90d $74,343 (+8,134 BTC)
+premium now    Bitfinex $59,377 vs Binance $59,287 = +0.152%
+7d-add peaks: max +4,341 BTC; episodes n=10; surge median best 2.4% worst -20.4% (-10% hit 70.0%, +10% hit 0.0%) | baseline (n=1587) best 6.1% worst -7.0% (-10% hit 39.0%)
 sample 2025-10-01 .. 2026-11-22 (9998 hours)
 saved state/bitfinex.json
-BTC daily read  |  2026-11-22 03:32 UTC
-spot $59,128 (Coinbase)   $59,257 (Binance)   USDT/USD 0.99777
+BTC daily read  |  2026-11-22 04:47 UTC
+spot $59,152 (Coinbase)   $59,287 (Binance)   USDT/USD 0.99777
 blocks use settled DAILY closes unless a line says 'live'
 VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
@@ -23,7 +23,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> [bear] ETF money still leaving: -$3,933.1M over 30d. (Prior run was 4d, latest day flat.)
 
 [2] Coinbase Premium Index - US vs global bid
-    live -0.217%   last close -0.216% (prev -0.232%)
+    live -0.228%   last close -0.216% (prev -0.232%)
     30d avg -0.146%   negative streak 78d   1y low -0.271%
     -> [bear] US still discounting to global for 78 straight days: US bid is the missing buyer.
 
@@ -33,14 +33,14 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
 [4] Stablecoin supply - is money coming back into crypto? (2026-11-22)
     USDT $174.5B   1d +$0.02B   7d -$0.92B   30d -$8.10B
-    USDC $68.7B   1d +$0.04B   7d -$0.56B   30d -$3.51B
-    USDT+USDC combined $243.2B   7d -$1.48B   30d -$11.61B
+    USDC $68.7B   1d +$0.04B   7d -$0.55B   30d -$3.51B
+    USDT+USDC combined $243.2B   7d -$1.48B   30d -$11.60B
     -> [bear] Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.
 
 [5] Spot taker flow by venue - net aggressive buying
-    Binance  1d -23m   7d -282m (-2.6% of vol)   30d +17m
-    OKX      48h -131m (-4.9% of vol)   (OKX publishes 48h only)
-    Coinbase live -4.6 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    Binance  1d -27m   7d -286m (-2.6% of vol)   30d +13m
+    OKX      48h -137m (-5.1% of vol)   (OKX publishes 48h only)
+    Coinbase live -1.7 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
     -> [bear] OKX net SELLING while Binance is flat.
     Binance PERP CVD 5d -5,366 BTC | 30d -1,860 BTC
@@ -57,10 +57,10 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> [flat] crowd mid-range (all-acct pctile 20): no crowding extreme; top traders ADDING longs (1.68->1.78); OI draining = deleveraging/liquidation, not new shorts.
 
 [7] Derivatives cost - funding rate & perp basis
-    funding now +0.0049% /8h  ->  +5.4% annualised
+    funding now +0.0067% /8h  ->  +7.4% annualised
     30d avg +0.0061% /8h  ->  +6.7% annualised   (positive in 93% of periods)
-    perp basis -0.066%  (mark 59,233 vs index 59,272)
-    perp 24h vol $20.8bn   last 24h +3.34%
+    perp basis -0.034%  (mark 59,265 vs index 59,285)
+    perp 24h vol $17.4bn   last 24h +5.49%
     -> [bear] longs pay shorts: leveraged longs still the crowded side, dips get flushed (bearish tilt).
 
 [8] Sentiment - Fear & Greed index
@@ -72,27 +72,27 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     WHAT THIS IS: people who borrowed dollars to buy BTC on Bitfinex and have not closed.
     It is leveraged money - it has to be repaid, so it tends to sell into rallies and gets
     liquidated on dips. Rising longs = someone is betting on higher prices with borrowed money.
-    size: 92,180 BTC - the most in 417 days of history (low 55,229)
+    size: 92,184 BTC - the most in 417 days of history (low 55,229)
     what they paid, averaged by the hour each position was added:
-      7d $59,252 on +1,775 BTC | 30d $68,988 on +4,592 BTC | 90d $74,351 on +8,130 BTC
-    Bitfinex trades 59,363 now -> last week's buys are +0.2%, the 30d are -14.0%, the 90d are -20.2%
-    premium +0.169% over Binance - they are still paying up on that one venue
+      7d $59,244 on +1,777 BTC | 30d $68,978 on +4,596 BTC | 90d $74,343 on +8,134 BTC
+    Bitfinex trades 59,377 now -> last week's buys are +0.2%, the 30d are -13.9%, the 90d are -20.1%
+    premium +0.152% over Binance - they are still paying up on that one venue
     WHAT IT MEANS FOR PRICE:
-      $59,252 is the live bid. That is where the newest leveraged buyers are long from,
+      $59,244 is the live bid. That is where the newest leveraged buyers are long from,
       so it is the line they defend and the line that triggers selling if it breaks.
-      $68,988 is overhead. The average 30-day buyer is -14.0% under water, so
+      $68,978 is overhead. The average 30-day buyer is -13.9% under water, so
       bounces run into people trying to get out even - which is why these rallies stall.
     WHAT HAPPENED LAST TIME (the part the tweets leave out): 10 earlier surges of this
       size (7d adds >= 2,170 BTC). Over the next 30 days the typical best
       case was +2.4% and the typical worst was -20.4% - against
-      +6.0% / -7.1% for a random hour in the same period.
-      70% of surges saw a 10% drop within 30 days vs 38%
-      normally, and 0% reached +10% vs 31% normally.
+      +6.1% / -7.0% for a random hour in the same period.
+      70% of surges saw a 10% drop within 30 days vs 39%
+      normally, and 0% reached +10% vs 32% normally.
       In plain terms: the buying was early, not smart. It marks a bid, not a bottom.
     LIMITS: one aggregate long book - no account sizes, no holders, so 'whales' is an inference
     from the venue, not something this series can show. Sample is 417 days of one regime, and
     10 episodes is thin. Treat it as context for the flow and positioning blocks, not a trigger.
--> [warn] a real bid at $59,252, and real overhead at $68,988. Historically these surges bought small bounces and deep dips first - support to watch, not a signal to front-run
+-> [warn] a real bid at $59,244, and real overhead at $68,978. Historically these surges bought small bounces and deep dips first - support to watch, not a signal to front-run
 
 ======================================================================
 3. PRICE STRUCTURE - where supply sits
@@ -104,8 +104,9 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     STH supply in loss 3,673,554 / profit 343,488 BTC (91% underwater)
     -> [bear] Short-term holders are largely underwater: capitulation zone; watch whether the 62-64K shelf holds.
 
-[11] Valuation floors - how far is the downside (spot $59,128)
+[11] Valuation floors - how far is the downside (spot $59,152)
     Balanced Price $38,169 (2026-11-21)  -> spot 1.55x
+    350-week MA $51,740  -> spot 1.14x (+14%)   (no weekly close below it in 499 weeks; closest ever 1.046x on 2023-01-01)
     AVWAP since 2015-07-20 $29,991 (thru 2026-11-21)  -> spot 1.97x
     -> [bear] Price is 1.5x the Balanced floor and 2.0x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,169.
 
@@ -114,7 +115,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     price) against the price now. 1.00 = the market exactly at break-even. Below 1.00 the
     average holder is under water - which has only ever happened near cycle bottoms.
     MVRV 1.109 live (settled 1.103 on 2026-11-21) | realised price $53,320
-    MVRV reaches 1.00 at $53,320 - that is -9.8% from spot
+    MVRV reaches 1.00 at $53,320 - that is -9.9% from spot
     cycle floors measured on our own 5,939-day series: 2011 0.386 | 2015 0.563 | 2019 0.690 | 2022 0.754
     this cycle's low so far: 1.103 (2026-11-21) - never went below 1.00
     WHAT IT IMPLIES FOR PRICE (two methods, and they disagree - that IS the answer):
@@ -138,7 +139,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 ======================================================================
 [13] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-21
     RSI(6) 20.7 | RSI(14) 22.6 | RSI(24) 27.8   (RSI14 1y percentile 3%)
-    same maths incl today's forming candle (live $59,128): RSI(6) 18.5 | RSI(14) 21.5  <- drifts until the close
+    weekly RSI(14) 32.8   (sub-30 on only 8 weeks in 16 yrs: 2015-01, 2022-06, 2026-02 - a bottom marker, not a trigger)
+    same maths incl today's forming candle (live $59,152): RSI(6) 18.6 | RSI(14) 21.5  <- drifts until the close
     -> [warn] oversold <30: capitulation zone, historically where bounces start; fast < slow = momentum deteriorating, bounces are being sold into.
 
 [14] Divergence - 20d price low vs RSI14 (the only RSI signal with an edge)
@@ -151,8 +153,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.
 ======================================================================
 [15] Short-fade watch - fade the bounce at resistance (the only positive-EV side)
-    MA200 72,426 | MA50 77,136 | MA10 64,253   -> spot 59,128 is -18.4% vs MA200
-    -> [flat] NOT ARMED - RSI14 22.6, needs to cross 40 (+17 pts). MA200 72,426 is +22.5% from spot
+    MA200 72,426 | MA50 77,136 | MA10 64,253   -> spot 59,152 is -18.3% vs MA200
+    -> [flat] NOT ARMED - RSI14 22.6, needs to cross 40 (+17 pts). MA200 72,426 is +22.4% from spot
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first
 
 

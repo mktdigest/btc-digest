@@ -524,12 +524,25 @@ REF_CARDS = [
      'candle) it is the break-even price of every Coinbase buyer since the exchange opened. Above '
      'it the average buyer is in profit; below it, underwater.</p>'
      '<p><strong>Balanced Price</strong> (realized price &minus; transferred price) is where past '
-     'cycle bottoms have converged (~1.0x). Both are deep floors, not timing triggers.</p>'),
+     'cycle bottoms have converged (~1.0x). Both are deep floors, not timing triggers.</p>'
+     '<p><strong>The 350-week MA</strong> is the long-term trend line with a perfect record: in '
+     '<strong>499 weeks</strong> since it existed, there has not been <strong>one weekly close '
+     'below it</strong>, and the closest approach was <strong>1.046x in January 2023</strong>. That '
+     'makes it a hard reference rather than a fitted guess &mdash; the difference between &ldquo;price '
+     'has always bounced around here&rdquo; and &ldquo;price has never once settled below here.&rdquo; '
+     'It is not a magnet: 2023 bottomed 4.6% above it and turned. Treat it as the line where the '
+     'long-term trend would actually break, not as a bounce trigger.</p>'),
 
     ("RSI &mdash; momentum", "RSI - momentum",
      '<p>Wilder RSI on <strong>daily closes only</strong>, printed two ways so they never have to '
      'be reconciled: <strong>settled</strong> (completed days, stable, what to reason with) and '
      '<strong>incl. today&rsquo;s forming candle</strong> (what a live chart shows, drifts all day).</p>'
+     '<p><strong>Weekly RSI</strong> is printed underneath for context, because it answers a '
+     'different question: daily RSI fires dozens of times a cycle, weekly RSI below 30 has happened '
+     'in only <strong>8 weeks in 16 years</strong> &mdash; January 2015, June 2022 and February '
+     '2026. It is a bottom marker, not a trade signal: the last three prints were followed within '
+     'six months by a best case of +47%, +28% and +20% and a worst case of 0%, &minus;13% and '
+     '&minus;11%.</p>'
      '<p class="note">RSI(6) &gt; RSI(14) &gt; RSI(24) = short-term momentum leading. '
      'RSI(6) &lt; RSI(24) = deteriorating, bounces being sold into. Never quote an RSI without its '
      'timeframe &mdash; the same market reads 62 on 1H and 9 on 1D.</p>'),
