@@ -4,7 +4,7 @@
 Why this file exists. The numeric audit compares numbers against sources, so it passed while:
   * the score bands were painted the full height of the 0-100 axis (a geometry bug - correct data,
     meaningless picture);
-  * the S2 card printed "/20" when its fitted weight caps it at 12.7 (a label bug - the number was
+  * the S2 card once printed "/12.7" because a fitted weight capped it (removed: equal weight now)
     right, the scale it was read against was wrong);
   * PIL raised on every build and build_site swallowed it, shipping a page 47KB smaller with the
     whole Bottom Score tab replaced by "unavailable" (a build bug - both audits were green).
@@ -44,7 +44,8 @@ def bad(m):
 
 # ---------------------------------------------------------------- gate 3 (pure, testable)
 def check_labels(pairs, weights):
-    """pairs: [(key, printed_ceiling)] - the printed max must equal 20 * fitted weight."""
+    """pairs: [(key, printed_ceiling)] - every signal is graded 0-20, equal weight, so the ceiling
+    a card prints must equal 20."""
     out = []
     for key, printed in pairs:
         want = round(20.0 * weights.get(key, 1.0), 1)
@@ -71,13 +72,13 @@ def check_bands(bands, zone_bottom, plot_bottom, n_episodes):
 
 # ---------------------------------------------------------------- selftest
 def selftest():
-    weights = {"S1": 1.0, "S2": 0.6341565517434212, "S3": 1.0, "S4": 1.0, "S5": 1.0}
+    weights = {"S1": 1.0, "S2": 1.0, "S3": 1.0, "S4": 1.0, "S5": 1.0}
     caught = []
 
-    bug1 = check_labels([("S2", 20.0)], weights)                    # the shipped bug
-    caught.append(("label /20 on a 0.634-weighted signal", bool(bug1)))
+    bug1 = check_labels([("S2", 12.7)], weights)                    # the shipped bug, now impossible
+    caught.append(("label /12.7 on an equal-weight signal", bool(bug1)))
 
-    good = check_labels([("S2", 12.7)], weights)
+    good = check_labels([("S2", 20.0)], weights)
     caught.append(("label /12.7 accepted (no false positive)", not good))
 
     # the shipped band bug: rectangles painted plot-top to plot-bottom
@@ -140,7 +141,7 @@ def main():
         ok("no stray stdout in the page")
 
     # ---- gate 3: card ceilings vs fitted weights
-    weights = json.loads((BOTTOM / "state" / "model_h.json").read_text())["weights"]
+    weights = {k: 1.0 for k in ("S1", "S2", "S3", "S4", "S5")}
     cards = re.findall(r'class="btitle">(S\d) &middot;.*?bbignum"[^>]*>([\d.]+)'
                        r'<span class="bof">/([\d.]+)</span>', html, re.S)
     if not cards:
@@ -151,7 +152,7 @@ def main():
         if not e and float(val) > float(ceil) + 0.05:
             bad(f"{key}: value {val} exceeds its printed ceiling {ceil}")
     if not errs:
-        ok(f"{len(cards)} card ceilings match fitted weights "
+        ok(f"{len(cards)} card ceilings match the equal-weight 20-point scale "
            f"(S2 = {round(20 * weights['S2'], 1)})")
 
     # ---- gate 4: band geometry, drawn by the real chart code
@@ -170,11 +171,13 @@ def main():
             run = False
     if run:
         eps += 1
+    # cycle-bottom markers come from our own series now, so this audit never needs an outside file
+    import sys as _sys
+    _sys.path.insert(0, str(BOTTOM))
+    import own_stats
     with tempfile.TemporaryDirectory() as td:
         info = bottom_chart.draw(Path(td) / "probe.png", ser,
-                                [(b["date"], b["price"]) for b in
-                                 json.loads((BOTTOM / "state" / "seanzhao_reference.json")
-                                            .read_text()).get("cycle_bottoms", [])])
+                                 [(b["date"], b["price"]) for b in own_stats.cycle_bottoms(ser)])
     if not isinstance(info, dict) or "bands" not in info:
         bad("bottom_chart.draw did not return band geometry - cannot verify the shading")
     else:
