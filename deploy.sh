@@ -22,10 +22,11 @@ LOCAL=$(md5sum index.html | cut -c1-32)
 echo "waiting for GitHub Pages (local md5 ${LOCAL:0:10})..."
 for i in $(seq 1 40); do
   sleep 8
-  BODY=$(curl -s -H 'Cache-Control: no-cache' "https://mktdigest.github.io/btc-digest/?cb=$(date +%s%N)")
-  LIVE=$(printf '%s' "$BODY" | md5sum | cut -c1-32)
+  curl -s -H 'Cache-Control: no-cache' -o /tmp/live_page.html \
+       "https://mktdigest.github.io/btc-digest/?cb=$(date +%s%N)"
+  LIVE=$(md5sum /tmp/live_page.html | cut -c1-32)
   if [ "$LIVE" = "$LOCAL" ]; then
-    if [ -z "$MARKER" ] || printf '%s' "$BODY" | grep -qF "$MARKER"; then
+    if [ -z "$MARKER" ] || grep -qF "$MARKER" /tmp/live_page.html; then
       echo "LIVE OK after $((i*8))s (md5 ${LIVE:0:10}${MARKER:+, marker found})"
       exit 0
     fi
