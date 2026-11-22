@@ -84,10 +84,10 @@ padding:4px 12px;border-radius:7px;margin-left:10px;vertical-align:3px;white-spa
 .sbadge.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
 .sbadge.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
 .key{margin:16px 0 2px;font-size:16px;color:var(--dim);line-height:2.1}
-.legend{display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center;margin:10px 0 26px;
-font-size:15px;color:#a9b4c0;padding:0;background:none;border:0;border-radius:0}
-.legend .lg{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;color:#c3ccd6}
-.legend .lg.dim{color:#78838f}
+.keys{display:grid;gap:12px;margin:18px 0 6px}
+.keyrow{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center;
+font-size:15px;color:#a9b4c0;line-height:1.55}
+@media(max-width:640px){.keyrow{grid-template-columns:1fr}}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
 table{width:100%;border-collapse:collapse;margin:13px 0;font-size:16.5px;display:block;overflow-x:auto}
@@ -1025,13 +1025,6 @@ def build(raw=None):
 </header>
 
 <section id="dash" class="tab on">
-<div class="legend">
-  <span class="lg"><span class="stag bear">BEARISH</span> money leaving</span>
-  <span class="lg"><span class="stag bull">BULLISH</span> money arriving</span>
-  <span class="lg"><span class="stag warn">CAUTION</span> risky either way</span>
-  <span class="lg"><span class="stag flat">NO SIGNAL</span> nothing to act on</span>
-  <span class="lg dim">prices are daily closes unless marked live</span>
-</div>
 {ladder_html}
 {blocks_html}
 </section>
@@ -1080,10 +1073,14 @@ def build(raw=None):
 positioning and sentiment, then price structure, momentum, and finally the trading signals.</p>
 <p class="bline">If flow is bearish, everything below it is a bounce to sell. Every block ends with a
 tagged verdict, and each section header carries its tally.</p>
-<p class="bline">The tag colour is the stance, not the tone of the wording: BEARISH means capital or
-demand is leaking, or the crowd is leaning the wrong way. BULLISH means capital or demand is arriving.
-CAUTION means contrarian or bounce risk - act carefully. NO SIGNAL means nothing directional, so do not
-force a trade.</p>
+<p class="bline">Every block ends with a coloured tag. The colour is the stance, not the tone of the
+wording.</p>
+<div class="keys">
+  <div class="keyrow"><span class="stag bear">BEARISH</span><span>Money or demand is leaving, or the crowd is leaning the wrong way.</span></div>
+  <div class="keyrow"><span class="stag bull">BULLISH</span><span>Money or demand is arriving.</span></div>
+  <div class="keyrow"><span class="stag warn">CAUTION</span><span>Contrarian or bounce risk. Act carefully, if at all.</span></div>
+  <div class="keyrow"><span class="stag flat">NO SIGNAL</span><span>Nothing directional. Do not force a trade.</span></div>
+</div>
 <p class="bline">All blocks use settled daily closes unless a line says "live".</p>
 </div>
 </div>

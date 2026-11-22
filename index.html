@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BTC Daily Digest</title>
 <meta name="digest-md5" content="39ec52e6bc4f">
-<meta name="page-built" content="2026-11-22 07:31 UTC">
+<meta name="page-built" content="2026-11-22 07:33 UTC">
 <meta name="description" content="Daily Bitcoin flow, positioning and momentum digest with backtested rules.">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -68,10 +68,10 @@ padding:4px 12px;border-radius:7px;margin-left:10px;vertical-align:3px;white-spa
 .sbadge.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
 .sbadge.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
 .key{margin:16px 0 2px;font-size:16px;color:var(--dim);line-height:2.1}
-.legend{display:flex;flex-wrap:wrap;gap:12px 26px;align-items:center;margin:10px 0 26px;
-font-size:15px;color:#a9b4c0;padding:0;background:none;border:0;border-radius:0}
-.legend .lg{display:inline-flex;align-items:center;gap:9px;white-space:nowrap;color:#c3ccd6}
-.legend .lg.dim{color:#78838f}
+.keys{display:grid;gap:12px;margin:18px 0 6px}
+.keyrow{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center;
+font-size:15px;color:#a9b4c0;line-height:1.55}
+@media(max-width:640px){.keyrow{grid-template-columns:1fr}}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
 table{width:100%;border-collapse:collapse;margin:13px 0;font-size:16.5px;display:block;overflow-x:auto}
@@ -141,7 +141,7 @@ font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
 </style></head><body><div class="wrap">
 <header>
   <h1>BTC Daily Digest</h1>
-  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated 2026-11-22 06:07 UTC &middot; build 2026-11-22 07:31Z &middot; digest 39ec52</span></div>
+  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated 2026-11-22 06:07 UTC &middot; build 2026-11-22 07:33Z &middot; digest 39ec52</span></div>
   <div class="spotpx">$59,014</div>
   <div class="spotrow"><span><b>Binance</b>$59,146</span><span><b>Coinbase &minus; Binance</b>-132 (-0.22%)</span><span><b>USDT/USD</b>0.99778</span></div>
   <div class="verdict-card bear"><span class="stag bear">BEARISH</span><span>US bid ABSENT - premium negative, 30d mean at lows</span></div>
@@ -157,13 +157,6 @@ font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
 </header>
 
 <section id="dash" class="tab on">
-<div class="legend">
-  <span class="lg"><span class="stag bear">BEARISH</span> money leaving</span>
-  <span class="lg"><span class="stag bull">BULLISH</span> money arriving</span>
-  <span class="lg"><span class="stag warn">CAUTION</span> risky either way</span>
-  <span class="lg"><span class="stag flat">NO SIGNAL</span> nothing to act on</span>
-  <span class="lg dim">prices are daily closes unless marked live</span>
-</div>
 <div class="ccard wide"><h4>Where price sits - every level on one ladder</h4><div class="cnow"><span class="chip">spot $59,014</span><span class="chip">STH cost $75,049</span><span class="chip">200-day MA (fade line) $72,426</span><span class="chip">350-week MA $51,740</span></div><img src="c_levels.png?v=e92d22156c" alt="Where price sits - every level on one ladder"><p class="cuse"><strong>How to use it:</strong> The blue line is today&#x27;s price. Levels above it are where people who bought higher are waiting to sell. Levels below it are prices where buyers have stepped in before. The percentage next to each level is how far price is from it today. Nearest floor: 350-week MA at $51,740.</p></div>
 <div class="hrow">blocks use settled DAILY closes unless a line says &#x27;live&#x27;</div>
 <h3 class="sec">1. FLOW - where the money is going <span class="sbadge bear">NET BEARISH - 5 bearish</span></h3>
@@ -261,7 +254,7 @@ not the next 48 hours.</p>
   (1.10x), 22% of the market cap under water,
   Fear &amp; Greed at 12, and the capital-flow divergence trigger is active.</p>
   <p class="bmeta">Scored on the settled 2026-11-20 close &middot; S1-S5 sum to the headline &middot;
-  model run 2026-11-22 07:31 UTC</p>
+  model run 2026-11-22 07:33 UTC</p>
   <p class="btension">Read this next to the flow verdict above, which is bearish. That combination &mdash; cheap on-chain, money still leaving &mdash; is what the marked cycle bottoms looked like: price reaches fair value before flow turns.</p>
 </div>
 
@@ -349,7 +342,7 @@ week or more - so the band is a claim you can check, not a belief.</p>
 
 <div class="bcard3">
   <h4>Price against the score, 2018-2026</h4>
-  <img src="bottom_chart.png?v=1795332711" alt="BTC price vs bottom score with accumulate zones shaded">
+  <img src="bottom_chart.png?v=1795332833" alt="BTC price vs bottom score with accumulate zones shaded">
   <p class="bnote">The shaded top strip is the score-60-to-100 zone, and the solid green bars inside it
   are the 17 stretches where the score held 60 or above - 101 days in total, roughly 2.5% of the series.
   A bar's width is how long the condition lasted, its height has no meaning. Amber dots are the marked
@@ -496,10 +489,14 @@ comparison rather than a claim. His score is grey, ours green.</p>
 positioning and sentiment, then price structure, momentum, and finally the trading signals.</p>
 <p class="bline">If flow is bearish, everything below it is a bounce to sell. Every block ends with a
 tagged verdict, and each section header carries its tally.</p>
-<p class="bline">The tag colour is the stance, not the tone of the wording: BEARISH means capital or
-demand is leaking, or the crowd is leaning the wrong way. BULLISH means capital or demand is arriving.
-CAUTION means contrarian or bounce risk - act carefully. NO SIGNAL means nothing directional, so do not
-force a trade.</p>
+<p class="bline">Every block ends with a coloured tag. The colour is the stance, not the tone of the
+wording.</p>
+<div class="keys">
+  <div class="keyrow"><span class="stag bear">BEARISH</span><span>Money or demand is leaving, or the crowd is leaning the wrong way.</span></div>
+  <div class="keyrow"><span class="stag bull">BULLISH</span><span>Money or demand is arriving.</span></div>
+  <div class="keyrow"><span class="stag warn">CAUTION</span><span>Contrarian or bounce risk. Act carefully, if at all.</span></div>
+  <div class="keyrow"><span class="stag flat">NO SIGNAL</span><span>Nothing directional. Do not force a trade.</span></div>
+</div>
 <p class="bline">All blocks use settled daily closes unless a line says "live".</p>
 </div>
 </div>
@@ -538,7 +535,7 @@ force a trade.</p>
 <footer>
 <p>Generated automatically from keyless public APIs (Coinbase, Binance, DeFiLlama, cryptoetf.today, Look Into Bitcoin, BGeometrics, alternative.me). No credentials, no subscription feeds.</p>
 <p>Not financial advice. Backtest figures are historical and samples are small where noted.</p>
-<p>Data as of 2026-11-22 06:07 UTC &middot; page built 2026-11-22 07:31 UTC</p>
+<p>Data as of 2026-11-22 06:07 UTC &middot; page built 2026-11-22 07:33 UTC</p>
 </footer>
 <script>
 document.querySelectorAll('.tabs button').forEach(function(b){
