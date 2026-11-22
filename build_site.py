@@ -50,9 +50,27 @@ h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:16.5px}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px;margin:13px 0}
-.card pre{font-family:var(--mono);font-size:16px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
+.card pre{font-family:var(--mono);font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
+.card{padding:19px 21px 17px}
+.card h3{font-size:17px;line-height:1.4;margin:0 0 4px}
+.bbody{margin:15px 0 0;font-size:15.5px;line-height:1.68;color:#cdd6e0}
+.blead{margin:0 0 16px;padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:14.5px;line-height:1.6}
+.frow{display:grid;grid-template-columns:minmax(112px,168px) 1fr;gap:4px 16px;padding:8px 0;border-top:1px solid rgba(255,255,255,.055)}
+.frow:first-of-type{border-top:0}
+.fk{color:#8b949e;font-size:13px;line-height:1.55;letter-spacing:.01em}
+.fv{color:#e6edf3;line-height:1.6}
+.bline{margin:0 0 13px}
+.bline:last-of-type{margin-bottom:0}
+.bsec{margin:16px 0 0;padding:13px 15px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.05);border-radius:8px}
+.bsec p{margin:5px 0 0;line-height:1.62}
+.bseck{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8b949e}
+.vbox{margin:18px 0 0;padding:13px 15px;border-radius:8px;border-left:3px solid;background:rgba(255,255,255,.028)}
+.vtext{margin:6px 0 0;font-size:15px;line-height:1.6;color:#dfe6ee}
+.vbox.bear{border-color:#f85149}.vbox.bull{border-color:#3fb950}
+.vbox.warn{border-color:#d29922}.vbox.flat{border-color:#6e7681}
 .verdict{color:var(--dim);font-weight:600}
 .vline{display:block;font-weight:650}
+.vbox .stag{margin:0 0 2px}
 .vline .stag,.key .stag{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.06em;
 padding:2px 8px;border-radius:5px;margin-right:9px;vertical-align:1px}
 .vline.bear{color:#ff8a80}.vline.bear .stag,.key .stag.bear{background:#3d1418;color:#ff8a80;border:1px solid #6e2126}
@@ -181,9 +199,57 @@ def fmt_line(line):
         return f'<span class="alert">{e}</span>'
     return e
 
+LEAD_LABELS = ("ONE LINE", "WHAT THIS IS", "WHAT IT IS")
+SECTION_LABELS = ("HISTORY", "LIMITS", "GAP", "CLOCK", "FLOOR PRICE")
 
-# One relevant chart per block, shown INSIDE the card on the dashboard. The chart is the same PNG the
-# Charts tab uses - no second copy, no chance of the two disagreeing.
+
+def render_body(lines):
+    """Simple, reliable reflow.
+
+    - Lead line (ONE LINE / WHAT THIS IS) becomes a muted intro paragraph.
+    - Remaining text is joined on lines that do not end a sentence.
+    - Verdict line becomes a styled callout box.
+    - Sections (HISTORY, LIMITS, etc.) get their own small heading.
+    """
+    items = []
+    for raw in lines:
+        line = raw.strip()
+        if not line:
+            continue
+        m = re.match(r"^->\s*\[(bear|bull|warn|flat)\]\s*(.+)$", line)
+        if m:
+            items.append(("verdict", m.group(1), m.group(2)))
+            continue
+        head = re.match(r"^([A-Z][A-Z ()]{2,22}):\s*(.+)$", line)
+        if head and head.group(1) in LEAD_LABELS:
+            items.append(("lead", "", head.group(2)))
+            continue
+        if head and head.group(1) in SECTION_LABELS:
+            items.append(("sec", head.group(1), head.group(2)))
+            continue
+        if items and items[-1][0] in ("text", "lead", "sec"):
+            prev = items[-1][2]
+            if not prev.rstrip().endswith((".", "!", "?", ":", "-")):
+                items[-1] = (items[-1][0], items[-1][1], (prev + " " + line).strip())
+                continue
+        items.append(("text", "", line))
+
+    out = []
+    for kind, label, text in items:
+        t = esc(text)
+        if kind == "verdict":
+            out.append(f'<div class="vbox {label}"><span class="stag">{STANCE_LABEL[label]}</span>'
+                       f'<p class="vtext">{t}</p></div>')
+        elif kind == "lead":
+            out.append(f'<p class="blead">{t}</p>')
+        elif kind == "sec":
+            out.append(f'<div class="bsec"><span class="bseck">{esc(label.title())}</span>'
+                       f'<p>{t}</p></div>')
+        else:
+            out.append(f'<p class="bline">{t}</p>')
+    return '<div class="bbody">' + "".join(out) + "</div>"
+
+
 BLOCK_CHARTS = {
     "1":  ("c_etf.png", "Daily net ETF flow, $M - bars in, bars out"),
     "2":  ("c_premium.png", "Coinbase premium over Binance, % - the US bid line"),
@@ -197,8 +263,6 @@ BLOCK_CHARTS = {
     "14": ("c_rsi.png", "RSI, daily - the oversold line is 30"),
 }
 
-# What the numbers in each block ARE - one line, in the reader's language. The Reference tab keeps
-# the long version; this is the key so a block can never be a wall of unexplained figures.
 BLOCK_FIELDS = {
     "1":  "latest = yesterday's net creation (T+1 = published a day late); 5d/10d/30d = running sums",
     "2":  "live = now, last close = settled; 30d avg = the trend; streak = days one sign; 1y low = the extreme",
@@ -240,6 +304,13 @@ def render_blocks(lines):
         if not any(x.strip() for x in body):
             continue
         num = (re.match(r"\[(\d+[a-z]?)\]", title) or [None, ""])[1]
+        # split the trailing verdict off the body: it is a callout, not a line of text
+        body_txt, verdict_line = [], None
+        for ln in body:
+            if re.match(r"^\s*->\s*\[(bear|bull|warn|flat)\]", ln) and ln.strip():
+                verdict_line = ln
+            else:
+                body_txt.append(ln)
         extra = ""
         fields = BLOCK_FIELDS.get(num)
         if fields:
@@ -256,8 +327,10 @@ def render_blocks(lines):
                 pass
             extra += (f'<figure class="bchart"><img src="{ch[0]}?v={ver}" alt="{esc(ch[1])}" '
                       f'loading="lazy"><figcaption>{esc(ch[1])}</figcaption></figure>')
-        out.append(f'<div class="card"><h3>{esc(title)}</h3><pre>'
-                   + "\n".join(fmt_line(l) for l in body) + f"</pre>{extra}</div>")
+        body_html = render_body(body_txt)
+        if verdict_line:
+            body_html += render_body([verdict_line])
+        out.append(f'<div class="card"><h3>{esc(title)}</h3>{body_html}{extra}</div>')
     return "\n".join(out)
 
 
