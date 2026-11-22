@@ -796,8 +796,13 @@ def build(raw=None):
     ladder_html = ""
     for m in chart_meta:
         if m.get("file") == "c_levels.png":
+            # the ladder is a map, not a verdict: its "nearest floor" line goes into the caption.
+            # Left as a -> line it reads as an untagged stance and trips the page audit.
+            use_txt = m.get("use", "")
+            if m.get("verdict"):
+                use_txt += " Nearest floor: " + m["verdict"].replace("nearest floor ", "") + "."
             ladder_html = card(m["title"], esc(m["file"]), m["title"], m.get("now"),
-                               m.get("use", ""), m.get("verdict", ""), " wide")
+                               use_txt, "", " wide")
             break
 
     # Bottom score tab, built by the engine in /root/btc-bottom. If it fails, say so on the page
