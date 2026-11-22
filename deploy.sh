@@ -7,6 +7,9 @@ cd /root/btc-digest-site
 
 MSG="${1:-site update}"
 MARKER="${2:-}"
+# consistency gate: one metric, one number, everywhere it appears
+python3 audit_consistency.py || { echo "ABORT: consistency audit failed, nothing pushed"; exit 1; }
+
 python3 build_site.py | tail -1
 
 if git diff --quiet && git diff --cached --quiet; then
