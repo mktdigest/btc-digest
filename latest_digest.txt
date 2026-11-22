@@ -1,14 +1,5 @@
-longs now      92,192 BTC   (sample min 55,229, max 92,192)
-  7d   change    +1,198 BTC
-  30d  change    +2,523 BTC
-  90d  change    +1,852 BTC
-cost basis of adds: 7d $59,228 (+1,780 BTC) | 30d $68,959 (+4,604 BTC) | 90d $74,325 (+8,135 BTC)
-premium now    Bitfinex $59,186 vs Binance $59,079 = +0.181%
-7d-add peaks: max +4,341 BTC; episodes n=10; surge median best 2.4% worst -20.4% (-10% hit 70.0%, +10% hit 0.0%) | baseline (n=1587) best 6.1% worst -7.0% (-10% hit 38.0%)
-sample 2025-10-01 .. 2026-11-22 (9998 hours)
-saved state/bitfinex.json
-BTC daily read  |  2026-11-22 06:05 UTC
-spot $58,965 (Coinbase)   $59,101 (Binance)   USDT/USD 0.99779
+BTC daily read  |  2026-11-22 06:07 UTC
+spot $59,014 (Coinbase)   $59,146 (Binance)   USDT/USD 0.99778
 blocks use settled DAILY closes unless a line says 'live'
 VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 
@@ -23,7 +14,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> [bear] ETF money still leaving: -$3,933.1M over 30d. (Prior run was 4d, latest day flat.)
 
 [2] Coinbase Premium Index - US vs global bid
-    live -0.231%   last close -0.216% (prev -0.232%)
+    live -0.223%   last close -0.216% (prev -0.232%)
     30d avg -0.146%   negative streak 78d   1y low -0.271%
     -> [bear] US still discounting to global for 78 straight days: US bid is the missing buyer.
 
@@ -38,9 +29,9 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> [bear] Stablecoin supply contracting on both windows: capital is leaving crypto, not waiting in it.
 
 [5] Spot taker flow by venue - net aggressive buying
-    Binance  1d -31m   7d -290m (-2.6% of vol)   30d +9m
-    OKX      48h -145m (-5.4% of vol)   (OKX publishes 48h only)
-    Coinbase live +0.1 BTC (last 1000 trades = minutes; CONTEXT ONLY)
+    Binance  1d -31m   7d -289m (-2.6% of vol)   30d +9m
+    OKX      48h -146m (-5.5% of vol)   (OKX publishes 48h only)
+    Coinbase live +0.2 BTC (last 1000 trades = minutes; CONTEXT ONLY)
     Bybit    n/a (publishes no taker split)
     -> [bear] OKX net SELLING while Binance is flat.
     Binance PERP CVD 5d -5,366 BTC | 30d -1,860 BTC
@@ -57,10 +48,10 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     -> [flat] crowd mid-range (all-acct pctile 20): no crowding extreme; top traders ADDING longs (1.68->1.78); OI draining = deleveraging/liquidation, not new shorts.
 
 [7] Derivatives cost - funding rate & perp basis
-    funding now +0.0082% /8h  ->  +8.9% annualised
+    funding now +0.0081% /8h  ->  +8.9% annualised
     30d avg +0.0061% /8h  ->  +6.7% annualised   (positive in 93% of periods)
-    perp basis -0.046%  (mark 59,060 vs index 59,087)
-    perp 24h vol $16.8bn   last 24h +5.96%
+    perp basis -0.051%  (mark 59,122 vs index 59,152)
+    perp 24h vol $16.8bn   last 24h +5.99%
     -> [bear] longs pay shorts: leveraged longs still the crowded side, dips get flushed (bearish tilt).
 
 [8] Sentiment - Fear & Greed index
@@ -94,8 +85,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
     STH supply in loss 3,673,554 / profit 343,488 BTC (91% underwater)
     -> [bear] Short-term holders are largely underwater: capitulation zone; watch whether the 62-64K shelf holds.
 
-[11] Valuation floors - how far is the downside (spot $58,965)
-    Balanced Price $38,169 (2026-11-21)  -> spot 1.54x
+[11] Valuation floors - how far is the downside (spot $59,014)
+    Balanced Price $38,169 (2026-11-21)  -> spot 1.55x
     350-week MA $51,740  -> spot 1.14x (+14%)   (0 weekly closes below it in 499 weeks tested; closest ever 1.046x on 2023-01-01)
     AVWAP since 2015-07-20 $29,991 (thru 2026-11-21)  -> spot 1.97x
     -> [bear] Price is 1.5x the Balanced floor and 2.0x the all-time VWAP. Prior cycle bottoms converged to ~1.0x Balanced, so a full retest means roughly $38,169.
@@ -103,7 +94,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 [12] MVRV - market value vs realised value: how cheap is this, really
     ONE LINE: market value / realised value - price vs the average price every coin last moved
     at. 1.00 = break-even for the average holder; below it they are underwater.
-    MVRV 1.106 live (1.103 settled 2026-11-21) | realised $53,320 -> 1.00 is -9.6% away
+    MVRV 1.107 live (1.103 settled 2026-11-21) | realised $53,320 -> 1.00 is -9.6% away
     cycle floors, our own 5,939-day series: 2011 0.386 | 2015 0.563 | 2019 0.690 | 2022 0.754
     this cycle's low 1.103 (2026-11-21) - has not gone below 1.00
     FLOOR PRICE: increments shrink (+0.177, +0.127, +0.063) -> 0.785 = $41,880
@@ -133,7 +124,7 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
 [14] RSI - momentum on DAILY candles (Wilder) - settled thru 2026-11-21
     RSI(6) 20.7 | RSI(14) 22.6 | RSI(24) 27.8   (RSI14 1y percentile 3%)
     weekly RSI(14) 32.8   (sub-30 on only 8 weeks in 16 yrs: 2015-01, 2022-06, 2026-02 - a bottom marker, not a trigger)
-    same maths incl today's forming candle (live $58,965): RSI(6) 18.2 | RSI(14) 21.3  <- drifts until the close
+    same maths incl today's forming candle (live $59,014): RSI(6) 18.3 | RSI(14) 21.4  <- drifts until the close
     -> [warn] oversold <30: capitulation zone, historically where bounces start; fast < slow = momentum deteriorating, bounces are being sold into.
 
 [15] Divergence - 20d price low vs RSI14 (the only RSI signal with an edge)
@@ -146,8 +137,8 @@ VERDICT: US bid ABSENT - premium negative, 30d mean at lows
    Only the actionable lines. One positive-EV setup exists: fade the bounce at MA200.
 ======================================================================
 [16] Short-fade watch - fade the bounce at resistance (the only positive-EV side)
-    MA200 72,426 | MA50 77,136 | MA10 64,253   -> spot 58,965 is -18.6% vs MA200
-    -> [flat] NOT ARMED - RSI14 22.6, needs to cross 40 (+17 pts). MA200 72,426 is +22.8% from spot
+    MA200 72,426 | MA50 77,136 | MA10 64,253   -> spot 59,014 is -18.5% vs MA200
+    -> [flat] NOT ARMED - RSI14 22.6, needs to cross 40 (+17 pts). MA200 72,426 is +22.7% from spot
     oversold now - the setup is a bounce that carries RSI14 to 40 near MA200, then rolls over. Fading at 65K is early: only 34% reach 70K first
 
 
