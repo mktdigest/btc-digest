@@ -142,6 +142,7 @@ h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--accent)
 #bottom > h3.bsub + p{margin-top:10px}
 #bottom > table + p,
 #bottom > .bgrid + p,
+#bottom > .bgrid2 + p,
 #bottom > .bcard3 + p,
 #bottom > .hrow + p{margin-top:14px}             /* a caption owns the data it comments on */
 #dash > .hrow{margin-top:18px}
