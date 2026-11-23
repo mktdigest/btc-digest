@@ -146,6 +146,8 @@ h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--accent)
    lead-ins (captions) keep the 32px block gap, so they stay attached to what they describe. */
 #bottom > h2 + p + *,
 #bottom > h3.bsub + p + *{margin-top:14px}
+#bottom > .bhero2 + .bgrid2{margin-top:14px}    /* no heading: the tiles belong to the score box */
+#bottom > .bnote + .bcard3{margin-top:56px}      /* the chart is a section of its own, not a caption */
 #bottom > table + p,
 #bottom > .bgrid + p,
 #bottom > .bgrid2 + p,
