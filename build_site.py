@@ -38,8 +38,8 @@ h1{font-size:38px;font-weight:680;letter-spacing:-.02em}
 /* Spot is the number that matters - give it the top of the page at display size. The big figure
    IS the Coinbase print, so Coinbase is not repeated below; the strip shows the other venues and
    the Coinbase/Binance spread, which is new information rather than an echo. */
-.spotlbl{font-size:15px;font-weight:700;letter-spacing:.13em;color:var(--dim);text-transform:uppercase}
-.spotlbl .upd{font-weight:400;letter-spacing:0;text-transform:none;margin-left:14px;font-size:14.5px}
+.spotlbl{font-size:16px;font-weight:700;letter-spacing:.13em;color:var(--dim);text-transform:uppercase}
+.spotlbl .upd{font-weight:400;letter-spacing:0;text-transform:none;margin-left:14px;font-size:16px}
 .spotpx{font-size:clamp(46px,11vw,78px);font-weight:750;letter-spacing:-.035em;line-height:1.04;
 margin:8px 0 2px;color:#fff;font-variant-numeric:tabular-nums}
 .spotrow{display:flex;flex-wrap:wrap;gap:8px 28px;font-size:17px;color:var(--txt);margin-top:10px;
@@ -51,55 +51,55 @@ h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
 h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-height:1.35}
 h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
-p.note{color:var(--dim);font-size:15.5px;line-height:1.6;margin:var(--s2) 0 0}
+p.note{color:var(--dim);font-size:16.5px;line-height:1.6;margin:var(--s2) 0 0}
 h3.cardh{font-size:20px;margin:0 0 var(--s2);color:#fff}
-h4.sub{font-size:15px;text-transform:uppercase;letter-spacing:.05em;color:#8b949e;
+h4.sub{font-size:16px;text-transform:uppercase;letter-spacing:.05em;color:#8b949e;
 margin:var(--s3) 0 var(--s1);font-weight:700}
-ol.steps{margin:var(--s2) 0 0;padding-left:22px;color:#c3ccd6;line-height:1.75;font-size:16px}
+ol.steps{margin:var(--s2) 0 0;padding-left:22px;color:#c3ccd6;line-height:1.75;font-size:17px}
 ol.steps li{margin:0 0 var(--s1)}
-p.bnote{color:#9aa7b4;font-size:15.5px;line-height:1.65;margin:var(--s2) 0 0}
+p.bnote{color:#9aa7b4;font-size:16.5px;line-height:1.65;margin:var(--s2) 0 0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:var(--s3) 0}
-.card pre{font-family:var(--mono);font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
+.card pre{font-family:var(--mono);font-size:16px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .card{padding:22px 24px}
 .card h3{font-size:19px;line-height:1.4;margin:0 0 6px;color:var(--accent)}
-.bbody{margin:15px 0 0;font-size:15.5px;line-height:1.68;color:#cdd6e0}
-.blead{margin:0 0 var(--s2);padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:14.5px;line-height:1.6}
+.bbody{margin:15px 0 0;font-size:16.5px;line-height:1.68;color:#cdd6e0}
+.blead{margin:0 0 var(--s2);padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:16px;line-height:1.6}
 .frow{display:grid;grid-template-columns:minmax(112px,168px) 1fr;gap:4px 16px;padding:8px 0;border-top:1px solid rgba(255,255,255,.055)}
 .frow:first-of-type{border-top:0}
-.fk{color:#8b949e;font-size:13px;line-height:1.55;letter-spacing:.01em}
+.fk{color:#8b949e;font-size:15px;line-height:1.55;letter-spacing:.01em}
 .fv{color:#e6edf3;line-height:1.6}
 .bline{margin:0 0 var(--s2)}
 .bline:last-of-type{margin-bottom:0}
 .bsec{margin:var(--s2) 0 0;padding:13px 15px;background:rgba(255,255,255,.022);border:1px solid rgba(255,255,255,.05);border-radius:8px}
 .bsec p{margin:5px 0 0;line-height:1.62}
-.bseck{font-size:12px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8b949e}
+.bseck{font-size:15px;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:#8b949e}
 .vbox{margin:var(--s2) 0 0;padding:13px 15px;border-radius:8px;border-left:3px solid;background:rgba(255,255,255,.028)}
-.vtext{margin:6px 0 0;font-size:15px;line-height:1.6;color:#dfe6ee}
+.vtext{margin:6px 0 0;font-size:16px;line-height:1.6;color:#dfe6ee}
 .vbox.bear{border-color:#f85149}.vbox.bull{border-color:#3fb950}
 .vbox.warn{border-color:#d29922}.vbox.flat{border-color:#6e7681}
 .verdict{color:var(--dim);font-weight:600}
 .vline{display:block;font-weight:650}
 .vbox .stag{margin:0 0 2px}
-.vline .stag,.key .stag{display:inline-block;font-size:13px;font-weight:700;letter-spacing:.06em;
+.vline .stag,.key .stag{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.06em;
 padding:2px 8px;border-radius:5px;margin-right:9px;vertical-align:1px}
 .vline.bear{color:#ff8a80}.vline.bear .stag,.key .stag.bear{background:#3d1418;color:#ff8a80;border:1px solid #6e2126}
 .vline.bull{color:#7ee787}.vline.bull .stag,.key .stag.bull{background:#0d2818;color:#7ee787;border:1px solid #238636}
 .vline.warn{color:#e3b341}.vline.warn .stag,.key .stag.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
 .vline.flat{color:#8b949e}.vline.flat .stag,.key .stag.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
-.sbadge{display:inline-block;font-size:15px;font-weight:700;letter-spacing:.03em;
+.sbadge{display:inline-block;font-size:16px;font-weight:700;letter-spacing:.03em;
 padding:4px 12px;border-radius:7px;margin-left:10px;vertical-align:3px;white-space:nowrap}
 .sbadge.bear{background:#3d1418;color:#ff8a80;border:1px solid #6e2126}
 .sbadge.bull{background:#0d2818;color:#7ee787;border:1px solid #238636}
 .sbadge.warn{background:#2b2210;color:#e3b341;border:1px solid #6b5320}
 .sbadge.flat{background:#1c2128;color:#8b949e;border:1px solid var(--line)}
-.key{margin:16px 0 2px;font-size:16px;color:var(--dim);line-height:2.1}
+.key{margin:16px 0 2px;font-size:17px;color:var(--dim);line-height:2.1}
 .keys{display:grid;gap:12px;margin:18px 0 6px}
 .keyrow{display:grid;grid-template-columns:110px 1fr;gap:16px;align-items:center;
-font-size:15px;color:#a9b4c0;line-height:1.55}
+font-size:16px;color:#a9b4c0;line-height:1.55}
 @media(max-width:640px){.keyrow{grid-template-columns:1fr}}
 .alert{color:var(--amber);font-weight:650}
 .watch{color:var(--accent)}
-table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:16px;display:table;table-layout:fixed}
+table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:17px;display:table;table-layout:fixed}
 th,td{overflow-wrap:break-word;vertical-align:top}
 thead th{white-space:nowrap}
 /* opt-in: only headings that follow a paragraph get the gap, not every card title */
@@ -108,39 +108,33 @@ h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:#e6edf3;margi
 /* the tab bar is sticky, so any heading scrolled to must stop below it, not under it */
 h2,h3,h4{scroll-margin-top:110px}
 th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
-@media(max-width:720px){table{display:block;overflow-x:auto;font-size:15px}th,td{white-space:nowrap;padding:8px 10px}}
-th{background:#1c2128;font-weight:650;font-size:15px;color:#c9d1d9}
+@media(max-width:720px){table{display:block;overflow-x:auto;font-size:16px}th,td{white-space:nowrap;padding:8px 10px}}
+th{background:#1c2128;font-weight:650;font-size:16px;color:#c9d1d9}
 td.num{font-family:var(--mono);text-align:right}
 .neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
 .warn{color:var(--amber);font-weight:650}
 img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px 0;display:block}
-.bfields{margin:9px 0 0;font-size:12.5px;color:var(--dim);line-height:1.45}
+.bfields{margin:9px 0 0;font-size:16px;color:var(--dim);line-height:1.45}
 .bfields b{color:var(--tx)}
 .bchart{margin:var(--s3) 0 0}
 .bchart img{width:100%;border:1px solid var(--line);border-radius:8px;display:block}
-.bchart figcaption{margin-top:6px;font-size:12px;color:var(--dim)}
+.bchart figcaption{margin-top:6px;font-size:15.5px;color:var(--dim)}
 .legcard{padding:8px 22px}
 .legrow{display:grid;grid-template-columns:46px 1fr;gap:2px 14px;padding:17px 0;
 border-top:1px solid rgba(255,255,255,.07)}
 .legrow:first-child{border-top:0}
 .legnum{grid-row:1/span 2;display:flex;align-items:flex-start;justify-content:center;
 width:30px;height:30px;border-radius:8px;background:#1b2430;border:1px solid #2c3846;
-color:var(--accent);font-size:14px;font-weight:700;line-height:28px;text-align:center}
-.legtxt h4{margin:2px 0 6px;font-size:16px;color:#e6edf3;letter-spacing:.01em}
-.legtxt p{margin:0;font-size:15px;line-height:1.68;color:#a9b4c0;max-width:none}
-.gloss{margin:0 0 12px;font-size:15.5px;line-height:1.6;color:#b6c2ce}
-details.more{margin-top:10px}
-details.more summary{cursor:pointer;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7d8896;list-style:none;display:inline-block}
-details.more summary::marker{content:"";display:none}
-details.more summary::-webkit-details-marker{display:none}
-details.more summary:after{content:" +";color:#5d6a78}
-details.more[open] summary:after{content:" -"}
-details.more p{margin:8px 0 0;font-size:15px;line-height:1.68;color:#a9b4c0}
+color:var(--accent);font-size:15.5px;font-weight:700;line-height:28px;text-align:center}
+.legtxt h4{margin:2px 0 6px;font-size:17px;color:#e6edf3;letter-spacing:.01em}
+.legtxt p{margin:0;font-size:16px;line-height:1.68;color:#a9b4c0;max-width:none}
+.gloss{margin:0 0 12px;font-size:16.5px;line-height:1.6;color:#b6c2ce}
+.bdetail{margin:12px 0 0;font-size:16.5px;line-height:1.72;color:#a9b4c0}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
-footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:15px}
-code{font-family:var(--mono);background:#1c2128;padding:2px 6px;border-radius:4px;font-size:15px}
-.hrow{font-family:var(--mono);font-size:15.5px;color:var(--dim);margin:4px 0}
+footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:16px}
+code{font-family:var(--mono);background:#1c2128;padding:2px 6px;border-radius:4px;font-size:16px}
+.hrow{font-family:var(--mono);font-size:16.5px;color:var(--dim);margin:4px 0}
 .tab .hrow:last-of-type{margin-bottom:var(--s3)}
 .verdict-card{border-radius:9px;padding:13px 17px;margin:18px 0 4px;font-size:17px;font-weight:650;
 display:flex;align-items:center;gap:12px;flex-wrap:wrap}
@@ -155,10 +149,10 @@ p.sdesc{color:var(--dim);font-size:17.5px;margin:0 0 var(--s3);font-style:italic
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:var(--s3) 0 0}
 @media(max-width:860px){.kpis{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:14px 16px}
-.kpi .k{display:block;font-size:14px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-weight:650}
+.kpi .k{display:block;font-size:15.5px;color:var(--dim);text-transform:uppercase;letter-spacing:.04em;font-weight:650}
 .kpi .v{display:block;font-size:26px;font-weight:650;font-family:var(--mono);margin-top:6px;line-height:1.15}
-.kpi .d{display:block;font-size:16.5px;font-weight:650;font-family:var(--mono);margin-top:4px}
-.kpi .n{display:block;font-size:14.5px;color:var(--dim);margin-top:5px;line-height:1.45}
+.kpi .d{display:block;font-size:17px;font-weight:650;font-family:var(--mono);margin-top:4px}
+.kpi .n{display:block;font-size:16px;color:var(--dim);margin-top:5px;line-height:1.45}
 .tabbar{position:sticky;top:0;z-index:80;max-width:none;background:rgba(13,17,23,.94);
 backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
 border:0;padding:14px 20px;margin:var(--s3) -20px}
@@ -168,14 +162,14 @@ width:fit-content;max-width:100%}
 section[id]{scroll-margin-top:92px}
 .tab > :first-child{margin-top:0}
 .tabs button{background:#161c25;border:1px solid #222b36;color:#a9b4c0;
-font:inherit;font-size:16px;padding:12px 22px;cursor:pointer;font-weight:650;
+font:inherit;font-size:17px;padding:12px 22px;cursor:pointer;font-weight:650;
 border-radius:9px;transition:background .12s,color .12s,border-color .12s;letter-spacing:.01em}
 .tabs button:hover{color:#e6edf3;background:#1d2530;border-color:#2f3a47}
 
 @media(max-width:600px){
 .tabbar{padding:8px 10px;margin-left:-15px;margin-right:-15px}
 .tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;width:100%;max-width:none;padding:6px}
-.tabs button{padding:10px 4px;font-size:13.5px;white-space:nowrap;overflow:hidden;
+.tabs button{padding:10px 4px;font-size:15.5px;white-space:nowrap;overflow:hidden;
 text-overflow:ellipsis;border-radius:8px}
 }
 .tabs button.on{color:#0b0f14;background:var(--accent);border-color:var(--accent);
@@ -184,14 +178,14 @@ box-shadow:0 2px 10px rgba(88,166,255,.25)}
 .cgrid{display:grid;grid-template-columns:1fr;gap:22px;margin-top:18px}
 .ccard{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px}
 .ccard img{width:100%;border-radius:8px;display:block;margin:14px 0}
-.ccard p{font-size:16.5px;color:#c9d1d9;margin:10px 0 0}
+.ccard p{font-size:17px;color:#c9d1d9;margin:10px 0 0}
 .ccard.wide{grid-column:1/-1}
 .cnow{display:flex;flex-wrap:wrap;gap:9px;margin:4px 0 4px}
 .chip{background:#1c2128;border:1px solid var(--line);border-radius:7px;padding:7px 14px;
 font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
-.cuse{color:var(--dim);font-size:16.5px}
+.cuse{color:var(--dim);font-size:17px}
 .cverdict{color:#7ee787;font-weight:650;font-size:17px;margin-top:12px}
-@media(max-width:600px){h1{font-size:23px}.wrap{padding:0 15px}th,td{padding:6px 8px;font-size:13px}}
+@media(max-width:600px){h1{font-size:23px}.wrap{padding:0 15px}th,td{padding:6px 8px;font-size:15px}}
 """
 
 EVIDENCE = {
@@ -449,8 +443,9 @@ def render_blocks(lines):
             body_html += render_body([verdict_line])
         ent = _LEGEND["map"].get(num)
         gloss = f'<p class="gloss">{esc(ent[0])}</p>' if ent and ent[0] else ""
-        more = (f'<details class="more"><summary>More detail</summary><p>{esc(ent[1])}</p></details>'
-                if ent and ent[1] else "")
+        # the disclosure was pointless friction: the legend text is short enough to just sit
+        # under the block. One less click, nothing hidden behind a triangle.
+        more = f'<p class="bdetail">{esc(ent[1])}</p>' if ent and ent[1] else ""
         if num:
             _LEGEND["seen"].add(num)
         out.append(f'<div class="card"><h3>{esc(title)}</h3>{gloss}{body_html}{extra}{more}</div>')
