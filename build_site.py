@@ -131,15 +131,19 @@ thead th{white-space:nowrap}
 /* opt-in: only headings that follow a paragraph get the gap, not every card title */
 /* these sit inside a .card, where .card h3 sets 17px - declare size/weight/colour or it stays small */
 h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--accent);margin:var(--s4) 0 var(--s1);line-height:1.3}
-/* Vertical rhythm for the Bottom Score tab. Every block keeps its distance regardless of the order
-   the sections are assembled in, so re-ordering can never leave a paragraph welded to the block
-   above or below it. One rule, one number: change --bs-rhythm and the whole tab follows. */
-:root{--bs-rhythm:30px}
+/* Vertical rhythm for the Bottom Score tab, expressed as ownership, not a blanket gap.
+   A section heading must sit closer to the block it introduces than to the block above it, or it
+   reads as floating between two sections. A caption must sit closer to the table it explains than
+   to whatever follows. Each relationship is declared on its own line - no catch-all spacing. */
 #bottom > *{margin-top:0;margin-bottom:0}
-#bottom > * + *{margin-top:var(--bs-rhythm)}
-#bottom > h3.bsub{margin-top:44px}
-#bottom > table + p, #bottom > p + table{margin-top:14px}
-/* dashboard: the 'blocks use settled daily closes' line was sitting 4px off the ladder row */
+#bottom > * + *{margin-top:32px}                 /* block to block: even air */
+#bottom > h3.bsub{margin-top:56px}               /* a new section starts with clear air above */
+#bottom > h3.bsub + *{margin-top:12px}           /* the heading owns the block beneath it */
+#bottom > h3.bsub + p{margin-top:10px}
+#bottom > table + p,
+#bottom > .bgrid + p,
+#bottom > .bcard3 + p,
+#bottom > .hrow + p{margin-top:14px}             /* a caption owns the data it comments on */
 #dash > .hrow{margin-top:18px}
 /* the tab bar is sticky, so any heading scrolled to must stop below it, not under it */
 h2,h3,h4{scroll-margin-top:110px}
