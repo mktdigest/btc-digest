@@ -103,7 +103,8 @@ table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:16px;disp
 th,td{overflow-wrap:break-word;vertical-align:top}
 thead th{white-space:nowrap}
 /* opt-in: only headings that follow a paragraph get the gap, not every card title */
-h3.bsub{margin:var(--s4) 0 var(--s1)}
+/* these sit inside a .card, where .card h3 sets 17px - declare size/weight/colour or it stays small */
+h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:#e6edf3;margin:var(--s4) 0 var(--s1);line-height:1.3}
 /* the tab bar is sticky, so any heading scrolled to must stop below it, not under it */
 h2,h3,h4{scroll-margin-top:110px}
 th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
