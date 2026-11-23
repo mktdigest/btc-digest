@@ -1201,7 +1201,18 @@ def build(raw=None):
 <section id="ev" class="tab">
 
 <div class="card">
-<h3 class="cardh">How the Bottom Score tab was measured</h3>
+<h3 class="cardh">Bottom Score - how the 0 to 100 is built, and how its bands were measured</h3>
+<p class="bline">Five signals, each worth a flat 20 points: holder cost basis, MVRV, share of supply at
+a loss, capital flow and crowd sentiment. They sum to 100 with no rescaling, so a 70 means the same
+thing every day and a change in the score is a change in the market, not in the arithmetic.</p>
+<p class="bline">The band table on that tab is measured on our own daily score series from 2018: how
+many days the score sat at or above each band, what price did over the next 90 days, and how often it
+ended higher. Bands with too few days say so rather than being filled in.</p>
+<p class="bline">{PROV_LINE}</p>
+</div>
+
+<div class="card">
+<h3 class="cardh">How the backtests on this page were measured</h3>
 <p class="bline">BTCUSDT daily. Forward returns are measured from the day you could actually act.
 Barrier tables are intrabar, and when both sides are touched in the same bar the adverse one is counted
 first. EV is the probability-weighted outcome of the target and stop pair.</p>
