@@ -48,8 +48,8 @@ font-variant-numeric:tabular-nums}
 a{color:#79c0ff;text-decoration:none;border-bottom:1px solid rgba(121,192,255,.28)}
 a:hover{color:#a8d4ff;border-bottom-color:currentColor}
 h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
-h3{font-size:21px;font-weight:650;margin:var(--s4) 0 var(--s1);color:#e6edf3;line-height:1.35}
-h4{font-size:19px;margin:var(--s3) 0 var(--s1);color:var(--txt)}
+h3{font-size:21px;font-weight:650;margin:0 0 12px;color:#e6edf3;line-height:1.35}
+h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:15.5px;line-height:1.6;margin:var(--s2) 0 0}
 h3.cardh{font-size:20px;margin:0 0 var(--s2);color:#fff}
@@ -102,6 +102,8 @@ font-size:15px;color:#a9b4c0;line-height:1.55}
 table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:16px;display:table;table-layout:fixed}
 th,td{overflow-wrap:break-word;vertical-align:top}
 thead th{white-space:nowrap}
+/* opt-in: only headings that follow a paragraph get the gap, not every card title */
+h3.bsub{margin:var(--s4) 0 var(--s1)}
 /* the tab bar is sticky, so any heading scrolled to must stop below it, not under it */
 h2,h3,h4{scroll-margin-top:110px}
 th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
