@@ -1201,11 +1201,10 @@ def build(raw=None):
 <section id="ev" class="tab">
 
 <div class="card">
-<h3 class="cardh">How these numbers were measured</h3>
+<h3 class="cardh">How the Bottom Score tab was measured</h3>
 <p class="bline">BTCUSDT daily. Forward returns are measured from the day you could actually act.
 Barrier tables are intrabar, and when both sides are touched in the same bar the adverse one is counted
 first. EV is the probability-weighted outcome of the target and stop pair.</p>
-<p class="bline bline-dim">{PROV_LINE}</p>
 </div>
 
 <div class="card">
