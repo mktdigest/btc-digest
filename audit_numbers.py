@@ -264,9 +264,10 @@ try:
     _m = _json.loads(open("/root/btc-bottom/state/model_h.json").read())
     _w, _keys = _m["weights"], list(_m["weights"])
     _rows = _sg.build_series()
-    _mx = {k: max(r["parts"][k] for r in _rows) or 1.0 for k in _keys}
-    _sc = [round(min(100.0, sum(round(r["parts"][k] * 20.0 / _mx[k] * _w[k], 2) for k in _keys)), 2)
-           for r in _rows]
+    # parts ARE the points (0-20 each, scaled inside score_g). Multiplying by 20/max here
+    # double-scaled every signal: the last reading came out 72.12 instead of 67.23 and the
+    # >=60 count 226 instead of 206, which made the audit "disagree" with the chart it checks.
+    _sc = [round(min(100.0, sum(r["parts"][k] * _w[k] for k in _keys)), 2) for r in _rows]
     _eps, _run = [], None
     for _i, _v in enumerate(_sc + [0.0]):
         if _v >= 60 and _run is None:

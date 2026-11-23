@@ -241,13 +241,22 @@ check("L/S percentile vs recomputed", tile_pct, real_pct, tol=1)
 # the note spells the rank out as a day count ("25 of the last 30 daily readings were lower").
 # That count is a second, independent rendering of the same fact - if the wording is ever
 # re-derived by hand it must still agree with the series.
-m_lower = re.search(r"(\d+) of the last 30 daily readings were lower",
-                    tiles["Longs per short"].get("note", ""))
+# The note carries ONE verifiable number, in either of two forms, and both are checked against the
+# series: either the day count ("3 of the last 30 daily readings were lower") or the band bounds
+# ("below the normal band (2.18-3.16)"). The percentile phrasing lives in the sub-line above.
+_note = tiles["Longs per short"].get("note", "")
+m_lower = re.search(r"(\d+) of the last 30 daily readings were lower", _note)
+m_band = re.search(r"[Bb]elow (?:the )?normal band \(([\d.]+)-([\d.]+)\)", _note)
 if m_lower:
     check("L/S 'N of 30 lower' vs recomputed",
           int(m_lower.group(1)), sum(1 for v in w if v <= w[-1]), tol=0)
+elif m_band:
+    check("L/S note band floor vs series 15th pctile",
+          float(m_band.group(1)), float(d["ls_c15"]), tol=0.02)
+    check("L/S note band ceiling vs series 85th pctile",
+          float(m_band.group(2)), float(d["ls_c85"]), tol=0.02)
 else:
-    fails.append("L/S tile note no longer states how many of the 30 readings were lower")
+    fails.append("L/S tile note carries no number that can be checked")
 
 # funding: 30d average 8-hourly rate x3 x365
 fund = S.get("funding", [])
