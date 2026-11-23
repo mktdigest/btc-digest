@@ -140,6 +140,13 @@ h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--accent)
 #bottom > h3.bsub{margin-top:56px}               /* a new section starts with clear air above */
 #bottom > h3.bsub + *{margin-top:12px}           /* the heading owns the block beneath it */
 #bottom > h3.bsub + p{margin-top:10px}
+#bottom > h2 + p{margin-top:10px}               /* the tab title owns its dek */
+/* a lead paragraph owns the block it introduces, same 14px as a caption owns its table -
+   otherwise the text above a table sits at 32 and the text below it at 14, which reads as drift */
+#bottom > p + table,
+#bottom > p + .bcard3,
+#bottom > p + .bhero2,
+#bottom > p + .bgrid2{margin-top:14px}
 #bottom > table + p,
 #bottom > .bgrid + p,
 #bottom > .bgrid2 + p,
