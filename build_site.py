@@ -45,9 +45,11 @@ margin:8px 0 2px;color:#fff;font-variant-numeric:tabular-nums}
 .spotrow{display:flex;flex-wrap:wrap;gap:8px 28px;font-size:17px;color:var(--txt);margin-top:10px;
 font-variant-numeric:tabular-nums}
 .spotrow b{color:var(--dim);font-weight:600;margin-right:9px}
+a{color:#79c0ff;text-decoration:none;border-bottom:1px solid rgba(121,192,255,.28)}
+a:hover{color:#a8d4ff;border-bottom-color:currentColor}
 h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
-h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-height:1.35}
-h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
+h3{font-size:21px;font-weight:650;margin:var(--s4) 0 var(--s1);color:#e6edf3;line-height:1.35}
+h4{font-size:19px;margin:var(--s3) 0 var(--s1);color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:15.5px;line-height:1.6;margin:var(--s2) 0 0}
 h3.cardh{font-size:20px;margin:0 0 var(--s2);color:#fff}
@@ -59,7 +61,7 @@ p.bnote{color:#9aa7b4;font-size:15.5px;line-height:1.65;margin:var(--s2) 0 0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:var(--s3) 0}
 .card pre{font-family:var(--mono);font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .card{padding:22px 24px}
-.card h3{font-size:17px;line-height:1.4;margin:0 0 4px}
+.card h3{font-size:17px;line-height:1.4;margin:0 0 4px;color:var(--accent)}
 .bbody{margin:15px 0 0;font-size:15.5px;line-height:1.68;color:#cdd6e0}
 .blead{margin:0 0 var(--s2);padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:14.5px;line-height:1.6}
 .frow{display:grid;grid-template-columns:minmax(112px,168px) 1fr;gap:4px 16px;padding:8px 0;border-top:1px solid rgba(255,255,255,.055)}
@@ -99,6 +101,7 @@ font-size:15px;color:#a9b4c0;line-height:1.55}
 .watch{color:var(--accent)}
 table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:16px;display:table;table-layout:fixed}
 th,td{overflow-wrap:break-word;vertical-align:top}
+thead th{white-space:nowrap}
 th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
 @media(max-width:720px){table{display:block;overflow-x:auto;font-size:15px}th,td{white-space:nowrap;padding:8px 10px}}
 th{background:#1c2128;font-weight:650;font-size:15px;color:#c9d1d9}
