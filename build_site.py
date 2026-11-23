@@ -48,7 +48,7 @@ font-variant-numeric:tabular-nums}
 a{color:#79c0ff;text-decoration:none;border-bottom:1px solid rgba(121,192,255,.28)}
 a:hover{color:#a8d4ff;border-bottom-color:currentColor}
 h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
-h3{font-size:21px;font-weight:650;margin:0 0 12px;color:#e6edf3;line-height:1.35}
+h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-height:1.35}
 h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:15.5px;line-height:1.6;margin:var(--s2) 0 0}
@@ -61,7 +61,7 @@ p.bnote{color:#9aa7b4;font-size:15.5px;line-height:1.65;margin:var(--s2) 0 0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:var(--s3) 0}
 .card pre{font-family:var(--mono);font-size:15px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .card{padding:22px 24px}
-.card h3{font-size:17px;line-height:1.4;margin:0 0 4px;color:var(--accent)}
+.card h3{font-size:19px;line-height:1.4;margin:0 0 6px;color:var(--accent)}
 .bbody{margin:15px 0 0;font-size:15.5px;line-height:1.68;color:#cdd6e0}
 .blead{margin:0 0 var(--s2);padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:14.5px;line-height:1.6}
 .frow{display:grid;grid-template-columns:minmax(112px,168px) 1fr;gap:4px 16px;padding:8px 0;border-top:1px solid rgba(255,255,255,.055)}
@@ -130,10 +130,11 @@ color:var(--accent);font-size:14px;font-weight:700;line-height:28px;text-align:c
 .legtxt p{margin:0;font-size:15px;line-height:1.68;color:#a9b4c0;max-width:none}
 .gloss{margin:0 0 12px;font-size:15.5px;line-height:1.6;color:#b6c2ce}
 details.more{margin-top:10px}
-details.more summary{cursor:pointer;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7d8896;list-style:none}
+details.more summary{cursor:pointer;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7d8896;list-style:none;display:inline-block}
+details.more summary::marker{content:"";display:none}
 details.more summary::-webkit-details-marker{display:none}
 details.more summary:after{content:" +";color:#5d6a78}
-details.more[open] summary:after{content:" \2212"}
+details.more[open] summary:after{content:" -"}
 details.more p{margin:8px 0 0;font-size:15px;line-height:1.68;color:#a9b4c0}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
