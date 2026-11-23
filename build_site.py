@@ -518,14 +518,24 @@ def render_digest(raw):
         i += 1
     # Parse the LEGEND section first: each block will carry its own gloss and collapsible detail,
     # so the reader never leaves the number to find out what the number means.
-    legend = {}
+    legend_raw = []
     for sec in sections:
         if sec["title"].startswith("LEGEND"):
             for raw in sec["body"]:
-                m = re.match(r"^\[(\d+[a-z]?)\]\s*(.+)$", raw.strip())
+                line = raw.strip()
+                if not line:
+                    continue
+                m = re.match(r"^\[(\d+[a-z]?)\]\s*(.+)$", line)
                 if m:
-                    t, d = split_entry(m.group(2).strip())
-                    legend[m.group(1)] = (t, d)
+                    legend_raw.append([m.group(1), m.group(2)])
+                elif legend_raw:
+                    # legend entries wrap across physical lines; dropping the continuation cut every
+                    # "more detail" off at the first line break
+                    legend_raw[-1][1] += " " + line
+    legend = {}
+    for n, txt in legend_raw:
+        t, d = split_entry(" ".join(txt.split()))
+        legend[n] = (t, d)
     _LEGEND["map"] = legend
     _LEGEND["seen"] = set()
 
