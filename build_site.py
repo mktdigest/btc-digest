@@ -131,6 +131,14 @@ thead th{white-space:nowrap}
 /* opt-in: only headings that follow a paragraph get the gap, not every card title */
 /* these sit inside a .card, where .card h3 sets 17px - declare size/weight/colour or it stays small */
 h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--accent);margin:var(--s4) 0 var(--s1);line-height:1.3}
+/* Vertical rhythm for the Bottom Score tab. Every block keeps its distance regardless of the order
+   the sections are assembled in, so re-ordering can never leave a paragraph welded to the block
+   above or below it. One rule, one number: change --bs-rhythm and the whole tab follows. */
+:root{--bs-rhythm:30px}
+#bottom > *{margin-top:0;margin-bottom:0}
+#bottom > * + *{margin-top:var(--bs-rhythm)}
+#bottom > h3.bsub{margin-top:44px}
+#bottom > table + p, #bottom > p + table{margin-top:14px}
 /* the tab bar is sticky, so any heading scrolled to must stop below it, not under it */
 h2,h3,h4{scroll-margin-top:110px}
 th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
