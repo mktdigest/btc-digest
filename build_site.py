@@ -1153,6 +1153,11 @@ def build(raw=None):
         _prov = open("/root/btc-bottom/state/provenance.txt").read().strip()
     except Exception:
         _prov = "input timestamps unavailable this build"
+    try:
+        ERA_TABLE = open("/root/btc-bottom/state/era_table.html").read().strip()
+    except Exception:
+        ERA_TABLE = '<p class="note">band table unavailable this build</p>'
+
     PROV_LINE = (f"Inputs: {_prov}. Reproduce the scores with "
                  f"<code>python3 score_g.py</code> in <code>/root/btc-bottom</code>.")
 
@@ -1215,9 +1220,10 @@ def build(raw=None):
 <p class="bline">Five signals, each worth a flat 20 points: holder cost basis, MVRV, share of supply at
 a loss, capital flow and crowd sentiment. They sum to 100 with no rescaling, so a 70 means the same
 thing every day and a change in the score is a change in the market, not in the arithmetic.</p>
-<p class="bline">The band table on that tab is measured on our own daily score series from 2018: how
-many days the score sat at or above each band, what price did over the next 90 days, and how often it
-ended higher. Bands with too few days say so rather than being filled in.</p>
+<p class="bline">The band record below is measured on our own daily score series from 2018: how many
+days the score sat at or above each band, what price did over the next 90 days, and how often it ended
+higher. Bands with too few days say so rather than being filled in.</p>
+{ERA_TABLE}
 <p class="bline">{PROV_LINE}</p>
 </div>
 
