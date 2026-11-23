@@ -61,10 +61,10 @@ a{color:#79c0ff;text-decoration:none;border-bottom:1px solid rgba(121,192,255,.2
 a:hover{color:#a8d4ff;border-bottom-color:currentColor}
 h2{font-size:26px;font-weight:650;margin:34px 0 6px;letter-spacing:-.01em}
 h3{font-size:22px;font-weight:650;margin:0 0 12px;color:var(--accent);line-height:1.35}
-h4{font-size:20px;margin:0 0 10px;color:var(--txt)}
+h4{font-size:22px;font-weight:700;margin:0 0 10px;color:var(--accent)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:16.5px;line-height:1.6;margin:var(--s2) 0 0}
-h3.cardh{font-size:20px;margin:0 0 var(--s2);color:#fff}
+h3.cardh{font-size:22px;font-weight:700;margin:0 0 var(--s2);color:var(--accent)}
 h4.sub{font-size:16px;text-transform:uppercase;letter-spacing:.05em;color:#8b949e;
 margin:var(--s3) 0 var(--s1);font-weight:700}
 ol.steps{margin:var(--s2) 0 0;padding-left:22px;color:#c3ccd6;line-height:1.75;font-size:17px}
@@ -73,7 +73,7 @@ p.bnote{color:#9aa7b4;font-size:16.5px;line-height:1.65;margin:var(--s2) 0 0}
 .card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:22px 24px;margin:var(--s3) 0}
 .card pre{font-family:var(--mono);font-size:16px;line-height:1.75;white-space:pre-wrap;word-break:break-word;color:#c9d1d9}
 .card{padding:22px 24px}
-.card h3{font-size:19px;line-height:1.4;margin:0 0 6px;color:var(--accent)}
+.card h3{font-size:22px;line-height:1.35;margin:0 0 8px;color:var(--accent);font-weight:700}
 .bbody{margin:15px 0 0;font-size:16.5px;line-height:1.68;color:#cdd6e0}
 .blead{margin:0 0 var(--s2);padding:0 0 0 12px;border-left:2px solid #2c3644;color:#9aa7b4;font-size:16px;line-height:1.6}
 .frow{display:grid;grid-template-columns:minmax(112px,168px) 1fr;gap:4px 16px;padding:8px 0;border-top:1px solid rgba(255,255,255,.055)}
@@ -123,6 +123,8 @@ th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space
 @media(max-width:720px){table{display:block;overflow-x:auto;font-size:16px}th,td{white-space:nowrap;padding:8px 10px}}
 th{background:#1c2128;font-weight:650;font-size:16px;color:#c9d1d9}
 td.num{font-family:var(--mono);text-align:right}
+th.num{font-family:var(--mono);text-align:right}
+/* a numeric column reads as one column: header and cells on the same edge */
 .neg{color:var(--red);font-weight:600}.pos{color:var(--green);font-weight:600}
 .warn{color:var(--amber);font-weight:650}
 img.chart{width:100%;border:1px solid var(--line);border-radius:10px;margin:13px 0;display:block}
@@ -141,7 +143,7 @@ color:var(--accent);font-size:15.5px;font-weight:700;line-height:28px;text-align
 .legtxt h4{margin:2px 0 6px;font-size:17px;color:#e6edf3;letter-spacing:.01em}
 .legtxt p{margin:0;font-size:16px;line-height:1.68;color:#a9b4c0;max-width:none}
 .gloss{margin:0 0 12px;font-size:16.5px;line-height:1.6;color:#b6c2ce}
-.bdetail{margin:12px 0 0;font-size:16.5px;line-height:1.72;color:#a9b4c0}
+.bdetail{margin:12px 0 0;font-size:16.5px;line-height:1.72;color:#a2b4c6}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:16px}
@@ -195,8 +197,10 @@ box-shadow:0 2px 10px rgba(88,166,255,.25)}
 .cnow{display:flex;flex-wrap:wrap;gap:9px;margin:4px 0 4px}
 .chip{background:#1c2128;border:1px solid var(--line);border-radius:7px;padding:7px 14px;
 font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
-.cuse{color:var(--dim);font-size:17px}
-.cverdict{color:#7ee787;font-weight:650;font-size:17px;margin-top:12px}
+/* chart card: the call comes straight after the picture, the explanation closes the card.
+   Both sit at the legend's 16.5px so nothing on the card outranks the reading itself. */
+.cverdict{font-weight:700;font-size:16.5px;line-height:1.55;margin:12px 0 0;color:#e6edf3}
+.cuse{color:#a2b4c6;font-size:16.5px;line-height:1.6;margin:10px 0 0}
 @media(max-width:600px){h1{font-size:23px}.wrap{padding:0 15px}th,td{padding:6px 8px;font-size:15px}}
 """
 
@@ -602,7 +606,8 @@ def render_digest(raw):
 
 
 def ev_table(rows):
-    h = ['<table><thead><tr><th>Rule / target</th><th>n</th><th>Forward / EV</th><th>Hit rate</th></tr></thead><tbody>']
+    h = ['<table><thead><tr><th>Rule / target</th><th class="num">n</th>'
+         '<th class="num">Forward / EV</th><th class="num">Hit rate</th></tr></thead><tbody>']
     for name, n, fwd, win in rows:
         cls = "neg" if fwd.startswith("-") else ("pos" if fwd.startswith("+") else "")
         h.append(f'<tr><td>{name}</td><td class="num">{n}</td>'
@@ -1046,8 +1051,8 @@ def build(raw=None):
         return (f'<div class="ccard{cls}"><h4>{esc(title)}</h4>'
                 f'<div class="cnow">{chips}</div>'
                 f'<img src="{img_src}{sep}v={ver}" alt="{esc(alt)}">'
-                f'<p class="cuse"><strong>How to use it:</strong> {esc(use)}</p>'
-                + (f'<p class="cverdict">&rarr; {esc(verdict)}</p>' if verdict else "")
+                + (f'<p class="cverdict">{esc(verdict)}</p>' if verdict else "")
+                + f'<p class="cuse">{esc(use)}</p>'
                 + "</div>")
 
     bal = _grab(r"Balanced Price \$([\d,]+)", raw)
