@@ -19,6 +19,18 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 import charts as chartmod  # noqa: E402
 
+# House style: short dash only. Every long dash variant collapses to the ASCII hyphen, and the
+# ellipsis becomes three dots. Applied to the finished document, so it also catches dashes that
+# arrive from data (provider names, digest text, cached strings) rather than from our own source.
+_LONG_DASHES = "\u2014\u2013\u2015\u2012\u2010\u2011\u2212\ufe58\u30fc"
+
+
+def ascii_dashes(s: str) -> str:
+    for ch in _LONG_DASHES:
+        s = s.replace(ch, "-")
+    return s.replace("\u2026", "...")
+
+
 SCRIPTS = "/root/.hermes/scripts"
 CHART_DIR = "/root/.hermes/state/charts"
 SERIES_PATH = "/root/.hermes/state/digest_series.json"
@@ -1296,6 +1308,9 @@ document.querySelectorAll('.tabs button').forEach(function(b){{
 </script>
 </div></body></html>
 """
+    # long dashes are banned by house style: em/en/figure/horizontal-bar dashes all become the
+    # plain hyphen, and the ellipsis becomes three dots, so the page is pure ASCII for punctuation.
+    doc = ascii_dashes(doc)
     path = os.path.join(HERE, "index.html")
     with open(path, "w") as f:
         f.write(doc)

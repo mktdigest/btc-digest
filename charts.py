@@ -28,6 +28,29 @@ PUR = (188, 140, 255)
 TEAL = (57, 197, 187)
 WHITE = (255, 255, 255)
 
+# House style: short dash only. Charts bake their labels into the PNG, so a long dash that arrives
+# from a provider name would survive every later text pass and be impossible to fix in the HTML.
+# Sanitising inside the draw call is the single choke point every label passes through.
+_LONG_DASHES = "\u2014\u2013\u2015\u2012\u2010\u2011\u2212\ufe58\u30fc"
+
+
+def _ascii_dash(t):
+    if not isinstance(t, str):
+        return t
+    for ch in _LONG_DASHES:
+        t = t.replace(ch, "-")
+    return t.replace("\u2026", "...")
+
+
+_orig_draw_text = ImageDraw.ImageDraw.text
+
+
+def _draw_text(self, xy, text, *a, **kw):
+    return _orig_draw_text(self, xy, _ascii_dash(text), *a, **kw)
+
+
+ImageDraw.ImageDraw.text = _draw_text
+
 W, H = 1120, 400                      # near 1:1 with the page's display width
 _FONTS = [
     "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",

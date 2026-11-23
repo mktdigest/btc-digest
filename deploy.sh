@@ -15,6 +15,8 @@ python3 audit_shared_figures.py | tail -3
 python3 audit_shared_figures.py >/dev/null || { echo "ABORT: shared-figure audit failed"; exit 1; }
 
 python3 build_site.py | tail -1
+# house style gate: short dash only, no em/en/figure dash anywhere in the page
+python3 audit_dashes.py index.html >/dev/null || { echo "ABORT: long dash in index.html"; exit 1; }
 
 if git diff --quiet && git diff --cached --quiet; then
   echo "nothing to commit"
