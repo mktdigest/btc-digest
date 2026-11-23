@@ -1138,6 +1138,14 @@ def build(raw=None):
         bottom_html = (f'<p class="note">Bottom score unavailable this build '
                        f'({type(_e).__name__}: {_e}). The rest of the digest is unaffected.</p>')
 
+    # provenance stamp written by the bottom-score renderer: input timestamps + the repro command
+    try:
+        _prov = open("/root/btc-bottom/state/provenance.txt").read().strip()
+    except Exception:
+        _prov = "input timestamps unavailable this build"
+    PROV_LINE = (f"Inputs: {_prov}. Reproduce the scores with "
+                 f"<code>python3 score_g.py</code> in <code>/root/btc-bottom</code>.")
+
     build_stamp = _stamp()
     doc = f"""<!DOCTYPE html>
 <html lang="en"><head><meta charset="utf-8">
@@ -1197,6 +1205,7 @@ def build(raw=None):
 <p class="bline">BTCUSDT daily. Forward returns are measured from the day you could actually act.
 Barrier tables are intrabar, and when both sides are touched in the same bar the adverse one is counted
 first. EV is the probability-weighted outcome of the target and stop pair.</p>
+<p class="bline bline-dim">{PROV_LINE}</p>
 </div>
 
 <div class="card">
