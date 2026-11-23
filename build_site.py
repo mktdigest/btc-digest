@@ -139,14 +139,13 @@ h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--accent)
 #bottom > * + *{margin-top:32px}                 /* block to block: even air */
 #bottom > h3.bsub{margin-top:56px}               /* a new section starts with clear air above */
 #bottom > h3.bsub + *{margin-top:12px}           /* the heading owns the block beneath it */
-#bottom > h3.bsub + p{margin-top:10px}
-#bottom > h2 + p{margin-top:10px}               /* the tab title owns its dek */
-/* a lead paragraph owns the block it introduces, same 14px as a caption owns its table -
-   otherwise the text above a table sits at 32 and the text below it at 14, which reads as drift */
-#bottom > p + table,
-#bottom > p + .bcard3,
-#bottom > p + .bhero2,
-#bottom > p + .bgrid2{margin-top:14px}
+#bottom > h2 + p,
+#bottom > h3.bsub + p{margin-top:10px}          /* a heading owns its dek */
+/* A lead paragraph is one that follows a heading: it introduces the block below, so it hugs it at
+   14px - the same distance a caption keeps from the table it comments on. Paragraphs that are not
+   lead-ins (captions) keep the 32px block gap, so they stay attached to what they describe. */
+#bottom > h2 + p + *,
+#bottom > h3.bsub + p + *{margin-top:14px}
 #bottom > table + p,
 #bottom > .bgrid + p,
 #bottom > .bgrid2 + p,
