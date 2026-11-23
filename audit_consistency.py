@@ -72,14 +72,14 @@ def main() -> int:
     # ---- 2. page: the printed figures must equal the same values
     html = (SITE / "index.html").read_text()
     checks = [
-        ("exchange netflow", rf"Exchange netflow, 30d \(USD\)</b></td><td[^>]*>\s*([+-][\d.]+) bn",
+        ("exchange netflow", rf"Exchange netflow, 30d \(USD\)</b>(?:<span[^>]*>.*?</span>)?\s*</td><td[^>]*>\s*([+-][\d.]+) bn",
          want["ex_netflow_30d_bn"], 0.15),
-        ("exchange supply", r"BTC held on exchanges</b></td><td[^>]*>\s*([\d.]+)M BTC",
+        ("exchange supply", r"BTC held on exchanges</b>(?:<span[^>]*>.*?</span>)?\s*</td><td[^>]*>\s*([\d.]+)M BTC",
          want["ex_supply_btc"] / 1e6, 0.02),
-        ("independent MVRV", r"Independent MVRV</b></td><td[^>]*>\s*([\d.]+)", want["cm_mvrv"], 0.002),
-        ("CBBI composite", r"Cycle gauge \(CBBI\)</b></td><td[^>]*>\s*([\d.]+)\s*&middot;",
+        ("independent MVRV", r"Independent MVRV</b>(?:<span[^>]*>.*?</span>)?\s*</td><td[^>]*>\s*([\d.]+)", want["cm_mvrv"], 0.002),
+        ("CBBI composite", r"Cycle gauge \(CBBI\)</b>(?:<span[^>]*>.*?</span>)?\s*</td><td[^>]*>\s*([\d.]+)\s*&middot;",
          want["cbbi_composite"], 0.002),
-        ("realised net P/L", rf"Realised net profit/loss, 30d</b></td><td[^>]*>\s*([+-][\d.]+) bn",
+        ("realised net P/L", rf"Realised net profit/loss, 30d</b>(?:<span[^>]*>.*?</span>)?\s*</td><td[^>]*>\s*([+-][\d.]+) bn",
          want["net_realised_pl_30d_bn"], 0.15),
     ]
     for label, pat, expect, tol_ in checks:

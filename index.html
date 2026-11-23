@@ -6,7 +6,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>BTC Daily Digest</title>
 <meta name="digest-md5" content="b123b0c6fad5">
-<meta name="page-built" content="2026-11-23 05:20 UTC">
+<meta name="page-built" content="2026-11-23 05:25 UTC">
 <meta name="description" content="Daily Bitcoin flow, positioning and momentum digest with backtested rules.">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -177,7 +177,7 @@ font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
 </style></head><body><div class="wrap">
 <header>
   <h1>BTC Daily Digest</h1>
-  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated 2026-11-23 04:55 UTC &middot; build 2026-11-23 05:20Z &middot; digest b123b0</span></div>
+  <div class="spotlbl">Bitcoin spot &middot; Coinbase<span class="upd">updated 2026-11-23 04:55 UTC &middot; build 2026-11-23 05:25Z &middot; digest b123b0</span></div>
   <div class="spotpx">$61,123</div>
   <div class="spotrow"><span><b>Binance</b>$61,221</span><span><b>Coinbase &minus; Binance</b>-98 (-0.16%)</span><span><b>USDT/USD</b>0.99856</span></div>
   <div class="verdict-card bear"><span class="stag bear">BEARISH</span><span>US bid ABSENT - premium negative, 30d mean at lows</span></div>
@@ -272,6 +272,7 @@ font-family:var(--mono);font-size:17px;font-weight:650;color:#e6edf3}
 .blatab{width:100%;border-collapse:collapse;font-size:17px;table-layout:fixed}
 .blatab th{text-align:left;font-size:15.5px;text-transform:uppercase;letter-spacing:.04em;color:#8b949e;padding:6px 8px;border-bottom:1px solid #30363d}
 .blatab td{padding:9px 8px;border-bottom:1px solid #21262d;vertical-align:top;line-height:1.45}
+.prov{display:block;font-size:15px;color:#8b949e;margin-top:3px;overflow-wrap:normal;white-space:nowrap}
 .blaband{font-family:var(--mono);font-weight:700;color:#e6edf3;white-space:nowrap}
 .blamon{font-family:var(--mono);font-size:16px;white-space:nowrap;color:#c9d1d9}
 .blamon.wrapok{white-space:normal;overflow-wrap:break-word}
@@ -293,7 +294,7 @@ not the next 48 hours.</p>
   (1.13x), 20% of the market cap under water,
   Fear &amp; Greed at 12, and the capital-flow divergence trigger is active.</p>
   <p class="bmeta">Scored on the settled 2026-11-21 close &middot; S1-S5 sum to the headline &middot;
-  model run 2026-11-23 05:20 UTC</p>
+  model run 2026-11-23 05:25 UTC</p>
   <p class="btension">Read this next to the flow verdict above, which is bearish. That combination &mdash; cheap on-chain, money still leaving &mdash; is what the marked cycle bottoms looked like: price reaches fair value before flow turns.</p>
 </div>
 
@@ -397,10 +398,9 @@ single board. Every row below is free, keyless and refreshed in the same daily p
 is measured on the full history each series has, not asserted: it is the correlation between that
 reading and the next 90 days of price.</p>
 <table>
-  <thead><tr><th style="width:168px">source</th><th style="width:132px">today</th>
-    <th>what it measures</th><th style="width:300px">predicts 90d?</th>
-    <th style="width:118px">provider</th></tr></thead>
-  <tbody><tr><td><b>Realised net profit/loss, 30d</b></td><td class="blamon wrapok">-17.0 bn</td><td>Value booked by coins that moved, profit minus loss. Negative means losses are being crystallised - people selling under water.</td><td class="blamon wrapok">-0.33 over 1,342 days - strongest flow input measured, but 4 years only</td><td>BGeometrics</td></tr><tr><td><b>Exchange netflow, 30d (USD)</b></td><td class="blamon wrapok">-6.1 bn</td><td>Value of coins sent to exchanges minus coins withdrawn. Positive = coins arriving, usually to sell.</td><td class="blamon wrapok">+0.03 over 5,571 days - too weak to score on its own</td><td><a href="https://community-api.coinmetrics.io/">CoinMetrics</a></td></tr><tr><td><b>BTC held on exchanges</b></td><td class="blamon wrapok">2.70M BTC</td><td>Coins sitting on venue wallets. Falling = withdrawal, coins moving to self-custody.</td><td class="blamon wrapok">-0.28 over 5,601 days - as strong as our S4 input, but a slow level</td><td><a href="https://community-api.coinmetrics.io/">CoinMetrics</a></td></tr><tr><td><b>Independent MVRV</b></td><td class="blamon wrapok">1.130</td><td>A second provider's market-value to realised-value ratio, computed their own way.</td><td class="blamon wrapok">agrees to 0.110 on average, so the level is provider-dependent</td><td><a href="https://community-api.coinmetrics.io/">CoinMetrics</a></td></tr><tr><td><b>Cycle gauge (CBBI)</b></td><td class="blamon wrapok">0.322 &middot; 28th pctile</td><td>Composite of nine cycle indicators, 0 = cycle top and 1 = cycle bottom, history from 2011.</td><td class="blamon wrapok">-0.07 over 5,537 days - a cycle dial, not a 90-day timer</td><td><a href="https://colintalkscrypto.com/cbbi/">CBBI</a></td></tr></tbody>
+  <thead><tr><th style="width:196px">source and provider</th><th style="width:132px">today</th>
+    <th>what it measures</th><th style="width:330px">predicts 90d?</th></tr></thead>
+  <tbody><tr><td><b>Realised net profit/loss, 30d</b><span class="prov">BGeometrics</span></td><td class="blamon wrapok">-17.0 bn</td><td>Value booked by coins that moved, profit minus loss. Negative means losses are being crystallised - people selling under water.</td><td class="blamon wrapok">-0.33 over 1,342 days - strongest flow input measured, but 4 years only</td></tr><tr><td><b>Exchange netflow, 30d (USD)</b><span class="prov"><a href="https://community-api.coinmetrics.io/">CoinMetrics</a></span></td><td class="blamon wrapok">-6.1 bn</td><td>Value of coins sent to exchanges minus coins withdrawn. Positive = coins arriving, usually to sell.</td><td class="blamon wrapok">+0.03 over 5,571 days - too weak to score on its own</td></tr><tr><td><b>BTC held on exchanges</b><span class="prov"><a href="https://community-api.coinmetrics.io/">CoinMetrics</a></span></td><td class="blamon wrapok">2.70M BTC</td><td>Coins sitting on venue wallets. Falling = withdrawal, coins moving to self-custody.</td><td class="blamon wrapok">-0.28 over 5,601 days - as strong as our S4 input, but a slow level</td></tr><tr><td><b>Independent MVRV</b><span class="prov"><a href="https://community-api.coinmetrics.io/">CoinMetrics</a></span></td><td class="blamon wrapok">1.130</td><td>A second provider's market-value to realised-value ratio, computed their own way.</td><td class="blamon wrapok">agrees to 0.110 on average, so the level is provider-dependent</td></tr><tr><td><b>Cycle gauge (CBBI)</b><span class="prov"><a href="https://colintalkscrypto.com/cbbi/">CBBI</a></span></td><td class="blamon wrapok">0.322 &middot; 28th pctile</td><td>Composite of nine cycle indicators, 0 = cycle top and 1 = cycle bottom, history from 2011.</td><td class="blamon wrapok">-0.07 over 5,537 days - a cycle dial, not a 90-day timer</td></tr></tbody>
 </table>
 <p class="note">What this changed and what it did not. <b>Nothing in the score moved.</b> Exchange
 netflow scored +0.03, too weak to act on, so it stays context; the 30-day net capital flow
@@ -411,7 +411,7 @@ provider it came from.</p>
 
 <div class="bcard3">
   <h4>Price against the score, 2018-2026</h4>
-  <img src="bottom_chart.png?v=1795411256" alt="BTC price vs bottom score with accumulate zones shaded">
+  <img src="bottom_chart.png?v=1795411522" alt="BTC price vs bottom score with accumulate zones shaded">
   <p class="bnote">The shaded top strip is the score-60-to-100 zone, and the solid green bars inside it
   are the 17 stretches where the score held 60 or above - 101 days in total, roughly 2.5% of the series.
   A bar's width is how long the condition lasted, its height has no meaning. Amber dots are the marked
@@ -638,7 +638,7 @@ tested dipped roughly 5 to 6% before it paid.</p>
 <footer>
 <p>Generated automatically from keyless public APIs (Coinbase, Binance, DeFiLlama, cryptoetf.today, Look Into Bitcoin, BGeometrics, alternative.me). No credentials, no subscription feeds.</p>
 <p>Not financial advice. Backtest figures are historical and samples are small where noted.</p>
-<p>Data as of 2026-11-23 04:55 UTC &middot; page built 2026-11-23 05:20 UTC</p>
+<p>Data as of 2026-11-23 04:55 UTC &middot; page built 2026-11-23 05:25 UTC</p>
 </footer>
 <script>
 document.querySelectorAll('.tabs button').forEach(function(b){
