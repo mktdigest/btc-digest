@@ -120,6 +120,13 @@ width:30px;height:30px;border-radius:8px;background:#1b2430;border:1px solid #2c
 color:var(--accent);font-size:14px;font-weight:700;line-height:28px;text-align:center}
 .legtxt h4{margin:2px 0 6px;font-size:16px;color:#e6edf3;letter-spacing:.01em}
 .legtxt p{margin:0;font-size:15px;line-height:1.68;color:#a9b4c0;max-width:none}
+.gloss{margin:0 0 12px;font-size:15.5px;line-height:1.6;color:#b6c2ce}
+details.more{margin-top:10px}
+details.more summary{cursor:pointer;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#7d8896;list-style:none}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary:after{content:" +";color:#5d6a78}
+details.more[open] summary:after{content:" \2212"}
+details.more p{margin:8px 0 0;font-size:15px;line-height:1.68;color:#a9b4c0}
 .callout{border-left:3px solid var(--amber);background:#1c1a12;border-radius:6px;padding:11px 15px;margin:13px 0}
 .callout p{margin:4px 0;color:#e6d7a8}
 footer{margin-top:44px;padding-top:20px;border-top:1px solid var(--line);color:var(--dim);font-size:15px}
@@ -431,7 +438,13 @@ def render_blocks(lines):
         body_html = render_body(body_txt)
         if verdict_line:
             body_html += render_body([verdict_line])
-        out.append(f'<div class="card"><h3>{esc(title)}</h3>{body_html}{extra}</div>')
+        ent = _LEGEND["map"].get(num)
+        gloss = f'<p class="gloss">{esc(ent[0])}</p>' if ent and ent[0] else ""
+        more = (f'<details class="more"><summary>More detail</summary><p>{esc(ent[1])}</p></details>'
+                if ent and ent[1] else "")
+        if num:
+            _LEGEND["seen"].add(num)
+        out.append(f'<div class="card"><h3>{esc(title)}</h3>{gloss}{body_html}{extra}{more}</div>')
     return "\n".join(out)
 
 
@@ -457,7 +470,7 @@ def section_stance(body_lines):
     return "flat", "NO SIGNAL - nothing directional"
 
 
-_LEGEND = {"html": ""}
+_LEGEND = {"html": "", "map": {}, "seen": set()}
 
 
 def _ensure_diagrams():
@@ -503,6 +516,19 @@ def render_digest(raw):
             continue
         (sections[-1]["body"] if sections else head).append(lines[i])
         i += 1
+    # Parse the LEGEND section first: each block will carry its own gloss and collapsible detail,
+    # so the reader never leaves the number to find out what the number means.
+    legend = {}
+    for sec in sections:
+        if sec["title"].startswith("LEGEND"):
+            for raw in sec["body"]:
+                m = re.match(r"^\[(\d+[a-z]?)\]\s*(.+)$", raw.strip())
+                if m:
+                    t, d = split_entry(m.group(2).strip())
+                    legend[m.group(1)] = (t, d)
+    _LEGEND["map"] = legend
+    _LEGEND["seen"] = set()
+
     out = []
     for l in [x for x in head if x.strip()]:
         if l.startswith("VERDICT:"):
@@ -511,15 +537,30 @@ def render_digest(raw):
             continue                       # promoted into the big spot block at the top
         out.append(f'<div class="hrow">{esc(l)}</div>')
     for s in sections:
-        st = section_stance(s["body"])
-        badge = f' <span class="sbadge {st[0]}">{esc(st[1])}</span>' if st else ""
-        out.append(f'<h3 class="sec">{esc(s["title"])}{badge}</h3>')
-        for d in s["desc"]:
-            out.append(f'<p class="sdesc">{esc(d)}</p>')
         if s["title"].startswith("LEGEND"):
-            # the legend is reference material: it belongs on the Reference tab, not under the blocks,
-            # where it made page one twice as long for no reason
-            out.append(render_legend(s["body"]))
+            # handled before the section header is emitted: the glossary itself is gone, and an
+            # empty heading with nothing under it is worse than no heading
+            pass
+        else:
+            st = section_stance(s["body"])
+            badge = f' <span class="sbadge {st[0]}">{esc(st[1])}</span>' if st else ""
+            out.append(f'<h3 class="sec">{esc(s["title"])}{badge}</h3>')
+            for d in s["desc"]:
+                out.append(f'<p class="sdesc">{esc(d)}</p>')
+        if s["title"].startswith("LEGEND"):
+            # every entry that has a block on this page now lives under that block, so only the
+            # leftovers ([+], [7b]) need a home here
+            leftovers = [(n, t, d) for n, (t, d) in _LEGEND["map"].items()
+                         if n not in _LEGEND["seen"]]
+            if leftovers:
+                rows = "".join(
+                    f'<div class="legrow"><span class="legnum">{n}</span>'
+                    f'<div class="legtxt"><h4>{esc(t)}</h4>'
+                    + (f'<p>{esc(d)}</p>' if d else '') + '</div></div>'
+                    for n, t, d in leftovers)
+                out.append(f'<h3 class="sec">Other readings</h3>'
+                           f'<p class="sdesc">These appear in the digest but not as their own block.</p>'
+                           f'<div class="card legcard">{rows}</div>')
             continue
         else:
             out.append(render_blocks(s["body"]))
