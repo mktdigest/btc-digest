@@ -158,6 +158,20 @@ h3.bsub{font-size:22px;font-weight:700;letter-spacing:-.01em;color:var(--accent)
 h2,h3,h4{scroll-margin-top:110px}
 th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
 @media(max-width:720px){table{display:block;overflow-x:auto;font-size:16px}th,td{white-space:nowrap;padding:8px 10px}}
+/* The sources table is four columns of prose. The generic mobile rule above turns every table into a
+   sideways-scrolling strip with nowrap cells, and with four prose columns that squeezed the wide one to
+   a sliver and stacked the writes into towers. On a phone it stacks as labelled rows instead. */
+table.srcs{table-layout:fixed}
+@media(max-width:760px){
+  table.srcs{display:block;overflow:visible;table-layout:auto;font-size:16px}
+  table.srcs thead{display:none}
+  table.srcs tbody{display:block}
+  table.srcs tr{display:block;border-top:1px solid var(--line);padding:12px 0 2px}
+  table.srcs tr:first-child{border-top:0}
+  table.srcs td{display:block;width:auto!important;white-space:normal;border:0;padding:3px 0 5px}
+  table.srcs td::before{content:attr(data-label);display:block;font-size:12px;letter-spacing:.06em;
+    text-transform:uppercase;color:#8b949e;margin-bottom:2px}
+}
 th{background:#1c2128;font-weight:650;font-size:16px;color:#c9d1d9}
 td.num{font-family:var(--mono);text-align:right}
 th.num{font-family:var(--mono);text-align:right}
