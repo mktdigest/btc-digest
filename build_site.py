@@ -25,6 +25,17 @@ import charts as chartmod  # noqa: E402
 _LONG_DASHES = "\u2014\u2013\u2015\u2012\u2010\u2011\u2212\ufe58\u30fc"
 
 
+# &mdash; is plain ASCII in the file but an em dash on screen, so the unicode sweep never saw it.
+# This is exactly how long dashes reached the Guide cards while the audit reported "0 non-ASCII".
+_DASH_ENTITIES = ("&mdash;", "&ndash;", "&horbar;", "&#8212;", "&#8211;", "&#x2014;", "&#x2013;")
+
+
+def flatten_dash_entities(text: str) -> str:
+    for ent in _DASH_ENTITIES:
+        text = text.replace(ent, "-")
+    return text
+
+
 def ascii_dashes(s: str) -> str:
     for ch in _LONG_DASHES:
         s = s.replace(ch, "-")
@@ -1315,6 +1326,7 @@ document.querySelectorAll('.tabs button').forEach(function(b){{
 """
     # long dashes are banned by house style: em/en/figure/horizontal-bar dashes all become the
     # plain hyphen, and the ellipsis becomes three dots, so the page is pure ASCII for punctuation.
+    doc = flatten_dash_entities(doc)
     doc = ascii_dashes(doc)
     path = os.path.join(HERE, "index.html")
     with open(path, "w") as f:
