@@ -103,7 +103,7 @@ table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:16px;disp
 th,td{overflow-wrap:break-word;vertical-align:top}
 thead th{white-space:nowrap}
 /* the tab bar is sticky, so any heading scrolled to must stop below it, not under it */
-h2,h3,h4{scroll-margin-top:92px}
+h2,h3,h4{scroll-margin-top:110px}
 th,td{border:1px solid var(--line);padding:11px 14px;text-align:left;white-space:normal;vertical-align:top}
 @media(max-width:720px){table{display:block;overflow-x:auto;font-size:15px}th,td{white-space:nowrap;padding:8px 10px}}
 th{background:#1c2128;font-weight:650;font-size:15px;color:#c9d1d9}
