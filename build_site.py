@@ -126,7 +126,7 @@ table{width:100%;border-collapse:collapse;margin:var(--s2) 0;font-size:17px;disp
 th,td{overflow-wrap:break-word;vertical-align:top}
 /* a paragraph straight after a table needs its own air: the table's margin was the only
    thing separating them, so the caption read as part of the last row */
-table + p{margin-top:16px}
+table + p, table + p.note, table + p.bnote, table + p.bmeta, table + p.gloss{margin-top:16px}
 thead th{white-space:nowrap}
 /* opt-in: only headings that follow a paragraph get the gap, not every card title */
 /* these sit inside a .card, where .card h3 sets 17px - declare size/weight/colour or it stays small */
