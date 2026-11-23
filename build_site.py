@@ -1230,13 +1230,6 @@ thing every day and a change in the score is a change in the market, not in the 
 </div>
 
 <div class="card">
-<h3 class="cardh">How the RSI, divergence, short-fade and long-bounce tables were measured</h3>
-<p class="bline">BTCUSDT daily. Forward returns are measured from the day you could actually act.
-Barrier tables are intrabar, and when both sides are touched in the same bar the adverse one is counted
-first. EV is the probability-weighted outcome of the target and stop pair.</p>
-</div>
-
-<div class="card">
 <h3 class="cardh">RSI crossovers alone are coin flips</h3>
 <p class="bline">Sample: 1000 days. These fire often and lose more often than they win, so they are useful
 for describing momentum, not for triggering entries.</p>
@@ -1269,6 +1262,11 @@ are not divergences. The numbers above replace it.</p></div>
 variant is negative EV. Buying the bounce and then shorting loses money on the first leg.</p>
 {ev_table(EVIDENCE["long_bounce"])}
 </div>
+
+<p class="bnote">Method for all four tables above: BTCUSDT daily. Forward returns are measured from
+the day you could actually act. Barrier tables are intrabar, and when both sides are touched in the
+same bar the adverse one is counted first. EV is the probability-weighted outcome of the target and
+stop pair.</p>
 
 </section>
 
