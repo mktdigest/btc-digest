@@ -343,6 +343,22 @@ BLOCK_FIELDS = {
 }
 
 
+def split_entry(text: str) -> tuple[str, str]:
+    """Split one legend entry into (title, rest).
+
+    Two shapes exist in the digest: "<Title: sentence...>" where a short lead-in is followed by a colon,
+    and "<Plain sentence>. <More sentences...>" with no colon at all. The earlier parser demanded the
+    first shape and a title under 40 characters, so every plain-sentence entry was silently dropped.
+    """
+    colon = text.find(":")
+    dot = text.find(". ")
+    if 0 < colon <= 45 and (dot == -1 or colon < dot):
+        return text[:colon].strip(), text[colon + 1:].strip()
+    if dot != -1 and dot <= 90:
+        return text[:dot].strip(), text[dot + 2:].strip()
+    return text.strip(), ""
+
+
 def render_legend(body_lines):
     """LEGEND entries as numbered rows, not one pre block.
 
@@ -354,14 +370,15 @@ def render_legend(body_lines):
         line = raw.strip()
         if not line:
             continue
-        m = re.match(r"^\[(\d+)\]\s*([^:]{2,40}):\s*(.+)$", line)
+        m = re.match(r"^\[(\d+)\]\s*(.+)$", line)
         if m:
-            entries.append([m.group(1), m.group(2).strip(), m.group(3).strip()])
+            title, detail = split_entry(m.group(2).strip())
+            entries.append([m.group(1), title, detail])
         elif entries:
             entries[-1][2] = (entries[-1][2] + " " + line).strip()
     rows = "".join(
         f'<div class="legrow"><span class="legnum">{n}</span>'
-        f'<div class="legtxt"><h4>{esc(t)}</h4><p>{esc(d)}</p></div></div>'
+        f'<div class="legtxt"><h4>{esc(t)}</h4>' + (f'<p>{esc(d)}</p>' if d else '') + '</div></div>'
         for n, t, d in entries)
     return f'<div class="card legcard">{rows}</div>'
 
