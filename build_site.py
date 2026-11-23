@@ -1230,7 +1230,7 @@ thing every day and a change in the score is a change in the market, not in the 
 </div>
 
 <div class="card">
-<h3 class="cardh">How the four backtest tables below were measured</h3>
+<h3 class="cardh">How the RSI, divergence, short-fade and long-bounce tables were measured</h3>
 <p class="bline">BTCUSDT daily. Forward returns are measured from the day you could actually act.
 Barrier tables are intrabar, and when both sides are touched in the same bar the adverse one is counted
 first. EV is the probability-weighted outcome of the target and stop pair.</p>
