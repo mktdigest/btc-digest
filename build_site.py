@@ -535,6 +535,14 @@ def render_digest(raw):
     legend = {}
     for n, txt in legend_raw:
         t, d = split_entry(" ".join(txt.split()))
+        # a gloss has to be one line: when an entry has no short lead-in its first sentence can run
+        # past 100 characters, so split there and let the rest live behind "more detail"
+        if not d and len(t) > 118:
+            j = t.find(". ")
+            if j > 0:
+                d, t = t[j + 2:], t[:j]
+        if len(t) > 118:
+            t = t[:118].rsplit(" ", 1)[0].rstrip(",;:") + "\u2026"
         legend[n] = (t, d)
     _LEGEND["map"] = legend
     _LEGEND["seen"] = set()
