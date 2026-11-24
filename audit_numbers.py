@@ -239,12 +239,26 @@ m_dist = re.search(r"-> 1\.00 is ([-+]\d+\.\d)% away", DIGEST)
 near("MVRV 1.00 distance %", float(m_dist.group(1)) if m_dist else None,
      round(100 * (rp_last / spot - 1), 1) if spot else None, 0.2)
 m_bid = re.search(r"BID \$([\d,]+)", DIGEST)
-m_avg = re.search(r"avg price of the adds: 7d \$([\d,]+)", DIGEST)
-if m_bid and m_avg:
-    if m_bid.group(1) == m_avg.group(1):
-        ok("Bitfinex BID == 7d average entry")
+m_avg = re.search(r"average price paid when the book grew: 7d \$([\d,]+)", DIGEST)
+if not (m_bid and m_avg):
+    # an anchor that quietly stops matching is a gate that stops checking: fail, do not skip
+    fail("Bitfinex BID vs 7d average", "block [9] wording moved - the anchor is gone and this check is blind")
+elif m_bid.group(1) == m_avg.group(1):
+    ok("Bitfinex BID == 7d average entry")
+else:
+    fail("Bitfinex BID vs 7d average", f"{m_bid.group(1)} != {m_avg.group(1)}")
+
+# gross adds and gross trims must reconcile to the net the same line prints
+m_fl = re.search(r"7d  added ([\d,]+) BTC in \d+ rising days, trimmed ([\d,]+) in \d+ falling days, "
+                 r"net ([+-][\d,]+)", DIGEST)
+if not m_fl:
+    fail("Bitfinex adds/trims", "no gross add/trim line in block [9]")
+else:
+    _a, _t, _n = (float(x.replace(",", "")) for x in m_fl.groups())
+    if abs(_a - _t - _n) > 1.0:
+        fail("Bitfinex adds/trims", f"{_a:,.0f} added - {_t:,.0f} trimmed != net {_n:,.0f}")
     else:
-        fail("Bitfinex BID vs 7d average", f"{m_bid.group(1)} != {m_avg.group(1)}")
+        ok(f"Bitfinex adds minus trims == net ({_a:,.0f} - {_t:,.0f} = {_n:+,.0f})")
 for lab in ("STH cost", "LTH cost", "350-week MA"):
     v = grab(rf"{lab} \$([\d,]+)")
     chip = re.search(rf"{lab} \$([\d,]+)", HTML)
