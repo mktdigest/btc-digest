@@ -205,6 +205,27 @@ def main():
         else:
             ok("sources table stacks on phones (all cells labelled, no pixel widths)")
 
+
+    # ---- the score gauge must agree with the number above it -------------------------------
+    # A marker that sits somewhere other than score/100, or a callout naming a different band
+    # than the chip beside the big number, is a rendered lie no numeric audit would catch.
+    _num = re.search(r'class="bignum">(\d+)<', html)
+    _mk = re.search(r'class="bgmark" style="left:([\d.]+)%"', html)
+    _chip = re.search(r'class="bzone2">([A-Z ]+)<', html)
+    _call = re.search(r'class="bgnote"[^>]*><b>([A-Z ]+) &middot; ([\d-]+)</b>', html)
+    if not (_num and _mk and _chip and _call):
+        errs.append("score gauge: bar, marker, zone chip or callout missing")
+    else:
+        _score, _pos, _chipname, (_callname, _span) = int(_num.group(1)), float(_mk.group(1)), _chip.group(1), (_call.group(1), _call.group(2))
+        if abs(_pos - _score) > 0.6:
+            errs.append(f"score gauge: marker sits at {_pos}% but the number is {_score}")
+        elif _chipname.strip() != _callname.strip():
+            errs.append(f"score gauge: chip says {_chipname}, callout says {_callname}")
+        elif not (_span.split("-")[0].isdigit() and int(_span.split("-")[0]) <= _score <= int(_span.split("-")[-1])):
+            errs.append(f"score gauge: {_score} is outside the band it claims ({_span})")
+        else:
+            ok(f"score gauge: marker at {_pos}% matches the {_score} above it, band {_span} contains it")
+
     # ---- report
     print()
     for m in oks:

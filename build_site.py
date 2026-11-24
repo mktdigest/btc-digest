@@ -13,7 +13,7 @@ import re
 import shutil
 import subprocess
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timezone, date
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
@@ -521,7 +521,7 @@ def render_blocks(lines):
         _tm = re.search(r"^(.*?) - ((?:live|T\+\d|daily|hourly|settled|provider lag ~\d+d|1d settled \+ live tape)"
                         r"(?:, data [^(]*\([^)]+\))?)$", title)
         if _tm:
-            _h3 = (f'{esc(_tm.group(1))}<span class="fresh">{esc(_tm.group(2))}</span>')
+            _h3 = (f'{esc(_tm.group(1))}<span class="fresh">{esc(recalc_age(_tm.group(2)))}</span>')
         else:
             _h3 = esc(title)
         out.append(f'<div class="card"><h3>{_h3}</h3>{gloss}{body_html}{extra}{more}</div>')
@@ -1016,6 +1016,29 @@ def block_heads(raw):
     return re.findall(r"^\[(\d+[a-z]?|\+)\]\s+(.+)$", raw, re.M)
 
 
+def recalc_age(tag):
+    """Recompute "data Nh old" at page build from the source stamp.
+
+    The digest writes its ages when it is generated; the page can be rebuilt hours later. Trusting
+    the written age would let the page claim a number is 8h old when it is 11h old. The stamp is
+    the source's own, so rebuilding the age from it is always true.
+    """
+    m = re.search(r"data (just now|\d+[hd] old|today) \((20\d{2}-\d{2}-\d{2})"
+                  r"(?: (\d{2}:\d{2}))?(?: UTC)?\)", tag)
+    if not m:
+        return tag
+    now = datetime.now(timezone.utc)
+    if m.group(3):
+        stamp = datetime.strptime(f"{m.group(2)} {m.group(3)}", "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+        hrs = (now - stamp).total_seconds() / 3600.0
+        human = ("just now" if hrs < 1 else
+                 f"{int(round(hrs))}h old" if hrs < 24 else f"{int(hrs // 24)}d old")
+    else:
+        days = (now.date() - date.fromisoformat(m.group(2))).days
+        human = "today" if days <= 0 else f"{days}d old"
+    return tag[:m.start(1)] + human + tag[m.end(1):]
+
+
 FRESH_TAG = re.compile(r" - ((?:live|T\+\d|daily|hourly|settled|provider lag ~\d+d|1d settled \+ live tape)"
                        r"(?:, data ([^(]*)\(([^)]+)\))?)$")
 
@@ -1032,7 +1055,7 @@ def fresh_table(heads):
         if not m:
             rows.append((num, title, '<span class="warn">no freshness tag</span>', "", ""))
             continue
-        tag, age, day = m.group(1), (m.group(2) or "").strip(), m.group(3) or ""
+        tag, age, day = recalc_age(m.group(1)), (m.group(2) or "").strip(), m.group(3) or ""
         cad = tag.split(", data")[0].strip()
         if day:
             as_of, how_old = day, (age or "current")
