@@ -49,7 +49,7 @@ def block(pattern: str):
 
 
 cmp("ETF 30d flow", tiles.get("ETF flows"), block(r"10d [-+]?\$[\d,]+\.\dM 30d ([-+]?\$[\d,]+\.\dM)"), 0.1)
-cmp("US premium live", tiles.get("US premium"), block(r"live (-?\d\.\d{3})% last close"), 0.001)
+cmp("US premium live", tiles.get("US premium"), block(r"live (-?\d\.\d{3})%.*?last close"), 0.001)
 cmp("Stablecoin total", tiles.get("Stablecoins"), block(r"USDT\+USDC combined \$([\d.]+)B"), 0.05)
 cmp("Fear & Greed", tiles.get("Fear &amp; Greed"), block(r"now (\d{1,3}) \("), 0)
 cmp("Open interest", tiles.get("Perp open interest"), block(r"OI \$([\d.]+)bn"), 0.01)

@@ -193,7 +193,9 @@ def main():
     if not _m:
         bad("sources table: table.srcs missing - the responsive rules apply to nothing")
     else:
-        _tbl = _m.group(0)
+        # every table.srcs must stack, not just the first one found
+        _all = re.findall(r"<table class=\"srcs\".*?</table>", html, re.S) or [_m.group(0)]
+        _tbl = "".join(_all)
         _nolabel = [t for t in re.findall(r"<td([^>]*)>", _tbl) if "data-label" not in t]
         _pxw = re.findall(r'width:\s*\d+px', _tbl)
         if _nolabel:
