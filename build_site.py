@@ -518,8 +518,8 @@ def render_blocks(lines):
         more = f'<p class="bdetail">{esc(ent[1])}</p>' if ent and ent[1] else ""
         if num:
             _LEGEND["seen"].add(num)
-        _tm = re.search(r"^(.*?) - ((?:live|T\+\d|daily|settled|provider lag ~\d+d|1d settled \+ live tape)"
-                        r"(?:, data [^(]*\([\d-]+\))?)$", title)
+        _tm = re.search(r"^(.*?) - ((?:live|T\+\d|daily|hourly|settled|provider lag ~\d+d|1d settled \+ live tape)"
+                        r"(?:, data [^(]*\([^)]+\))?)$", title)
         if _tm:
             _h3 = (f'{esc(_tm.group(1))}<span class="fresh">{esc(_tm.group(2))}</span>')
         else:
@@ -1016,8 +1016,8 @@ def block_heads(raw):
     return re.findall(r"^\[(\d+[a-z]?|\+)\]\s+(.+)$", raw, re.M)
 
 
-FRESH_TAG = re.compile(r" - ((?:live|T\+\d|daily|settled|provider lag ~\d+d|1d settled \+ live tape)"
-                       r"(?:, data ([^(]*)\(([\d-]+)\))?)$")
+FRESH_TAG = re.compile(r" - ((?:live|T\+\d|daily|hourly|settled|provider lag ~\d+d|1d settled \+ live tape)"
+                       r"(?:, data ([^(]*)\(([^)]+)\))?)$")
 
 
 def fresh_table(heads):
@@ -1045,8 +1045,10 @@ def fresh_table(heads):
     if not rows:
         return ""
     body = "".join(
-        f'<tr><td>[{n}] {esc(t)}</td><td class="blamon">{esc(c)}</td>'
-        f'<td class="blamon">{esc(d)}</td><td class="blamon">{esc(a)}</td></tr>'
+        f'<tr><td data-label="block">[{n}] {esc(t)}</td>'
+        f'<td class="blamon" data-label="publishes">{esc(c)}</td>'
+        f'<td class="blamon" data-label="data as of">{esc(d)}</td>'
+        f'<td class="blamon" data-label="age">{esc(a)}</td></tr>'
         for n, t, c, d, a in rows)
     return ('<div class="card"><h3 class="cardh">How fresh is each number</h3>'
             '<p class="bline">Every block heading carries the same two facts: how often that source '

@@ -16,7 +16,7 @@ Exit code 1 if any HARD check fails.
 """
 import hashlib
 import json
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 import re
 import statistics
 import sys
@@ -412,7 +412,7 @@ print()
 # printed age has to match the date it quotes.
 _raw = open(DIGEST).read()
 _heads = re.findall(r"^\[(\d+[a-z]?|\+)\]\s+(.+)$", _raw, re.M)
-_FRESH = re.compile(r" - (live|T\+\d|daily|settled|provider lag ~\d+d|1d settled \+ live tape)(, data .+)?$")
+_FRESH = re.compile(r" - (live|T\+\d|daily|hourly|settled|provider lag ~\d+d|1d settled \+ live tape)(, data .+)?$")
 _missing = [f"[{n}] {t[:44]}" for n, t in _heads if not _FRESH.search(t)]
 if _missing:
     fails.append(f"{len(_missing)} block headings carry no freshness tag: " + "; ".join(_missing[:5]))
@@ -421,11 +421,22 @@ else:
 
 _bad_age = []
 for _n, _t in _heads:
-    _m = re.search(r"data (\d+)d old \((20\d{2}-\d{2}-\d{2})\)", _t)
+    _m = re.search(r"data (\d+)([dh]) old \((20\d{2}-\d{2}-\d{2})(?: (\d{2}:\d{2}))? UTC?\)", _t)
     if _m:
-        _want = (date.today() - date.fromisoformat(_m.group(2))).days
-        if int(_m.group(1)) != _want:
-            _bad_age.append(f"[{_n}] says {_m.group(1)}d, {_m.group(2)} is {_want}d")
+        _num, _unit, _day, _hm = int(_m.group(1)), _m.group(2), _m.group(3), _m.group(4)
+        if _unit == "d":
+            _want = (date.today() - date.fromisoformat(_day)).days
+            if _num != _want:
+                _bad_age.append(f"[{_n}] says {_num}d, {_day} is {_want}d")
+        elif _hm:
+            _stamp = datetime.strptime(f"{_day} {_hm}", "%Y-%m-%d %H:%M").replace(tzinfo=timezone.utc)
+            _want = int((datetime.now(timezone.utc) - _stamp).total_seconds() // 3600)
+            if abs(_num - _want) > 1:
+                _bad_age.append(f"[{_n}] says {_num}h, {_day} {_hm} UTC is {_want}h")
+    elif "data today (" in _t:
+        _d2 = re.search(r"data today \((20\d{2}-\d{2}-\d{2})\)", _t)
+        if _d2 and _d2.group(1) != date.today().isoformat():
+            _bad_age.append(f"[{_n}] says today, stamp is {_d2.group(1)}")
 if _bad_age:
     fails.append("freshness age disagrees with its own date: " + "; ".join(_bad_age[:4]))
 elif any("data " in t for _n, t in _heads):
