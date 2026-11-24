@@ -76,6 +76,9 @@ h4{font-size:22px;font-weight:700;margin:0 0 10px;color:var(--accent)}
 p{color:#c9d1d9;margin:9px 0}
 p.note{color:var(--dim);font-size:16.5px;line-height:1.6;margin:var(--s2) 0 0}
 h3.cardh{font-size:22px;font-weight:700;margin:0 0 var(--s2);color:var(--accent)}
+/* how fresh a block's data is, in the same slot on every heading: cadence + age */
+h3 .fresh{font-size:15px;font-weight:600;color:#8b949e;letter-spacing:.01em;margin-left:10px;white-space:nowrap}
+@media(max-width:760px){h3 .fresh{display:block;margin:6px 0 0;white-space:normal}}
 h4.sub{font-size:18px;text-transform:uppercase;letter-spacing:.05em;color:#8b949e;
 margin:var(--s3) 0 var(--s1);font-weight:700}
 ol.steps{margin:var(--s2) 0 0;padding-left:22px;color:#c3ccd6;line-height:1.75;font-size:17px}
@@ -515,7 +518,13 @@ def render_blocks(lines):
         more = f'<p class="bdetail">{esc(ent[1])}</p>' if ent and ent[1] else ""
         if num:
             _LEGEND["seen"].add(num)
-        out.append(f'<div class="card"><h3>{esc(title)}</h3>{gloss}{body_html}{extra}{more}</div>')
+        _tm = re.search(r"^(.*?) - ((?:live|T\+\d|daily|settled|provider lag ~\d+d|1d settled \+ live tape)"
+                        r"(?:, data [^(]*\([\d-]+\))?)$", title)
+        if _tm:
+            _h3 = (f'{esc(_tm.group(1))}<span class="fresh">{esc(_tm.group(2))}</span>')
+        else:
+            _h3 = esc(title)
+        out.append(f'<div class="card"><h3>{_h3}</h3>{gloss}{body_html}{extra}{more}</div>')
     return "\n".join(out)
 
 
@@ -1007,6 +1016,50 @@ def block_heads(raw):
     return re.findall(r"^\[(\d+[a-z]?|\+)\]\s+(.+)$", raw, re.M)
 
 
+FRESH_TAG = re.compile(r" - ((?:live|T\+\d|daily|settled|provider lag ~\d+d|1d settled \+ live tape)"
+                       r"(?:, data ([^(]*)\(([\d-]+)\))?)$")
+
+
+def fresh_table(heads):
+    """One row per block: what its publish cadence is, and how old its newest datum is.
+
+    Built by parsing the same heading tags the blocks print, so this table cannot disagree with
+    the headings - if a tag is missing the row says so instead of inventing one.
+    """
+    rows = []
+    for num, title in heads:
+        m = FRESH_TAG.search(title)
+        if not m:
+            rows.append((num, title, '<span class="warn">no freshness tag</span>', "", ""))
+            continue
+        tag, age, day = m.group(1), (m.group(2) or "").strip(), m.group(3) or ""
+        cad = tag.split(", data")[0].strip()
+        if day:
+            as_of, how_old = day, (age or "current")
+        elif cad == "live":
+            as_of, how_old = "now", "live"
+        else:
+            # no date printed: say so rather than claiming the number is current
+            as_of, how_old = "not dated", "-"
+        rows.append((num, title[:m.start()], cad, as_of, how_old))
+    if not rows:
+        return ""
+    body = "".join(
+        f'<tr><td>[{n}] {esc(t)}</td><td class="blamon">{esc(c)}</td>'
+        f'<td class="blamon">{esc(d)}</td><td class="blamon">{esc(a)}</td></tr>'
+        for n, t, c, d, a in rows)
+    return ('<div class="card"><h3 class="cardh">How fresh is each number</h3>'
+            '<p class="bline">Every block heading carries the same two facts: how often that source '
+            'publishes, and how old its newest datum is. This is the same information collected in one '
+            'place, so you can see at a glance which numbers move during the day and which are a day '
+            'or a week behind.</p>'
+            '<table class="srcs"><thead><tr><th style="width:34%">block</th>'
+            '<th style="width:20%">publishes</th><th style="width:16%">data as of</th>'
+            '<th style="width:14%">age</th></tr></thead><tbody>' + body + '</tbody></table>'
+            '<p class="bnote">A block that prints no date shows the cadence only - the tag never '
+            'invents an age it cannot measure.</p></div>')
+
+
 def num_of(heads, prefix, default="?"):
     """The number the digest gave the block whose title starts with `prefix`."""
     for n, t in heads:
@@ -1301,6 +1354,8 @@ is the stance, not the tone of the wording:</p>
 </div>
 <p class="bnote">All blocks use settled daily closes unless a line says "live".</p>
 </div>
+
+{fresh_table(heads)}
 
 <div class="card">
 <h3 class="cardh">Divergence</h3>

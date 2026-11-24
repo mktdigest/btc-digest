@@ -16,7 +16,7 @@ Exit code 1 if any HARD check fails.
 """
 import hashlib
 import json
-from datetime import datetime
+from datetime import datetime, date
 import re
 import statistics
 import sys
@@ -246,7 +246,10 @@ check("L/S percentile vs recomputed", tile_pct, real_pct, tol=1)
 # ("below the normal band (2.18-3.16)"). The percentile phrasing lives in the sub-line above.
 _note = tiles["Longs per short"].get("note", "")
 m_lower = re.search(r"(\d+) of the last 30 daily readings were lower", _note)
-m_band = re.search(r"[Bb]elow (?:the )?normal band \(([\d.]+)-([\d.]+)\)", _note)
+# three phrasings exist - above / below / inside the band - so match the band itself, not the
+# direction word. The previous version only knew "below" and failed the moment the ratio sat
+# inside the range, which is the one state that carries no crowding claim at all.
+m_band = re.search(r"normal band \(([\d.]+)-([\d.]+)\)", _note)
 if m_lower:
     check("L/S 'N of 30 lower' vs recomputed",
           int(m_lower.group(1)), sum(1 for v in w if v <= w[-1]), tol=0)
@@ -403,6 +406,31 @@ except Exception:
     pass
 
 print()
+# --- every block heading must state how stale its own data is ------------------------------
+# The lag used to be documented in four headings out of sixteen, which is how a placeholder zero
+# ended up presented as today's ETF flow. A heading with no freshness tag is now a failure, and a
+# printed age has to match the date it quotes.
+_raw = open(DIGEST).read()
+_heads = re.findall(r"^\[(\d+[a-z]?|\+)\]\s+(.+)$", _raw, re.M)
+_FRESH = re.compile(r" - (live|T\+\d|daily|settled|provider lag ~\d+d|1d settled \+ live tape)(, data .+)?$")
+_missing = [f"[{n}] {t[:44]}" for n, t in _heads if not _FRESH.search(t)]
+if _missing:
+    fails.append(f"{len(_missing)} block headings carry no freshness tag: " + "; ".join(_missing[:5]))
+else:
+    oks.append(f"all {len(_heads)} block headings state their data freshness")
+
+_bad_age = []
+for _n, _t in _heads:
+    _m = re.search(r"data (\d+)d old \((20\d{2}-\d{2}-\d{2})\)", _t)
+    if _m:
+        _want = (date.today() - date.fromisoformat(_m.group(2))).days
+        if int(_m.group(1)) != _want:
+            _bad_age.append(f"[{_n}] says {_m.group(1)}d, {_m.group(2)} is {_want}d")
+if _bad_age:
+    fails.append("freshness age disagrees with its own date: " + "; ".join(_bad_age[:4]))
+elif any("data " in t for _n, t in _heads):
+    oks.append("freshness ages match the dates they quote")
+
 for o in oks:
     print(f"  PASS  {o}")
 for w in warns:

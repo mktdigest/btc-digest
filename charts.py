@@ -13,6 +13,7 @@ import os
 import re
 import statistics
 import urllib.request
+from datetime import date
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -381,8 +382,12 @@ def dual_chart(path, primary, secondary, title, days=None, log=True,
 
 
 def bars_chart(path, values, title, days=None, pad=(104, 26, 52, 44), pos=UP, neg=DN,
-               cum=False, unit="", cum_scale=1.0, deco=None, symmetric=True):
+               cum=False, unit="", cum_scale=1.0, deco=None, symmetric=True, pending=0):
+    # The cumulative line needs room for its own axis on the right, otherwise it is a shape with
+    # no scale - which is exactly how a -$4.3B cumulative read as a cliff to the -750 bar gridline.
     pl, pr, pt, pb = pad
+    if cum:
+        pr = max(pr, 84)
     img, d = _frame(title)
     x0, x1, y0, y1 = pl, W - pr, pt, H - pb
     if not values:
@@ -420,11 +425,38 @@ def bars_chart(path, values, title, days=None, pad=(104, 26, 52, 44), pos=UP, ne
             run.append(tot)
         cmin, cmax = min(run), max(run)
         cspan = (cmax - cmin) or 1
-        pts = [(_mapx(i, n, x0, x1), y1 - (y1 - y0) * 0.9 * ((v - cmin) / cspan) - (y1 - y0) * 0.05)
-               for i, v in enumerate(run)]
-        d.line(pts, fill=AMBER, width=3, joint="curve")
+
+        def _cyof(v):
+            return y1 - (y1 - y0) * 0.9 * ((v - cmin) / cspan) - (y1 - y0) * 0.05
+
+        pts = [(_mapx(i, n, x0, x1), _cyof(v)) for i, v in enumerate(run)]
+        # a trailing unpublished day is not a day of zero flow, so the line stops at the last
+        # published print instead of running flat through it
+        draw_pts = pts[:len(pts) - pending] if 0 < pending < len(pts) else pts
+        d.line(draw_pts, fill=AMBER, width=3, joint="curve")
+
+        # its own axis, so the line's position means something
+        for k in range(4):
+            val = cmin + cspan * k / 3.0
+            yy = _cyof(val)
+            d.line([(x1, yy), (x1 + 6, yy)], fill=AMBER)
+            d.text((x1 + 11, yy), _fmt(val * cum_scale), fill=AMBER, font=_font(14), anchor="lm")
         d.text((x1, 20), f"cumulative {_fmt(tot * cum_scale)}{unit}", fill=AMBER,
                 font=_font(17, True), anchor="ra")
+        if 0 < pending < len(pts):
+            px_, py_ = pts[len(pts) - pending]
+            d.ellipse([px_ - 5, py_ - 5, px_ + 5, py_ + 5], outline=AMBER, width=2)
+
+    # non-trading days: a tick on the baseline, so a flat stretch on the chart is explained by the
+    # chart rather than by a footnote
+    if days and len(days) == len(values):
+        for i, day in enumerate(days):
+            try:
+                if date.fromisoformat(day).weekday() >= 5:
+                    xx = _mapx(i, n, x0, x1)
+                    d.line([(xx, y1), (xx, y1 + 5)], fill=DIM, width=2)
+            except Exception:
+                continue
     _xaxis(d, days or [], x0, x1, y1)
     img.save(path)
     return True
@@ -1003,7 +1035,7 @@ def build_all(outdir, series_path, digest_text=None):
         ed = S.get("etf_days", [])
         p = os.path.join(outdir, "c_etf.png")
         if ef and bars_chart(p, ef[-60:], "US spot bitcoin ETF flows, $ per day",
-                             days=ed[-60:],
+                             days=ed[-60:], pending=int(S.get("etf_pending_days", 0) or 0),
                              cum=True, unit="", cum_scale=1e6):
             s5 = sum(ef[-5:]); s30 = sum(ef[-30:]); last = ef[-1]
             add("c_etf.png", "US spot ETF flows - are institutions buying?",
