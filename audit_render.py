@@ -185,6 +185,24 @@ def main():
         if not errs:
             ok(f"{len(info['bands'])} bands, all inside the 60-100 zone ({eps} episodes)")
 
+    # ---- the sources table must survive a phone ---------------------------------
+    # Four columns of prose: on a narrow viewport it has to stack into labelled rows. That only
+    # works if every cell carries its own label and no column keeps a pixel width - pixel widths
+    # on a fixed-layout table squeezed the prose column to a sliver and towered every row.
+    _m = re.search(r'<table class="srcs">.*?</table>', html, re.S)
+    if not _m:
+        bad("sources table: table.srcs missing - the responsive rules apply to nothing")
+    else:
+        _tbl = _m.group(0)
+        _nolabel = [t for t in re.findall(r"<td([^>]*)>", _tbl) if "data-label" not in t]
+        _pxw = re.findall(r'width:\s*\d+px', _tbl)
+        if _nolabel:
+            bad(f"sources table: {len(_nolabel)} cells have no data-label, so they cannot stack")
+        elif _pxw:
+            bad(f"sources table: {len(_pxw)} pixel column widths - use percentages for 390px")
+        else:
+            ok("sources table stacks on phones (all cells labelled, no pixel widths)")
+
     # ---- report
     print()
     for m in oks:
