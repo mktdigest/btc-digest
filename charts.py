@@ -1037,7 +1037,13 @@ def build_all(outdir, series_path, digest_text=None):
         if ef and bars_chart(p, ef[-60:], "US spot bitcoin ETF flows, $ per day",
                              days=ed[-60:], pending=int(S.get("etf_pending_days", 0) or 0),
                              cum=True, unit="", cum_scale=1e6):
-            s5 = sum(ef[-5:]); s30 = sum(ef[-30:]); last = ef[-1]
+            # the digest stores its own 5/10/30 sums so the card chip cannot drift from the
+            # block: recomputing here meant the two used different windows and "30d" meant 30
+            # calendar rows on one and the whole payload (31 rows) on the other
+            _sums = S.get("etf_sums") or {}
+            s5 = _sums.get("5", sum(ef[-5:]))
+            s30 = _sums.get("30", sum(ef[-30:]))
+            last = ef[-1]
             add("c_etf.png", "US spot ETF flows - are institutions buying?",
                 ([f"latest day not published yet", f"last 5 days {_usd(s5 / 1000)}",
                   f"last 30 days {_usd(s30 / 1000)}"] if abs(last) < 0.5 else
